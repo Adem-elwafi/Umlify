@@ -1,41 +1,101 @@
 <template>
-  <div class="canvas" @click="handleCanvasClick">
-    <Actor v-for="actor in actors" 
-          :key="actor.id" 
-          :position="actor.position" />
-    <UseCase v-for="useCase in useCases" 
-            :key="useCase.id" 
-            :position="useCase.position" />
-    <connector v-for="connection in connections" 
-              :key="connection.id" 
-              :start="connection.start" 
-              :end="connection.end" />
+  <div class="canvas">
+    <button @click="addActor">Add Actor</button>
+    <button @click="addUseCase">Add Use Case</button>
+
+    <div
+      v-for="element in elements"
+      :key="element.id"
+      :class="['uml-element', element.type]"
+      :style="{ left: element.x + 'px', top: element.y + 'px' }"
+      @mousedown="startDrag($event, element)"
+    >
+      {{ element.label }}
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { useDiagramStore } from '../composables/useDiagramStore'
-import Actor from './Actor.vue'
-import UseCase from './UseCase.vue'
-import connector from './connector.vue'
 
-const store = useDiagramStore()
-const actors = ref([])
-const useCases = ref([])
-const connections = ref([])
+const elements = ref([])
 
-const handleCanvasClick = (event) => {
-  // Handle canvas click events
-  console.log('Canvas clicked', event)
+function addActor() {
+  elements.value.push({
+    id: Date.now(),
+    type: 'actor',
+    label: 'New Actor',
+    x: 100,
+    y: 100
+  })
+}
+
+function addUseCase() {
+  elements.value.push({
+    id: Date.now(),
+    type: 'usecase',
+    label: 'New Use Case',
+    x: 200,
+    y: 200
+  })
+}
+
+let dragging = null
+
+function startDrag(event, element) {
+   dragging = element ; 
+
+  //see the position of our cursor  
+  const StartX = event.clientX ; 
+  const StartY = event.clientY ; 
+  const initialX = element.x ; 
+  const initialY = element.y ; 
+  const move = (e)=>{
+    const dx = e.clientX -StartX ; 
+    const dy = e.clientY - StartY ; 
+    
+    element.x = initialX + dx ; 
+    element.y = initialY + dy; 
+  }
+
+  
+
+  const stop = () => {
+    window.removeEventListener('mousemove', move)
+    window.removeEventListener('mouseup', stop)
+    dragging = null
+  }
+
+  window.addEventListener('mousemove', move)
+  window.addEventListener('mouseup', stop)
 }
 </script>
 
 <style scoped>
 .canvas {
-  width: 100%;
-  height: 100%;
-  background: #fafafa;
   position: relative;
+  width: 100%;
+  height: 600px;
+  border: 2px dashed #ccc;
+  margin-top: 1rem;
+  overflow: hidden;
+}
+
+.uml-element {
+  position: absolute;
+  padding: 8px 12px;
+  background: #f0f0f0;
+  border-radius: 6px;
+  cursor: grab;
+  user-select: none;
+}
+
+.actor {
+  border: 2px solid #007bff;
+}
+
+.usecase {
+  border: 2px solid #28a745;
+  border-radius: 50%;
 }
 </style>
