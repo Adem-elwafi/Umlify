@@ -1,49 +1,55 @@
 <template>
-  <div class="use-case" :style="positionStyle">
-    <div class="ellipse">
-      {{ title }}
-    </div>
+  <div
+    class="usecase"
+    :style="{ left: x + 'px', top: y + 'px' }"
+    @mousedown="startDrag"
+  >
+    {{ label }}
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-
 const props = defineProps({
-  position: {
-    type: Object,
-    required: true,
-    default: () => ({ x: 0, y: 0 })
-  },
-  title: {
-    type: String,
-    default: 'Use Case'
-  }
+  label: String,
+  x: Number,
+  y: Number,
+  onDrag: Function
 })
 
-const positionStyle = computed(() => ({
-  left: `${props.position.x}px`,
-  top: `${props.position.y}px`
-}))
+function startDrag(event) {
+  // Remember initial positions
+  const startX = event.clientX
+  const startY = event.clientY
+  const initialX = props.x
+  const initialY = props.y
+
+  const move = (e) => {
+    // Calculate how far we've moved
+    const dx = e.clientX - startX
+    const dy = e.clientY - startY
+    
+    // Update position based on initial position plus movement
+    props.onDrag(initialX + dx, initialY + dy)
+  }
+
+  const stop = () => {
+    window.removeEventListener('mousemove', move)
+    window.removeEventListener('mouseup', stop)
+  }
+
+  window.addEventListener('mousemove', move)
+  window.addEventListener('mouseup', stop)
+}
 </script>
 
 <style scoped>
-.use-case {
+.usecase {
   position: absolute;
-  cursor: move;
-}
-
-.ellipse {
-  width: 120px;
-  height: 60px;
-  background: white;
-  border: 2px solid #333;
-  border-radius: 60px / 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-  text-align: center;
-  font-size: 0.9rem;
+  padding: 8px 12px;
+  background: #eaffea;
+  border: 2px solid #28a745;
+  border-radius: 50%;
+  cursor: grab;
+  user-select: none;
 }
 </style>

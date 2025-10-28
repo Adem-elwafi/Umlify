@@ -3,21 +3,29 @@
     <button @click="addActor">Add Actor</button>
     <button @click="addUseCase">Add Use Case</button>
 
-    <div
-      v-for="element in elements"
-      :key="element.id"
-      :class="['uml-element', element.type]"
-      :style="{ left: element.x + 'px', top: element.y + 'px' }"
-      @mousedown="startDrag($event, element)"
-    >
-      {{ element.label }}
-    </div>
+    <template v-for="element in elements" :key="element.id">
+      <Actor
+        v-if="element.type === 'actor'"
+        :label="element.label"
+        :x="element.x"
+        :y="element.y"
+        :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
+      />
+      <UseCase
+        v-else-if="element.type === 'usecase'"
+        :label="element.label"
+        :x="element.x"
+        :y="element.y"
+        :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
+      />
+    </template>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-
+import Actor from './Actor.vue'
+import UseCase from './UseCase.vue'
 const elements = ref([])
 
 function addActor() {
@@ -40,34 +48,12 @@ function addUseCase() {
   })
 }
 
-let dragging = null
-
-function startDrag(event, element) {
-   dragging = element ; 
-
-  //see the position of our cursor  
-  const StartX = event.clientX ; 
-  const StartY = event.clientY ; 
-  const initialX = element.x ; 
-  const initialY = element.y ; 
-  const move = (e)=>{
-    const dx = e.clientX -StartX ; 
-    const dy = e.clientY - StartY ; 
-    
-    element.x = initialX + dx ; 
-    element.y = initialY + dy; 
+function updatePosition(id, newX, newY) {
+  const el = elements.value.find(e => e.id === id)
+  if (el) {
+    el.x = newX
+    el.y = newY
   }
-
-  
-
-  const stop = () => {
-    window.removeEventListener('mousemove', move)
-    window.removeEventListener('mouseup', stop)
-    dragging = null
-  }
-
-  window.addEventListener('mousemove', move)
-  window.addEventListener('mouseup', stop)
 }
 </script>
 
