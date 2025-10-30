@@ -23,17 +23,23 @@
       />
     </template>
 
-    <!-- Connectors -->
-    <Connector
-      v-for="(conn, index) in connections"
-      :key="index"
-      :from="getConnectionPoint(conn.from)"
-      :to="getConnectionPoint(conn.to)"
-    />
+        <!-- Connectors -->
+        <Connector
+          v-for="(conn, index) in connections"
+          :key="index"
+          :from="getConnectionPoint(conn.from)"
+          :to="getConnectionPoint(conn.to)"
+          :type="conn.type"
+        />
 
     <button @click="connectElements(elements[0]?.id, elements[1]?.id)" class="connect-btn">
       Connect First Two
     </button>
+<select v-model="selectedType">
+    <option value="association">Association</option>
+    <option value="include">Include</option>
+    <option value="extend">Extend</option>
+</select>
   </div>
 </template>  
 
@@ -42,7 +48,9 @@ import { ref } from 'vue'
 import Actor from './Actor.vue'
 import Connector from './Connector.vue'
 import UseCase from './UseCase.vue'
+
 const elements = ref([])
+const selectedType = ref('association')
 
 function addActor() {
   elements.value.push({
@@ -101,11 +109,16 @@ function getConnectionPoint(element) {
   return { x: element.x, y: element.y }
 }
 
+
 function connectElements(id1, id2) {
   const from = elements.value.find(e => e.id === id1)
   const to = elements.value.find(e => e.id === id2)
   if (from && to) {
-    connections.value.push({ from, to })
+    connections.value.push({
+      from,
+      to,
+      type: selectedType.value
+    })
   }
 }
 </script>

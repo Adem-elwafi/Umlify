@@ -7,15 +7,24 @@
       :y2="to.y"
       stroke="black"
       stroke-width="2"
-      stroke-dasharray="4"
     />
+    <text
+      :x="(from.x + to.x) / 2"
+      :y="(from.y + to.y) / 2 - 10"
+      font-size="12"
+      fill="black"
+      text-anchor="middle"
+    >
+      {{ type }}
+    </text>
   </svg>
 </template>
 
 <script setup>
 const props = defineProps({
-  from: Object, // { x, y }
-  to: Object    // { x, y }
+  from: Object,
+  to: Object,
+  type: String
 })
 </script>
 
@@ -26,7 +35,6 @@ const props = defineProps({
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none;
-  z-index: -1; /* Place lines behind elements */
+  pointer-events: none; /* let mouse events through to elements */
 }
 </style>
