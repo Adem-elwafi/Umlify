@@ -1,22 +1,34 @@
 <template>
   <div
-    class="usecase"
+    class="uml-element"
+    :class="['usecase', { selected }]"
     :style="{ left: x + 'px', top: y + 'px' }"
     @mousedown="startDrag"
+    @click.stop="handleClick"
   >
     {{ label }}
   </div>
 </template>
 
 <script setup>
+import { defineProps, defineEmits, ref } from 'vue'
 const props = defineProps({
   label: String,
   x: Number,
   y: Number,
-  onDrag: Function
+  onDrag: Function,
+  selected: { type: Boolean, default: false }
 })
+const emit = defineEmits(['click'])
+const dragging = ref(false)
+
+function handleClick() {
+  if (!dragging.value) emit('click')
+}
 
 function startDrag(event) {
+  // mark dragging so we don't trigger selection on mouseup click
+  dragging.value = true
   // Remember initial positions
   const startX = event.clientX
   const startY = event.clientY
@@ -35,6 +47,8 @@ function startDrag(event) {
   const stop = () => {
     window.removeEventListener('mousemove', move)
     window.removeEventListener('mouseup', stop)
+    // small delay to avoid immediate click after drag
+    setTimeout(() => { dragging.value = false }, 0)
   }
 
   window.addEventListener('mousemove', move)

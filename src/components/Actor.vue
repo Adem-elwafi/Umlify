@@ -1,24 +1,33 @@
 <template>
   <div
     class="actor"
+    :class="{ selected }"
     :style="{ left: x + 'px', top: y + 'px' }"
     @mousedown="startDrag"
+    @click.stop="handleClick"
   >
     {{ label }}
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 
 const props = defineProps({
   label: String,
   x: Number,
   y: Number,
-  onDrag: Function
+  onDrag: Function,
+  selected: { type: Boolean, default: false }
 })
+const emit = defineEmits(['click'])
 
 const dragging = ref(false)
+
+function handleClick() {
+  // Only emit click if we didn't just finish a drag
+  if (!dragging.value) emit('click')
+}
 
 function startDrag(event) {
   dragging.value = true
@@ -41,7 +50,8 @@ function startDrag(event) {
   const stop = () => {
     window.removeEventListener('mousemove', move)
     window.removeEventListener('mouseup', stop)
-    dragging.value = false
+    // small timeout to avoid immediate click firing in some browsers
+    setTimeout(() => { dragging.value = false }, 0)
   }
 
   window.addEventListener('mousemove', move)

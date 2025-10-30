@@ -1,26 +1,31 @@
-<template>
+<template >
   <div class="canvas">
     <button @click="addActor">Add Actor</button>
     <button @click="addUseCase">Add Use Case</button>
 
     <!-- Elements -->
     <template v-for="element in elements" :key="element.id">
-      <Actor
-        v-if="element.type === 'actor'"
-        :label="element.label"
-        :x="element.x"
-        :y="element.y"
-        :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
-        ref="elementRefs"
-      />
-      <UseCase
-        v-else-if="element.type === 'usecase'"
-        :label="element.label"
-        :x="element.x"
-        :y="element.y"
-        :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
-        ref="elementRefs"
-      />
+<Actor
+  v-if="element.type === 'actor'"
+  :key="element.id"
+  :label="element.label"
+  :x="element.x"
+  :y="element.y"
+  :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
+  :selected="selectedElements.includes(element.id)"
+  @click="selectElement(element.id)"
+/>
+<UseCase 
+  v-else-if="element.type === 'usecase'"
+  :key="element.id"
+  :label="element.label"
+  :x="element.x"
+  :y="element.y"
+  :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
+  :selected="selectedElements.includes(element.id)"
+  @click="selectElement(element.id)"
+/>
+
     </template>
 
         <!-- Connectors -->
@@ -51,7 +56,7 @@ import UseCase from './UseCase.vue'
 
 const elements = ref([])
 const selectedType = ref('association')
-
+const selectedElements = ref([])
 function addActor() {
   elements.value.push({
     id: Date.now(),
@@ -121,6 +126,20 @@ function connectElements(id1, id2) {
     })
   }
 }
+
+
+function selectElement(id) {
+  if (selectedElements.value.includes(id)) {
+    selectedElements.value = selectedElements.value.filter(e => e !== id)
+  } else {
+    selectedElements.value.push(id)
+    if (selectedElements.value.length === 2) {
+      connectElements(selectedElements.value[0], selectedElements.value[1])
+      selectedElements.value = []
+    }
+  }
+}
+
 </script>
 
 <style scoped>
@@ -149,5 +168,12 @@ function connectElements(id1, id2) {
 .usecase {
   border: 2px solid #28a745;
   border-radius: 50%;
+}
+
+/* highlight selected elements */
+.selected {
+  box-shadow: 0 0 10px rgba(0,123,255,0.65);
+  transform: translateZ(0) scale(1.02);
+  transition: box-shadow 0.12s ease, transform 0.12s ease;
 }
 </style>
