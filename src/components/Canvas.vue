@@ -1,58 +1,53 @@
-<template >
+<template>
   <div class="canvas">
-    <button @click="addActor">Add Actor</button>
-    <button @click="addUseCase">Add Use Case</button>
+
 
     <!-- Elements -->
-    <template v-for="element in elements" :key="element.id">
-<Actor
-  v-if="element.type === 'actor'"
-  :key="element.id"
-  :label="element.label"
-  :x="element.x"
-  :y="element.y"
-  :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
-  :selected="selectedElements.includes(element.id)"
-  @click="selectElement(element.id)"
-/>
-<UseCase 
-  v-else-if="element.type === 'usecase'"
-  :key="element.id"
-  :label="element.label"
-  :x="element.x"
-  :y="element.y"
-  :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
-  :selected="selectedElements.includes(element.id)"
-  @click="selectElement(element.id)"
-/>
+    <div v-for="element in elements" :key="element.id">
+      <Actor
+        v-if="element.type === 'actor'"
+        :label="element.label"
+        :x="element.x"
+        :y="element.y"
+        :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
+        :selected="selectedElements.includes(element.id)"
+        @click="selectElement(element.id)"
+      />
+      <UseCase 
+        v-else-if="element.type === 'usecase'"
+        :label="element.label"
+        :x="element.x"
+        :y="element.y"
+        :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
+        :selected="selectedElements.includes(element.id)"
+        @click="selectElement(element.id)"
+      />
+    </div>
 
-    </template>
-
-        <!-- Connectors -->
-        <Connector
-          v-for="(conn, index) in connections"
-          :key="index"
-          :from="getConnectionPoint(conn.from)"
-          :to="getConnectionPoint(conn.to)"
-          :type="conn.type"
-        />
-
-    <button @click="connectElements(elements[0]?.id, elements[1]?.id)" class="connect-btn">
-      Connect First Two
-    </button>
-<select v-model="selectedType">
-    <option value="association">Association</option>
-    <option value="include">Include</option>
-    <option value="extend">Extend</option>
-</select>
+    <Toolbar
+      v-model:selectedType="selectedType"
+      :onAddActor="addActor"
+      :onAddUseCase="addUseCase"
+      :onExport="exportDiagram"
+    />
+    
+    <!-- Connectors -->
+    <Connector
+      v-for="(conn, index) in connections"
+      :key="index"
+      :from="getConnectionPoint(conn.from)"
+      :to="getConnectionPoint(conn.to)"
+      :type="conn.type"
+    />
   </div>
-</template>  
+</template>
 
 <script setup>
 import { ref } from 'vue'
 import Actor from './Actor.vue'
 import Connector from './Connector.vue'
 import UseCase from './UseCase.vue'
+import Toolbar from './Toolbar.vue'
 
 const elements = ref([])
 const selectedType = ref('association')
@@ -138,6 +133,33 @@ function selectElement(id) {
       selectedElements.value = []
     }
   }
+}
+
+function exportDiagram() {
+  const data = {
+    elements: elements.value.map(e => ({
+      id: e.id,
+      type: e.type,
+      label: e.label,
+      x: e.x,
+      y: e.y
+    })),
+    connections: connections.value.map(c => ({
+      from: c.from.id,
+      to: c.to.id,
+      type: c.type
+    }))
+  }
+  const json = JSON.stringify(data, null, 2)
+  const blob = new Blob([json], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+
+  const link = document.createElement('a')
+  link.href = url
+  link.download = 'uml-diagram.json'
+  link.click()
+
+  URL.revokeObjectURL(url)
 }
 
 </script>

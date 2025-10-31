@@ -1,67 +1,41 @@
+<script setup>
+import { computed } from 'vue'
+
+defineProps({
+  selectedType: String,
+  onUpdateType: Function,
+  onAddActor: Function,
+  onAddUseCase: Function,
+  onExport: Function  
+})
+
+defineEmits(['update:selectedType'])
+</script>
+
 <template>
   <div class="toolbar">
-    <div class="tool-group">
-      <button @click="selectTool('actor')" :class="{ active: currentTool === 'actor' }">
-        Actor
-      </button>
-      <button @click="selectTool('useCase')" :class="{ active: currentTool === 'useCase' }">
-        Use Case
-      </button>
-      <button @click="selectTool('connector')" :class="{ active: currentTool === 'connector' }">
-        Connector
-      </button>
-    </div>
-    <div class="tool-group">
-      <button @click="exportDiagram">Export</button>
-    </div>
+    <button @click="onAddActor">Add Actor</button>
+    <button @click="onAddUseCase">Add Use Case</button>
+
+    <select 
+      :value="selectedType"
+      @change="$emit('update:selectedType', $event.target.value)"
+    >
+      <option value="association">Association</option>
+      <option value="include">Include</option>
+      <option value="extend">Extend</option>
+    </select>
+  <button @click="onExport">Export Diagram</button>
+    
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import { useDiagramStore } from '../composables/useDiagramStore'
-
-const store = useDiagramStore()
-const currentTool = ref('select')
-
-const selectTool = (tool) => {
-  currentTool.value = tool
-  // Update store with selected tool
-}
-
-const exportDiagram = () => {
-  // Trigger export panel
-}
-</script>
 
 <style scoped>
 .toolbar {
-  padding: 1rem;
-  background: #f5f5f5;
-  width: 200px;
-  height: 100%;
-}
-
-.tool-group {
-  margin-bottom: 1rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-button {
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  background: white;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-button.active {
-  background: #e0e0e0;
-}
-
-button:hover {
-  background: #f0f0f0;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
 }
 </style>
