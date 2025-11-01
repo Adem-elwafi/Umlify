@@ -1,15 +1,53 @@
 <script setup>
 import { computed } from 'vue'
 
-defineProps({
+const props = defineProps({
   selectedType: String,
   onUpdateType: Function,
   onAddActor: Function,
   onAddUseCase: Function,
-  onExport: Function  
+  onExport: Function, 
+  onImport: Function 
 })
 
-defineEmits(['update:selectedType'])
+const emit = defineEmits(['update:selectedType'])
+
+function handleImport(event) {
+  const file = event.target.files[0]
+  if (!file) return
+
+  if (!file.name.toLowerCase().endsWith('.json')) {
+    alert('Please select a JSON file')
+    event.target.value = '' // Reset the input
+    return
+  }
+
+  const reader = new FileReader()
+  reader.onload = () => {
+    try {
+      const content = reader.result
+      const parsed = JSON.parse(content)
+      
+      // Validate the imported data structure
+      if (!parsed.elements || !Array.isArray(parsed.elements) || 
+          !parsed.connections || !Array.isArray(parsed.connections)) {
+        throw new Error('Invalid diagram format')
+      }
+      
+      if (props.onImport) {
+        props.onImport(parsed)
+      }
+    } catch (err) {
+      alert('Invalid diagram file: ' + err.message)
+      event.target.value = '' // Reset the input
+    }
+  }
+  reader.onerror = () => {
+    alert('Error reading file')
+    event.target.value = '' // Reset the input
+  }
+  reader.readAsText(file)
+}
 </script>
 
 <template>
@@ -26,7 +64,7 @@ defineEmits(['update:selectedType'])
       <option value="extend">Extend</option>
     </select>
   <button @click="onExport">Export Diagram</button>
-    
+  <input type="file" @change="handleImport" accept=".jSON">
   </div>
 </template>
 

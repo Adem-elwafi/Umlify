@@ -23,12 +23,15 @@
         @click="selectElement(element.id)"
       />
     </div>
+  <button @click="connectElements"> add connections</button>
 
     <Toolbar
       v-model:selectedType="selectedType"
       :onAddActor="addActor"
       :onAddUseCase="addUseCase"
       :onExport="exportDiagram"
+      :onImport="importDiagram"
+
     />
     
     <!-- Connectors -->
@@ -160,6 +163,45 @@ function exportDiagram() {
   link.click()
 
   URL.revokeObjectURL(url)
+}
+
+function importDiagram(data) {
+  try {
+    // Clear existing elements and connections
+    elements.value = []
+    connections.value = []
+    
+    // Import elements first
+    elements.value = data.elements.map(e => ({
+      id: e.id || Date.now(), // Ensure we have an ID
+      type: e.type,
+      label: e.label || (e.type === 'actor' ? 'New Actor' : 'New Use Case'),
+      x: e.x || 100,
+      y: e.y || 100
+    }))
+
+    // Import connections after elements are loaded
+    // This ensures we can properly link the connections
+    connections.value = data.connections
+      .filter(c => {
+        // Only import connections where both elements exist
+        const fromExists = elements.value.some(e => e.id === c.from)
+        const toExists = elements.value.some(e => e.id === c.to)
+        return fromExists && toExists
+      })
+      .map(c => {
+        const from = elements.value.find(e => e.id === c.from)
+        const to = elements.value.find(e => e.id === c.to)
+        return {
+          from,
+          to,
+          type: c.type || 'association'
+        }
+      })
+  } catch (error) {
+    console.error('Error importing diagram:', error)
+    alert('Error importing diagram. Please check the file format.')
+  }
 }
 
 </script>
