@@ -7,7 +7,8 @@ const props = defineProps({
   onAddActor: Function,
   onAddUseCase: Function,
   onExport: Function, 
-  onImport: Function 
+  onImport: Function , 
+  onExportImage : Function 
 })
 
 const emit = defineEmits(['update:selectedType'])
@@ -64,6 +65,7 @@ function handleImport(event) {
       <option value="extend">Extend</option>
     </select>
   <button @click="onExport">Export Diagram</button>
+  <button @click="onExportImage">Export as Image</button>
   <input type="file" @change="handleImport" accept=".jSON">
   </div>
 </template>

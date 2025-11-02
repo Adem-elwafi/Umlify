@@ -1,9 +1,9 @@
 <template>
-  <div class="canvas">
+  <div id="uml-canvas" class="canvas">
 
 
     <!-- Elements -->
-    <div v-for="element in elements" :key="element.id">
+    <div v-for="element in elements"  :key="element.id">
       <Actor
         v-if="element.type === 'actor'"
         :label="element.label"
@@ -31,6 +31,7 @@
       :onAddUseCase="addUseCase"
       :onExport="exportDiagram"
       :onImport="importDiagram"
+      :onExportImage="exportAsImage" 
 
     />
     
@@ -51,6 +52,7 @@ import Actor from './Actor.vue'
 import Connector from './Connector.vue'
 import UseCase from './UseCase.vue'
 import Toolbar from './Toolbar.vue'
+import html2canvas from 'html2canvas' 
 
 const elements = ref([])
 const selectedType = ref('association')
@@ -204,6 +206,17 @@ function importDiagram(data) {
   }
 }
 
+function exportAsImage() {
+  const canvasElement = document.getElementById('uml-canvas')
+  if (!canvasElement) return
+
+  html2canvas(canvasElement).then(canvas => {
+    const link = document.createElement('a')
+    link.download = 'uml-diagram.png'
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+  })
+}
 </script>
 
 <style scoped>
