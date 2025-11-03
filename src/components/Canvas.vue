@@ -10,7 +10,7 @@
         :x="element.x"
         :y="element.y"
         :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
-        :selected="selectedElements.includes(element.id)"
+        :selected="selectedElements.includes(String(element.id))"
         @click="selectElement(element.id)"
       />
       <UseCase 
@@ -18,12 +18,12 @@
         :label="element.label"
         :x="element.x"
         :y="element.y"
-        :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
-        :selected="selectedElements.includes(element.id)"
+        :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"  
+        :selected="selectedElements.includes(String(element.id))"
         @click="selectElement(element.id)"
       />
     </div>
-  <button @click="connectElements"> add connections</button>
+  <!-- connection button removed; connections are created by selecting two elements -->
 
     <Toolbar
       v-model:selectedType="selectedType"
@@ -31,14 +31,15 @@
       :onAddUseCase="addUseCase"
       :onExport="exportDiagram"
       :onImport="importDiagram"
-      :onExportImage="exportAsImage" 
-
+      :onExportImage="exportAsImage"
+      :connectMode="connectMode"
+      :onToggleConnect="toggleConnectMode"
     />
     
     <!-- Connectors -->
     <Connector
       v-for="(conn, index) in connections"
-      :key="index"
+      :key="`${conn.from?.id || 'f'}-${conn.to?.id || 't'}-${index}`"
       :from="getConnectionPoint(conn.from)"
       :to="getConnectionPoint(conn.to)"
       :type="conn.type"
@@ -57,6 +58,15 @@ import html2canvas from 'html2canvas'
 const elements = ref([])
 const selectedType = ref('association')
 const selectedElements = ref([])
+const connectMode = ref(false)
+const connectFrom = ref(null)
+
+function toggleConnectMode() {
+  connectMode.value = !connectMode.value
+  connectFrom.value = null
+  selectedElements.value = []
+  console.log('connectMode set to', connectMode.value)
+}
 function addActor() {
   elements.value.push({
     id: Date.now(),
@@ -116,30 +126,61 @@ function getConnectionPoint(element) {
 
 
 function connectElements(id1, id2) {
-  const from = elements.value.find(e => e.id === id1)
-  const to = elements.value.find(e => e.id === id2)
+  console.log('connectElements called with', id1, id2)
+  // match by string to avoid number/string mismatch
+  const from = elements.value.find(e => String(e.id) === String(id1))
+  const to = elements.value.find(e => String(e.id) === String(id2))
+  console.log('found from, to:', from, to)
   if (from && to) {
     connections.value.push({
       from,
       to,
       type: selectedType.value
     })
+    console.log('connection created', connections.value[connections.value.length - 1])
+    return true
   }
+  console.warn('Could not create connection — missing element(s)')
+  return false
 }
 
 
 function selectElement(id) {
-  if (selectedElements.value.includes(id)) {
-    selectedElements.value = selectedElements.value.filter(e => e !== id)
-  } else {
-    selectedElements.value.push(id)
-    if (selectedElements.value.length === 2) {
-      connectElements(selectedElements.value[0], selectedElements.value[1])
-      selectedElements.value = []
+  const idStr = String(id)
+  console.log('selectElement called with', idStr, 'connectMode=', connectMode.value)
+
+  if (connectMode.value) {
+    if (!connectFrom.value) {
+      connectFrom.value = idStr
+      selectedElements.value = [idStr]
+      console.log('connectFrom set to', idStr)
+      return
     }
+
+    if (connectFrom.value === idStr) {
+      connectFrom.value = null
+      selectedElements.value = []
+      console.log('connectFrom cleared')
+      return
+    }
+
+    // attempt to create connection
+    connectElements(connectFrom.value, idStr)
+    connectFrom.value = null
+    selectedElements.value = []
+    console.log('connection attempt finished; connectFrom cleared')
+    return
+  }
+
+  // non-connect mode selection
+  if (selectedElements.value.includes(idStr)) {
+    selectedElements.value = selectedElements.value.filter(e => e !== idStr)
+  } else {
+    selectedElements.value.push(idStr)
+    // In non-connect mode we only toggle selection. Connections are
+    // created explicitly via Connect Mode to avoid accidental links.
   }
 }
-
 function exportDiagram() {
   const data = {
     elements: elements.value.map(e => ({

@@ -1,14 +1,26 @@
 <script setup>
 import { computed } from 'vue'
 
-const props = defineProps({
+const {
+  selectedType,
+  onUpdateType,
+  onAddActor,
+  onAddUseCase,
+  onExport,
+  onImport,
+  onExportImage,
+  connectMode,
+  onToggleConnect
+} = defineProps({
   selectedType: String,
   onUpdateType: Function,
   onAddActor: Function,
   onAddUseCase: Function,
   onExport: Function, 
   onImport: Function , 
-  onExportImage : Function 
+  onExportImage : Function,
+  connectMode: Boolean,
+  onToggleConnect: Function
 })
 
 const emit = defineEmits(['update:selectedType'])
@@ -35,8 +47,8 @@ function handleImport(event) {
         throw new Error('Invalid diagram format')
       }
       
-      if (props.onImport) {
-        props.onImport(parsed)
+      if (onImport) {
+        onImport(parsed)
       }
     } catch (err) {
       alert('Invalid diagram file: ' + err.message)
@@ -52,7 +64,7 @@ function handleImport(event) {
 </script>
 
 <template>
-  <div class="toolbar">
+  <div class="toolbar" >
     <button @click="onAddActor">Add Actor</button>
     <button @click="onAddUseCase">Add Use Case</button>
 
@@ -66,6 +78,12 @@ function handleImport(event) {
     </select>
   <button @click="onExport">Export Diagram</button>
   <button @click="onExportImage">Export as Image</button>
+  <button
+    :class="{ active: connectMode }"
+    @click="onToggleConnect && onToggleConnect()"
+  >
+    {{ connectMode ? 'Connect: ON' : 'Connect Mode' }}
+  </button>
   <input type="file" @change="handleImport" accept=".jSON">
   </div>
 </template>
@@ -77,5 +95,10 @@ function handleImport(event) {
   gap: 1rem;
   margin-bottom: 1rem;
   align-items: center;
+}
+
+.toolbar button.active {
+  border-color: #646cff;
+  box-shadow: 0 0 0 3px rgba(100,108,255,0.08);
 }
 </style>

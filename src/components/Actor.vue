@@ -4,7 +4,7 @@
     :class="{ selected }"
     :style="{ left: x + 'px', top: y + 'px' }"
     @mousedown="startDrag"
-    @click.stop="handleClick"
+    @mouseup="handleMouseUp"
   >
     {{ label }}
   </div>
@@ -23,10 +23,23 @@ const props = defineProps({
 const emit = defineEmits(['click'])
 
 const dragging = ref(false)
+const moved = ref(false)
 
 function handleClick() {
   // Only emit click if we didn't just finish a drag
-  if (!dragging.value) emit('click')
+  if (!dragging.value) {
+    console.log('Actor clicked, id?', props)
+    emit('click')
+  }
+}
+function handleMouseUp() {
+  // Only emit click if we didn't move the element (not a drag)
+  if (!moved.value) {
+    console.log('Actor clicked, props:', props)
+    emit('click')
+  }
+  // reset moved for next interaction
+  moved.value = false
 }
 
 function startDrag(event) {
@@ -42,6 +55,9 @@ function startDrag(event) {
     // Calculate how far we've moved
     const dx = e.clientX - startX
     const dy = e.clientY - startY
+    
+      // mark that we've moved enough to be a drag
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved.value = true
     
     // Update position based on initial position plus movement
     props.onDrag(initialX + dx, initialY + dy)
@@ -68,5 +84,12 @@ function startDrag(event) {
   border-radius: 6px;
   cursor: grab;
   user-select: none;
+}
+
+/* highlight selected elements */
+.selected {
+  box-shadow: 0 0 10px rgba(0,123,255,0.65);
+  transform: translateZ(0) scale(1.02);
+  transition: box-shadow 0.12s ease, transform 0.12s ease;
 }
 </style>
