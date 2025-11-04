@@ -1,79 +1,55 @@
+/* Global project stylesheet
+   Adds color variables (user palette) and small base rules so the whole app can use the same colors.
+   Palette: #001BB7 (dark), #0046FF (primary), #FF8040 (accent), #F5F1DC (cream)
+*/
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --c-primary-dark: #001BB7;
+  --c-primary: #0046FF;
+  --c-accent: #FF8040;
+  --c-cream: #F5F1DC;
+  --text-on-primary: #ffffff;
+  --muted: rgba(0,0,0,0.54);
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
+/* Reset / base */
+* { box-sizing: border-box; }
+html, body, #app { height: 100%; }
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(180deg, var(--c-cream), #ffffff);
+  color: #072059;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+/* Generic controls use the palette but remain subtle by default */
+button, input[type="button"], input[type="submit"] {
+  font: inherit;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  border-radius: 8px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  background: transparent;
 }
 
-.card {
-  padding: 2em;
+.btn-primary {
+  background: var(--c-primary);
+  color: var(--text-on-primary);
+  border-color: rgba(255,255,255,0.06);
 }
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+.btn-accent {
+  background: var(--c-accent);
+  color: #fff;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+select, input, textarea {
+  font: inherit;
 }
+
+/* Helpful utilities */
+.muted { color: var(--muted); }
+
+/* Keep this file small — components should still use scoped styles but can reference the variables above
+   to ensure color consistency across the project. */
