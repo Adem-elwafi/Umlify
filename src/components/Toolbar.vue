@@ -116,7 +116,7 @@ function handleImport(event) {
   gap: 14px;
   padding: 14px;
   align-items: stretch;
-  background: linear-gradient(180deg, var(--c-primary-dark, #001BB7) 0%, var(--c-primary, #0046FF) 100%);
+  background: rgba(0, 0, 0, 0.715);
   color: var(--c-cream);
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,8,40,0.55), inset 0 1px 0 rgba(255,255,255,0.02);
@@ -140,8 +140,8 @@ function handleImport(event) {
   border-radius: 10px;
   border: 1px solid rgba(0,0,0,0.08);
   /* Make buttons use the accent (orange) color requested by the user */
-  background: var(--c-accent, #FF8040);
-  color: #ffffff;
+  background: var(--c-cream) ;
+  color: #000000 o ;
   font-weight: 700;
   transition: transform .12s ease, box-shadow .12s ease, background-color .12s ease, filter .08s ease;
 }
@@ -159,7 +159,7 @@ function handleImport(event) {
 .toolbar .connect-button.active {
   border-color: var(--c-primary);
   box-shadow: 0 12px 34px rgba(0,70,255,0.22);
-  background: linear-gradient(180deg, var(--c-primary), var(--c-accent));
+  background: var(--c-accent);
   color: #fff;
 }
 
@@ -171,11 +171,41 @@ function handleImport(event) {
 
 
 .select {
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(245,241,220,0.08);
-  background: rgba(245,241,220,0.03);
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--c-accent);
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px auto;
+  padding-right: 32px;
+  transition: all 0.2s ease;
+}
+
+.select:hover {
+  background-color: var(--c-accent);
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.select:focus {
+  outline: none;
+  border-color: rgba(255,255,255,0.3);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.1);
+}
+
+.select option {
+  background-color: var(--c-primary);
   color: var(--c-cream);
+  padding: 8px;
+  font-weight: 600;
+
 }
 
 .file-btn {
@@ -184,9 +214,10 @@ function handleImport(event) {
   justify-content: center;
   padding: 8px 12px;
   border-radius: 10px;
-  background: rgba(245,241,220,0.02);
+  background: var(--c-accent);
   border: 1px dashed rgba(245,241,220,0.14);
-  color: var(--c-primary-dark);
+  color:white;
+  font-weight: bold;
   cursor: pointer;
 }
 

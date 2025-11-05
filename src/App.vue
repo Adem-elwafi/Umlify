@@ -1,6 +1,5 @@
 <template>
   <main>
-    <h1>Welcome to UMLify 🧠</h1>
     <Canvas />
   </main>
 </template>

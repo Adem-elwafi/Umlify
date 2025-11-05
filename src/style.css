@@ -19,8 +19,8 @@ body {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(180deg, var(--c-cream), #ffffff);
-  color: #072059;
+  background: linear-gradient(180deg, var(--c-primary), var(--c-primary-dark));
+  color: #072059 ; 
 }
 
 /* Generic controls use the palette but remain subtle by default */
@@ -53,3 +53,10 @@ select, input, textarea {
 
 /* Keep this file small — components should still use scoped styles but can reference the variables above
    to ensure color consistency across the project. */
+.pencil-cursor,
+.pencil-cursor * {
+  cursor: url("data:image/svg+xml;utf8,\
+  <svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'>\
+  <path fill='%23000' d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/>\
+  </svg>") 8 24, auto !important;
+}

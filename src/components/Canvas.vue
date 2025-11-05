@@ -1,29 +1,39 @@
 <template>
-  <div id="uml-canvas" class="canvas">
-
-
-    <!-- Elements -->
-    <div v-for="element in elements"  :key="element.id">
-      <Actor
-        v-if="element.type === 'actor'"
-        :label="element.label"
-        :x="element.x"
-        :y="element.y"
-        :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
-        :selected="selectedElements.includes(String(element.id))"
-        @click="selectElement(element.id)"
-      />
-      <UseCase 
-        v-else-if="element.type === 'usecase'"
-        :label="element.label"
-        :x="element.x"
-        :y="element.y"
-        :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"  
-        :selected="selectedElements.includes(String(element.id))"
-        @click="selectElement(element.id)"
+  <div id="uml-canvas" class="canvas-container" :class="{'pencil-cursor': connectMode}">
+    <div class="canvas">
+      <!-- Elements -->
+      <div class="elements-container">
+        <div v-for="element in elements" :key="element.id">
+          <Actor
+            v-if="element.type === 'actor'"
+            :label="element.label"
+            :x="element.x"
+            :y="element.y"
+            :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
+            :selected="selectedElements.includes(String(element.id))"
+            @click="selectElement(element.id)"
+            :class="{'pencil-cursor': connectMode}"
+          />
+          <UseCase 
+            v-else-if="element.type === 'usecase'"
+            :label="element.label"
+            :x="element.x"
+            :y="element.y"
+            :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"  
+            :selected="selectedElements.includes(String(element.id))"
+            @click="selectElement(element.id)"
+          />
+        </div>
+      </div>
+      <!-- Connectors -->
+      <Connector
+        v-for="(conn, index) in connections"
+        :key="`${conn.from?.id || 'f'}-${conn.to?.id || 't'}-${index}`"
+        :from="getConnectionPoint(conn.from)"
+        :to="getConnectionPoint(conn.to)"
+        :type="conn.type"
       />
     </div>
-  <!-- connection button removed; connections are created by selecting two elements -->
 
     <Toolbar
       v-model:selectedType="selectedType"
@@ -34,15 +44,6 @@
       :onExportImage="exportAsImage"
       :connectMode="connectMode"
       :onToggleConnect="toggleConnectMode"
-    />
-    
-    <!-- Connectors -->
-    <Connector
-      v-for="(conn, index) in connections"
-      :key="`${conn.from?.id || 'f'}-${conn.to?.id || 't'}-${index}`"
-      :from="getConnectionPoint(conn.from)"
-      :to="getConnectionPoint(conn.to)"
-      :type="conn.type"
     />
   </div>
 </template>
@@ -72,17 +73,18 @@ function addActor() {
     id: Date.now(),
     type: 'actor',
     label: 'New Actor',
-    x: 100,
+    x: 400,
     y: 100
   })
 }
 
 function addUseCase() {
+  let L =  prompt("enter use case name ")
   elements.value.push({
     id: Date.now(),
     type: 'usecase',
-    label: 'New Use Case',
-    x: 200,
+    label: L,
+    x: 500,
     y: 200
   })
 }
@@ -261,13 +263,28 @@ function exportAsImage() {
 </script>
 
 <style scoped>
-.canvas {
+.canvas-container {
+  width: 80%;
+  float: right;
+  margin-top: 1rem;
   position: relative;
+}
+
+.canvas {
   width: 100%;
   height: 600px;
   border: 2px dashed #ccc;
-  margin-top: 1rem;
+  position: relative;
   overflow: hidden;
+  background: white;
+  box-shadow: 0px 0px 3px var(--c-accent) inset;
+}
+
+.elements-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .uml-element {
