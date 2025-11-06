@@ -1,14 +1,27 @@
 /* Global project stylesheet
-   Adds color variables (user palette) and small base rules so the whole app can use the same colors.
-   Palette: #001BB7 (dark), #0046FF (primary), #FF8040 (accent), #F5F1DC (cream)
+   Modern color palette: Peachy beige, warm peach, teal, and dark teal
+   #F5E5E1 (soft beige), #F9B487 (warm peach), #427A76 (teal), #174143 (dark teal)
 */
 :root {
-  --c-primary-dark: #001BB7;
-  --c-primary: #0046FF;
-  --c-accent: #FF8040;
-  --c-cream: #F5F1DC;
-  --text-on-primary: #ffffff;
-  --muted: rgba(0,0,0,0.54);
+  --c-beige: #F5E5E1;
+  --c-beige-light: rgba(245, 229, 225, 0.6);
+  --c-beige-transparent: rgba(245, 229, 225, 0.85);
+  
+  --c-peach: #F9B487;
+  --c-peach-light: rgba(249, 180, 135, 0.7);
+  --c-peach-transparent: rgba(249, 180, 135, 0.15);
+  
+  --c-teal: #427A76;
+  --c-teal-light: rgba(66, 122, 118, 0.7);
+  --c-teal-transparent: rgba(66, 122, 118, 0.15);
+  
+  --c-dark-teal: #174143;
+  --c-dark-teal-transparent: rgba(23, 65, 67, 0.85);
+  
+  --text-primary: #174143;
+  --text-light: #427A76;
+  --text-on-dark: #F5E5E1;
+  --muted: rgba(23, 65, 67, 0.54);
 }
 
 /* Reset / base */
@@ -19,29 +32,45 @@ body {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(180deg, var(--c-primary), var(--c-primary-dark));
-  color: #072059 ; 
+  background: linear-gradient(135deg, #F5E5E1 0%, #e8d5cf 100%);
+  color: var(--text-primary);
 }
 
 /* Generic controls use the palette but remain subtle by default */
 button, input[type="button"], input[type="submit"] {
   font: inherit;
   cursor: pointer;
-  border-radius: 8px;
-  padding: 8px 10px;
-  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 10px 14px;
+  border: 2px solid transparent;
   background: transparent;
+  transition: all 0.2s ease;
 }
 
 .btn-primary {
-  background: var(--c-primary);
-  color: var(--text-on-primary);
-  border-color: rgba(255,255,255,0.06);
+  background: var(--c-teal);
+  color: var(--text-on-dark);
+  border-color: rgba(66, 122, 118, 0.3);
+  box-shadow: 0 4px 12px rgba(66, 122, 118, 0.2);
+}
+
+.btn-primary:hover {
+  background: #4d918c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(66, 122, 118, 0.3);
 }
 
 .btn-accent {
-  background: var(--c-accent);
-  color: #fff;
+  background: var(--c-peach);
+  color: var(--c-dark-teal);
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(249, 180, 135, 0.3);
+}
+
+.btn-accent:hover {
+  background: #fac49d;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249, 180, 135, 0.4);
 }
 
 select, input, textarea {
@@ -50,7 +79,41 @@ select, input, textarea {
 
 /* Helpful utilities */
 .muted { color: var(--muted); }
+.ConectingPointA{
+  background: black;
+  width: 10px; 
+  height: 10px; 
+  border-radius: 50%;
+  position: absolute;
+  right: -50px;
+  top: 20px;
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.2s ease;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.ConectingPointU{
+  background: black;
+  width: 10px; 
+  height: 10px; 
+  border-radius: 50%;
+  position: absolute;
+  left: -50px;
+  top: 20px;
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.2s ease;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
 
+.ConectingPointA:hover,
+.ConectingPointU:hover {
+  transform: scale(1.4);
+  background: var(--c-peach);
+  box-shadow: 0 0 12px rgba(249, 180, 135, 0.8);
+}
 /* Keep this file small — components should still use scoped styles but can reference the variables above
    to ensure color consistency across the project. */
 .pencil-cursor,

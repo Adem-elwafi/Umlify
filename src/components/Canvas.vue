@@ -3,7 +3,7 @@
     <div class="canvas">
       <!-- Elements -->
       <div class="elements-container">
-        <div v-for="element in elements" :key="element.id">
+        <div v-for="element in elements" :key="element.id" :data-element-id="element.id">
           <Actor
             v-if="element.type === 'actor'"
             :label="element.label"
@@ -12,6 +12,8 @@
             :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
             :selected="selectedElements.includes(String(element.id))"
             @click="selectElement(element.id)"
+            @connection-point-click="() => selectElement(element.id)"
+            @update:label="(newLabel) => updateLabel(element.id, newLabel)"
             :class="{'pencil-cursor': connectMode}"
           />
           <UseCase 
@@ -22,6 +24,8 @@
             :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"  
             :selected="selectedElements.includes(String(element.id))"
             @click="selectElement(element.id)"
+            @connection-point-click="() => selectElement(element.id)"
+            @update:label="(newLabel) => updateLabel(element.id, newLabel)"
           />
         </div>
       </div>
@@ -69,21 +73,23 @@ function toggleConnectMode() {
   console.log('connectMode set to', connectMode.value)
 }
 function addActor() {
+  let ActorTxt =  'Actor'
   elements.value.push({
     id: Date.now(),
     type: 'actor',
-    label: 'New Actor',
+    label: 'Actor',
     x: 400,
     y: 100
+
   })
 }
 
 function addUseCase() {
-  let L =  prompt("enter use case name ")
+  let UseCaseTxt = 'useCase' ; 
   elements.value.push({
     id: Date.now(),
     type: 'usecase',
-    label: L,
+    label: UseCaseTxt,
     x: 500,
     y: 200
   })
@@ -96,31 +102,42 @@ function updatePosition(id, newX, newY) {
     el.y = newY
   }
 }
+
+function updateLabel(id, newLabel) {
+  const el = elements.value.find(e => e.id === id)
+  if (el) {
+    el.label = newLabel
+  }
+}
 const connections = ref([])
 
 function getConnectionPoint(element) {
-  const padding = 8  // padding from CSS
-  const borderWidth = 2  // border width from CSS
+  // Try to find the actual DOM element and its connection point
+  const elementContainer = document.querySelector(`[data-element-id="${element.id}"]`)
+  if (elementContainer) {
+    const connectionPoint = elementContainer.querySelector('.ConectingPoint')
+    if (connectionPoint) {
+      const rect = connectionPoint.getBoundingClientRect()
+      const canvasRect = document.querySelector('.canvas').getBoundingClientRect()
+      
+      // Get the center of the connection point relative to the canvas
+      return {
+        x: rect.left - canvasRect.left + (rect.width / 2),
+        y: rect.top - canvasRect.top + (rect.height / 2)
+      }
+    }
+  }
   
+  // Fallback to estimated position if DOM query fails
   if (element.type === 'actor') {
-    // Get the center of the actor element
-    // Assuming average actor width is about 60px
-    const width = 60 + (padding * 2) + (borderWidth * 2)
-    const height = 40 + (padding * 2) + (borderWidth * 2)
-    
     return {
-      x: element.x + (width / 2),
-      y: element.y + (height / 2)
+      x: element.x + 98 + 50 + 7,
+      y: element.y + 20 + 7
     }
   } else if (element.type === 'usecase') {
-    // Get the center of the use case ellipse
-    // Assuming average use case width is about 80px
-    const width = 80 + (padding * 2) + (borderWidth * 2)
-    const height = 30 + (padding * 2) + (borderWidth * 2)
-    
     return {
-      x: element.x + (width / 2),
-      y: element.y + (height / 2)
+      x: element.x + 166 + 50 + 7,
+      y: element.y + 20 + 7
     }
   }
   return { x: element.x, y: element.y }
@@ -264,20 +281,28 @@ function exportAsImage() {
 
 <style scoped>
 .canvas-container {
-  width: 80%;
+  width: calc(100% - 260px);
   float: right;
-  margin-top: 1rem;
+  margin: 1.5rem;
+  margin-left: 0;
   position: relative;
 }
 
 .canvas {
   width: 100%;
-  height: 600px;
-  border: 2px dashed #ccc;
+  height: calc(100vh - 3rem);
+  border: 3px dashed var(--c-teal-light);
+  border-radius: 20px;
   position: relative;
   overflow: hidden;
-  background: white;
-  box-shadow: 0px 0px 3px var(--c-accent) inset;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.9) 0%, 
+    rgba(245, 229, 225, 0.7) 100%);
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 20px 60px rgba(23, 65, 67, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 0 40px rgba(249, 180, 135, 0.1);
 }
 
 .elements-container {
@@ -289,26 +314,29 @@ function exportAsImage() {
 
 .uml-element {
   position: absolute;
-  padding: 8px 12px;
-  background: #f0f0f0;
-  border-radius: 6px;
+  padding: 12px 16px;
+  background: rgba(245, 229, 225, 0.9);
+  border-radius: 12px;
   cursor: grab;
   user-select: none;
+  transition: all 0.2s ease;
 }
 
 .actor {
-  border: 2px solid #007bff;
+  border: 3px solid var(--c-teal);
 }
 
 .usecase {
-  border: 2px solid #28a745;
+  border: 3px solid var(--c-teal);
   border-radius: 50%;
 }
 
 /* highlight selected elements */
 .selected {
-  box-shadow: 0 0 10px rgba(0,123,255,0.65);
-  transform: translateZ(0) scale(1.02);
-  transition: box-shadow 0.12s ease, transform 0.12s ease;
+  box-shadow: 
+    0 0 30px rgba(249, 180, 135, 0.6),
+    0 12px 32px rgba(66, 122, 118, 0.35);
+  transform: translateZ(0) scale(1.05);
+  transition: all 0.2s ease;
 }
 </style>

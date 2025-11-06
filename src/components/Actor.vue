@@ -6,12 +6,19 @@
     @mousedown="startDrag"
     @mouseup="handleMouseUp"
   >
-    {{ label }}
+    <div 
+      class="ConectingPointA ConectingPoint" 
+      @mousedown.stop="handleConnectionPointClick"
+      @mouseup.stop="handleConnectionPointClick"
+    ></div>
+    
+    <input type="text" v-model="localLabel" @input="updateLabel">
+
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 const props = defineProps({
   label: String,
@@ -20,7 +27,23 @@ const props = defineProps({
   onDrag: Function,
   selected: { type: Boolean, default: false }
 })
-const emit = defineEmits(['click'])
+const emit = defineEmits(['click', 'update:label', 'connection-point-click'])
+
+const localLabel = ref(props.label || 'Actor')
+
+// Watch for external prop changes
+watch(() => props.label, (newLabel) => {
+  localLabel.value = newLabel
+})
+
+function updateLabel() {
+  emit('update:label', localLabel.value)
+}
+
+function handleConnectionPointClick(event) {
+  event.preventDefault()
+  emit('connection-point-click')
+}
 
 const dragging = ref(false)
 const moved = ref(false)
@@ -43,6 +66,11 @@ function handleMouseUp() {
 }
 
 function startDrag(event) {
+  // Don't start drag if clicking on input field
+  if (event.target.tagName === 'INPUT') {
+    return
+  }
+  
   dragging.value = true
   
   // Remember initial positions
@@ -78,18 +106,55 @@ function startDrag(event) {
 <style scoped>
 .actor {
   position: absolute;
-  padding: 8px 12px;
-  background: #e0f0ff;
-  border: 2px solid #007bff;
-  border-radius: 6px;
+  padding: 12px 16px;
+  background: var(--c-beige-transparent);
+  border: 3px solid var(--c-teal);
+  border-radius: 12px;
   cursor: grab;
   user-select: none;
+  backdrop-filter: blur(8px);
+  box-shadow: 
+    0 8px 24px rgba(66, 122, 118, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: all 0.2s ease;
+}
+
+.actor:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 32px rgba(66, 122, 118, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.actor input {
+  border: none;
+  background: transparent;
+  text-align: center;
+  width: 100%;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--c-dark-teal);
+  outline: none;
+  cursor: text;
+  padding: 4px;
+}
+
+.actor input:focus {
+  background: rgba(249, 180, 135, 0.2);
+  border-radius: 6px;
+  box-shadow: 0 0 0 2px rgba(249, 180, 135, 0.4);
 }
 
 /* highlight selected elements */
 .selected {
-  box-shadow: 0 0 10px rgba(0,123,255,0.65);
-  transform: translateZ(0) scale(1.02);
-  transition: box-shadow 0.12s ease, transform 0.12s ease;
+  border-color: var(--c-peach);
+  background: rgba(249, 180, 135, 0.25);
+  box-shadow: 
+    0 0 30px rgba(249, 180, 135, 0.6),
+    0 12px 32px rgba(66, 122, 118, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transform: translateZ(0) scale(1.05);
+  transition: all 0.2s ease;
 }
+
 </style>
