@@ -6,10 +6,26 @@
   @mousedown="startDrag"
   @mouseup="handleMouseUp"
   >
+    <!-- 4 Connection Points: top, bottom, left, right -->
     <div 
-      class="ConectingPointU ConectingPoint" 
-      @mousedown.stop="handleConnectionPointClick"
-      @mouseup.stop="handleConnectionPointClick"
+      class="ConectingPoint top" 
+      @mousedown.stop
+      @mouseup.stop="handleConnectionPointClick('top')"
+    ></div>
+    <div 
+      class="ConectingPoint bottom" 
+      @mousedown.stop
+      @mouseup.stop="handleConnectionPointClick('bottom')"
+    ></div>
+    <div 
+      class="ConectingPoint left" 
+      @mousedown.stop
+      @mouseup.stop="handleConnectionPointClick('left')"
+    ></div>
+    <div 
+      class="ConectingPoint right" 
+      @mousedown.stop
+      @mouseup.stop="handleConnectionPointClick('right')"
     ></div>
     
     <input type="text" v-model="localLabel" @input="updateLabel">
@@ -39,9 +55,8 @@ function updateLabel() {
   emit('update:label', localLabel.value)
 }
 
-function handleConnectionPointClick(event) {
-  event.preventDefault()
-  emit('connection-point-click')
+function handleConnectionPointClick(side) {
+  emit('connection-point-click', side)
 }
 
 const dragging = ref(false)

@@ -79,28 +79,14 @@ select, input, textarea {
 
 /* Helpful utilities */
 .muted { color: var(--muted); }
-.ConectingPointA{
+
+/* Connection points - 4 per element (top, bottom, left, right) */
+.ConectingPoint {
   background: black;
   width: 10px; 
   height: 10px; 
   border-radius: 50%;
   position: absolute;
-  right: -50px;
-  top: 20px;
-  cursor: pointer;
-  z-index: 100;
-  transition: all 0.2s ease;
-  border: 2px solid white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-.ConectingPointU{
-  background: black;
-  width: 10px; 
-  height: 10px; 
-  border-radius: 50%;
-  position: absolute;
-  left: -50px;
-  top: 20px;
   cursor: pointer;
   z-index: 100;
   transition: all 0.2s ease;
@@ -108,11 +94,60 @@ select, input, textarea {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.ConectingPointA:hover,
-.ConectingPointU:hover {
-  transform: scale(1.4);
+.ConectingPoint.top {
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.ConectingPoint.bottom {
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.ConectingPoint.left {
+  left: -7px;
+  top: 50%;  .ConectingPoint {
+    background: black;
+    width: 10px; 
+    height: 10px; 
+    border-radius: 50%;
+    position: absolute;
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.2s ease;
+    border: 2px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  transform: translateY(-50%);
+}
+
+.ConectingPoint.right {
+  right: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.ConectingPoint:hover {
   background: var(--c-peach);
   box-shadow: 0 0 12px rgba(249, 180, 135, 0.8);
+}
+
+.ConectingPoint.top:hover {
+  transform: translateX(-50%) scale(1.4);
+}
+
+.ConectingPoint.bottom:hover {
+  transform: translateX(-50%) scale(1.4);
+}
+
+.ConectingPoint.left:hover {
+  transform: translateY(-50%) scale(1.4);
+}
+
+.ConectingPoint.right:hover {
+  transform: translateY(-50%) scale(1.4);
 }
 /* Keep this file small — components should still use scoped styles but can reference the variables above
    to ensure color consistency across the project. */

@@ -12,7 +12,7 @@
             :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
             :selected="selectedElements.includes(String(element.id))"
             @click="selectElement(element.id)"
-            @connection-point-click="() => selectElement(element.id)"
+            @connection-point-click="(side) => handleConnectionPointClick(element.id, side)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
             :class="{'pencil-cursor': connectMode}"
           />
@@ -24,7 +24,7 @@
             :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"  
             :selected="selectedElements.includes(String(element.id))"
             @click="selectElement(element.id)"
-            @connection-point-click="() => selectElement(element.id)"
+            @connection-point-click="(side) => handleConnectionPointClick(element.id, side)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
           />
         </div>
@@ -33,8 +33,8 @@
       <Connector
         v-for="(conn, index) in connections"
         :key="`${conn.from?.id || 'f'}-${conn.to?.id || 't'}-${index}`"
-        :from="getConnectionPoint(conn.from)"
-        :to="getConnectionPoint(conn.to)"
+        :from="getConnectionPoint(conn.from, conn.fromSide)"
+        :to="getConnectionPoint(conn.to, conn.toSide)"
         :type="conn.type"
       />
     </div>
@@ -65,10 +65,12 @@ const selectedType = ref('association')
 const selectedElements = ref([])
 const connectMode = ref(false)
 const connectFrom = ref(null)
+const connectFromSide = ref(null)
 
 function toggleConnectMode() {
   connectMode.value = !connectMode.value
   connectFrom.value = null
+  connectFromSide.value = null
   selectedElements.value = []
   console.log('connectMode set to', connectMode.value)
 }
@@ -111,11 +113,11 @@ function updateLabel(id, newLabel) {
 }
 const connections = ref([])
 
-function getConnectionPoint(element) {
+function getConnectionPoint(element, side = 'right') {
   // Try to find the actual DOM element and its connection point
   const elementContainer = document.querySelector(`[data-element-id="${element.id}"]`)
   if (elementContainer) {
-    const connectionPoint = elementContainer.querySelector('.ConectingPoint')
+    const connectionPoint = elementContainer.querySelector(`.ConectingPoint.${side}`)
     if (connectionPoint) {
       const rect = connectionPoint.getBoundingClientRect()
       const canvasRect = document.querySelector('.canvas').getBoundingClientRect()
@@ -130,22 +132,32 @@ function getConnectionPoint(element) {
   
   // Fallback to estimated position if DOM query fails
   if (element.type === 'actor') {
-    return {
-      x: element.x + 98 + 50 + 7,
-      y: element.y + 20 + 7
+    const width = 98
+    const height = 50
+    const positions = {
+      top: { x: element.x + width / 2, y: element.y - 7 },
+      bottom: { x: element.x + width / 2, y: element.y + height + 7 },
+      left: { x: element.x - 7, y: element.y + height / 2 },
+      right: { x: element.x + width + 7, y: element.y + height / 2 }
     }
+    return positions[side] || positions.right
   } else if (element.type === 'usecase') {
-    return {
-      x: element.x + 166 + 50 + 7,
-      y: element.y + 20 + 7
+    const width = 166
+    const height = 60
+    const positions = {
+      top: { x: element.x + width / 2, y: element.y - 7 },
+      bottom: { x: element.x + width / 2, y: element.y + height + 7 },
+      left: { x: element.x - 7, y: element.y + height / 2 },
+      right: { x: element.x + width + 7, y: element.y + height / 2 }
     }
+    return positions[side] || positions.left
   }
   return { x: element.x, y: element.y }
 }
 
 
-function connectElements(id1, id2) {
-  console.log('connectElements called with', id1, id2)
+function connectElements(id1, id2, side1, side2) {
+  console.log('connectElements called with', id1, id2, side1, side2)
   // match by string to avoid number/string mismatch
   const from = elements.value.find(e => String(e.id) === String(id1))
   const to = elements.value.find(e => String(e.id) === String(id2))
@@ -154,6 +166,8 @@ function connectElements(id1, id2) {
     connections.value.push({
       from,
       to,
+      fromSide: side1,
+      toSide: side2,
       type: selectedType.value
     })
     console.log('connection created', connections.value[connections.value.length - 1])
@@ -164,30 +178,43 @@ function connectElements(id1, id2) {
 }
 
 
-function selectElement(id) {
+function handleConnectionPointClick(id, side) {
   const idStr = String(id)
-  console.log('selectElement called with', idStr, 'connectMode=', connectMode.value)
+  console.log('handleConnectionPointClick called with', idStr, side, 'connectMode=', connectMode.value)
 
   if (connectMode.value) {
     if (!connectFrom.value) {
       connectFrom.value = idStr
+      connectFromSide.value = side
       selectedElements.value = [idStr]
-      console.log('connectFrom set to', idStr)
+      console.log('connectFrom set to', idStr, 'side:', side)
       return
     }
 
     if (connectFrom.value === idStr) {
       connectFrom.value = null
+      connectFromSide.value = null
       selectedElements.value = []
       console.log('connectFrom cleared')
       return
     }
 
     // attempt to create connection
-    connectElements(connectFrom.value, idStr)
+    connectElements(connectFrom.value, idStr, connectFromSide.value, side)
     connectFrom.value = null
+    connectFromSide.value = null
     selectedElements.value = []
     console.log('connection attempt finished; connectFrom cleared')
+    return
+  }
+}
+
+function selectElement(id) {
+  const idStr = String(id)
+  console.log('selectElement called with', idStr, 'connectMode=', connectMode.value)
+
+  if (connectMode.value) {
+    // In connect mode, only connection points should work
     return
   }
 
@@ -212,6 +239,8 @@ function exportDiagram() {
     connections: connections.value.map(c => ({
       from: c.from.id,
       to: c.to.id,
+      fromSide: c.fromSide,
+      toSide: c.toSide,
       type: c.type
     }))
   }
@@ -257,6 +286,8 @@ function importDiagram(data) {
         return {
           from,
           to,
+          fromSide: c.fromSide || 'right',
+          toSide: c.toSide || 'left',
           type: c.type || 'association'
         }
       })
