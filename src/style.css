@@ -133,6 +133,10 @@ select, input, textarea {
   background: var(--c-peach);
   box-shadow: 0 0 12px rgba(249, 180, 135, 0.8);
 }
+.ConectingPoint.active{
+  background: var(--c-peach);
+  box-shadow: 0 0 12px rgba(249, 180, 135, 0.8);
+}
 
 .ConectingPoint.top:hover {
   transform: translateX(-50%) scale(1.4);

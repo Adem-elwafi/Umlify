@@ -1,8 +1,22 @@
 <template>
   <div id="uml-canvas" class="canvas-container" :class="{'pencil-cursor': connectMode}">
+    <!-- Zoom Controls -->
+    <div class="zoom-controls">
+      <button @click="zoomIn" class="zoom-btn" title="Zoom In">
+        <span>+</span>
+      </button>
+      <span class="zoom-level">{{ Math.round(zoomLevel * 100) }}%</span>
+      <button @click="zoomOut" class="zoom-btn" title="Zoom Out">
+        <span>−</span>
+      </button>
+      <button @click="resetZoom" class="zoom-btn reset-btn" title="Reset Zoom">
+        <span>⟲</span>
+      </button>
+    </div>
+    
     <div class="canvas">
       <!-- Elements -->
-      <div class="elements-container">
+      <div class="elements-container" :style="{ transform: `scale(${zoomLevel})`, transformOrigin: 'top left' }">
         <div v-for="element in elements" :key="element.id" :data-element-id="element.id">
           <Actor
             v-if="element.type === 'actor'"
@@ -66,6 +80,23 @@ const selectedElements = ref([])
 const connectMode = ref(false)
 const connectFrom = ref(null)
 const connectFromSide = ref(null)
+const zoomLevel = ref(1)
+
+function zoomIn() {
+  if (zoomLevel.value < 2) {
+    zoomLevel.value = Math.min(2, zoomLevel.value + 0.1)
+  }
+}
+
+function zoomOut() {
+  if (zoomLevel.value > 0.5) {
+    zoomLevel.value = Math.max(0.5, zoomLevel.value - 0.1)
+  }
+}
+
+function resetZoom() {
+  zoomLevel.value = 1
+}
 
 function toggleConnectMode() {
   connectMode.value = !connectMode.value
@@ -319,13 +350,66 @@ function exportAsImage() {
   position: relative;
 }
 
+.zoom-controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 8px 12px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(23, 65, 67, 0.15);
+  z-index: 10;
+  backdrop-filter: blur(10px);
+}
+
+.zoom-btn {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--c-teal);
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--c-teal);
+  transition: all 0.2s ease;
+}
+
+.zoom-btn:hover {
+  background: var(--c-teal);
+  color: white;
+  transform: scale(1.05);
+}
+
+.zoom-btn:active {
+  transform: scale(0.95);
+}
+
+.zoom-btn.reset-btn {
+  font-size: 18px;
+}
+
+.zoom-level {
+  min-width: 50px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--c-teal);
+  font-size: 14px;
+}
+
 .canvas {
   width: 100%;
   height: calc(100vh - 3rem);
   border: 3px dashed var(--c-teal-light);
   border-radius: 20px;
   position: relative;
-  overflow: hidden;
+  overflow: scroll;
   background: linear-gradient(135deg, 
     rgba(255, 255, 255, 0.9) 0%, 
     rgba(245, 229, 225, 0.7) 100%);
