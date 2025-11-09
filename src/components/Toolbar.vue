@@ -16,6 +16,7 @@ const {
   onUpdateType: Function,
   onAddActor: Function,
   onAddUseCase: Function,
+  onAddSystem: Function,
   onExport: Function, 
   onImport: Function , 
   onExportImage : Function,
@@ -66,6 +67,7 @@ function handleImport(event) {
 <template>
   <div class="toolbar" >
     <div class="toolbar-group">
+      <button class="action" @click="onAddSystem">Add System</button>
       <button class="action" @click="onAddActor">Add Actor</button>
       <button class="action" @click="onAddUseCase">Add Use Case</button>
     </div>

@@ -18,6 +18,15 @@
       <!-- Elements -->
       <div class="elements-container" :style="{ transform: `scale(${zoomLevel})`, transformOrigin: 'top left' }">
         <div v-for="element in elements" :key="element.id" :data-element-id="element.id">
+          <System
+            v-if="element.type === 'System'"
+            :label="element.label"
+            :x="element.x"
+            :y="element.y"
+            :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
+            :selected="selectedElements.includes(String(element.id))"
+            @click="selectElement(element.id)"
+          />
           <Actor
             v-if="element.type === 'actor'"
             :label="element.label"
@@ -57,6 +66,7 @@
       v-model:selectedType="selectedType"
       :onAddActor="addActor"
       :onAddUseCase="addUseCase"
+      :onAddSystem="AddSystem"
       :onExport="exportDiagram"
       :onImport="importDiagram"
       :onExportImage="exportAsImage"
@@ -69,10 +79,11 @@
 <script setup>
 import { ref } from 'vue'
 import Actor from './Actor.vue'
-import Connector from './Connector.vue'
+import Connector from './connector.vue'
 import UseCase from './UseCase.vue'
 import Toolbar from './Toolbar.vue'
 import html2canvas from 'html2canvas' 
+import System from './System.vue' 
 
 const elements = ref([])
 const selectedType = ref('association')
@@ -114,6 +125,15 @@ function addActor() {
     x: 400,
     y: 100
 
+  })
+}
+function AddSystem() {
+  elements.value.push({
+    id: Date.now(),
+    type: 'System',
+    label: 'System',
+    x: 500,
+    y: 200
   })
 }
 
