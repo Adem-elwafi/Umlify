@@ -1,11 +1,19 @@
 <template>
   <div
-    class="uml-element"
-    :class="['usecase', { selected }]"
-    :style="{ left: x + 'px', top: y + 'px' }"
+    class="uml-element element"
+    :class="['usecase', { selected, dragging, resizing }]"
+    :style="{ 
+      left: x + 'px', 
+      top: y + 'px',
+      width: width ? width + 'px' : 'auto',
+      height: height ? height + 'px' : 'auto'
+    }"
   @mousedown="startDrag"
   @mouseup="handleMouseUp"
   >
+    <!-- Resize handles (only show when selected) -->
+    <div v-if="selected" class="resize-handle bottom-right" @mousedown.stop="startResize"></div>
+    
     <!-- 4 Connection Points: top, bottom, left, right -->
     <div 
       class="ConectingPoint top" 
@@ -39,7 +47,10 @@ const props = defineProps({
   label: String,
   x: Number,
   y: Number,
+  width: Number,
+  height: Number,
   onDrag: Function,
+  onResize: Function,
   selected: { type: Boolean, default: false }
 })
 const emit = defineEmits(['click', 'update:label', 'connection-point-click'])
@@ -60,6 +71,7 @@ function handleConnectionPointClick(side) {
 }
 
 const dragging = ref(false)
+const resizing = ref(false)
 const moved = ref(false)
 
 function handleMouseUp() {
@@ -105,6 +117,38 @@ function startDrag(event) {
   window.addEventListener('mousemove', move)
   window.addEventListener('mouseup', stop)
 }
+
+function startResize(event) {
+  event.stopPropagation()
+  
+  resizing.value = true
+  
+  const startX = event.clientX
+  const startY = event.clientY
+  const initialWidth = props.width || 166
+  const initialHeight = props.height || 60
+
+  const resize = (e) => {
+    const dx = e.clientX - startX
+    const dy = e.clientY - startY
+    
+    const newWidth = Math.max(100, initialWidth + dx)
+    const newHeight = Math.max(50, initialHeight + dy)
+    
+    if (props.onResize) {
+      props.onResize(newWidth, newHeight)
+    }
+  }
+
+  const stopResize = () => {
+    window.removeEventListener('mousemove', resize)
+    window.removeEventListener('mouseup', stopResize)
+    setTimeout(() => { resizing.value = false }, 0)
+  }
+
+  window.addEventListener('mousemove', resize)
+  window.addEventListener('mouseup', stopResize)
+}
 </script>
 
 <style scoped>
@@ -120,11 +164,20 @@ function startDrag(event) {
   box-shadow: 
     0 8px 24px rgba(66, 122, 118, 0.3),
     inset 0 2px 8px rgba(255, 255, 255, 0.2);
-  transition: all 0.2s ease;
   min-width: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.usecase.dragging {
+  transition: none !important;
+  cursor: grabbing;
+}
+
+.usecase.resizing {
+  transition: none !important;
 }
 
 .usecase:hover {
@@ -163,5 +216,28 @@ function startDrag(event) {
     inset 0 2px 10px rgba(255, 255, 255, 0.3);
   transform: translateZ(0) scale(1.05);
   transition: all 0.2s ease;
+}
+
+/* Resize handle */
+.resize-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: var(--c-peach);
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  cursor: nwse-resize;
+  z-index: 10;
+}
+
+.resize-handle.bottom-right {
+  bottom: -6px;
+  right: -6px;
+}
+
+.resize-handle:hover {
+  background: var(--c-teal);
+  transform: scale(1.2);
 }
 </style>

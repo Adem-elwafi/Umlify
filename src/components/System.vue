@@ -1,11 +1,19 @@
 <template>
   <div
-    class="System"
-    :class="{ selected }"
-    :style="{ left: x + 'px', top: y + 'px' }"
+    class="System element"
+    :class="{ selected, dragging, resizing }"
+    :style="{ 
+      left: x + 'px', 
+      top: y + 'px',
+      width: width ? width + 'px' : '380px',
+      height: height ? height + 'px' : '560px'
+    }"
     @mousedown="startDrag"
     @mouseup="handleMouseUp"
   >
+    <!-- Resize handles (only show when selected) -->
+    <div v-if="selected" class="resize-handle bottom-right" @mousedown.stop="startResize"></div>
+    
     <!-- Title bar -->
     <div class="system-header" @mousedown.stop>
       <input
@@ -29,7 +37,10 @@ const props = defineProps({
   label: String,
   x: Number,
   y: Number,
+  width: Number,
+  height: Number,
   onDrag: Function,
+  onResize: Function,
   selected: { type: Boolean, default: false }
 })
 const emit = defineEmits(['click', 'update:label', 'connection-point-click'])
@@ -50,6 +61,7 @@ watch(localLabel, (val) => emit('update:label', val))
 
 
 const dragging = ref(false)
+const resizing = ref(false)
 const moved = ref(false)
 
 function handleClick() {
@@ -105,6 +117,38 @@ function startDrag(event) {
   window.addEventListener('mousemove', move)
   window.addEventListener('mouseup', stop)
 }
+
+function startResize(event) {
+  event.stopPropagation()
+  
+  resizing.value = true
+  
+  const startX = event.clientX
+  const startY = event.clientY
+  const initialWidth = props.width || 380
+  const initialHeight = props.height || 560
+
+  const resize = (e) => {
+    const dx = e.clientX - startX
+    const dy = e.clientY - startY
+    
+    const newWidth = Math.max(200, initialWidth + dx)
+    const newHeight = Math.max(200, initialHeight + dy)
+    
+    if (props.onResize) {
+      props.onResize(newWidth, newHeight)
+    }
+  }
+
+  const stopResize = () => {
+    window.removeEventListener('mousemove', resize)
+    window.removeEventListener('mouseup', stopResize)
+    setTimeout(() => { resizing.value = false }, 0)
+  }
+
+  window.addEventListener('mousemove', resize)
+  window.addEventListener('mouseup', stopResize)
+}
 </script>
 
 <style scoped>
@@ -120,12 +164,18 @@ function startDrag(event) {
   box-shadow: 
     0 8px 24px rgba(66, 122, 118, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  transition: all 0.2s ease;
-  /* Give the system a sensible visual size so it looks like a boundary */
-  width: 380px;
-  height: 560px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   /* Keep system behind other draggable elements */
   z-index: -1;
+}
+
+.System.dragging {
+  transition: none !important;
+  cursor: grabbing;
+}
+
+.System.resizing {
+  transition: none !important;
 }
 
 .System:hover {
@@ -184,6 +234,29 @@ function startDrag(event) {
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
   transform: translateZ(0) scale(1.05);
   transition: all 0.2s ease;
+}
+
+/* Resize handle */
+.resize-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: var(--c-peach);
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  cursor: nwse-resize;
+  z-index: 10;
+}
+
+.resize-handle.bottom-right {
+  bottom: -6px;
+  right: -6px;
+}
+
+.resize-handle:hover {
+  background: var(--c-teal);
+  transform: scale(1.2);
 }
 
 </style>

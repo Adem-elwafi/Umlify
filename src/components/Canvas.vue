@@ -23,16 +23,23 @@
             :label="element.label"
             :x="element.x"
             :y="element.y"
+            :width="element.width"
+            :height="element.height"
             :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
+            :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
             @click="selectElement(element.id)"
+            @update:label="(newLabel) => updateLabel(element.id, newLabel)"
           />
           <Actor
             v-if="element.type === 'actor'"
             :label="element.label"
             :x="element.x"
             :y="element.y"
+            :width="element.width"
+            :height="element.height"
             :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
+            :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
             @click="selectElement(element.id)"
             @connection-point-click="(side) => handleConnectionPointClick(element.id, side)"
@@ -44,7 +51,10 @@
             :label="element.label"
             :x="element.x"
             :y="element.y"
-            :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"  
+            :width="element.width"
+            :height="element.height"
+            :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
+            :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
             @click="selectElement(element.id)"
             @connection-point-click="(side) => handleConnectionPointClick(element.id, side)"
@@ -156,6 +166,14 @@ function updatePosition(id, newX, newY) {
   }
 }
 
+function updateSize(id, newWidth, newHeight) {
+  const el = elements.value.find(e => e.id === id)
+  if (el) {
+    el.width = newWidth
+    el.height = newHeight
+  }
+}
+
 function updateLabel(id, newLabel) {
   const el = elements.value.find(e => e.id === id)
   if (el) {
@@ -183,8 +201,8 @@ function getConnectionPoint(element, side = 'right') {
   
   // Fallback to estimated position if DOM query fails
   if (element.type === 'actor') {
-    const width = 98
-    const height = 50
+    const width = element.width || 98
+    const height = element.height || 50
     const positions = {
       top: { x: element.x + width / 2, y: element.y - 7 },
       bottom: { x: element.x + width / 2, y: element.y + height + 7 },
@@ -193,8 +211,8 @@ function getConnectionPoint(element, side = 'right') {
     }
     return positions[side] || positions.right
   } else if (element.type === 'usecase') {
-    const width = 166
-    const height = 60
+    const width = element.width || 166
+    const height = element.height || 60
     const positions = {
       top: { x: element.x + width / 2, y: element.y - 7 },
       bottom: { x: element.x + width / 2, y: element.y + height + 7 },
@@ -285,7 +303,9 @@ function exportDiagram() {
       type: e.type,
       label: e.label,
       x: e.x,
-      y: e.y
+      y: e.y,
+      width: e.width,
+      height: e.height
     })),
     connections: connections.value.map(c => ({
       from: c.from.id,
@@ -319,7 +339,9 @@ function importDiagram(data) {
       type: e.type,
       label: e.label || (e.type === 'actor' ? 'New Actor' : 'New Use Case'),
       x: e.x || 100,
-      y: e.y || 100
+      y: e.y || 100,
+      width: e.width,
+      height: e.height
     }))
 
     // Import connections after elements are loaded
@@ -368,6 +390,7 @@ function exportAsImage() {
   margin: 1.5rem;
   margin-left: 0;
   position: relative;
+
 }
 
 .zoom-controls {
