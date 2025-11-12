@@ -10,7 +10,7 @@
       :y1="from.y"
       :x2="to.x"
       :y2="to.y"
-      stroke="#427A76"
+      stroke="white"
       stroke-width="3"
       stroke-dasharray="5,5"
       filter="url(#shadow)"

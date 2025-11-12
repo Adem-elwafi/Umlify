@@ -5,12 +5,13 @@
 </template>
 
 <script setup>
+
 import Canvas from './components/Canvas.vue'
 </script>
 
 <style>
 main {
-  padding: 2rem;
+  padding:0;
   font-family: sans-serif;
 }
 </style>

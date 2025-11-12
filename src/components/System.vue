@@ -14,6 +14,9 @@
     <!-- Resize handles (only show when selected) -->
     <div v-if="selected" class="resize-handle bottom-right" @mousedown.stop="startResize"></div>
     
+    <!-- Delete button (shows when selected) -->
+    <button v-if="selected" class="delete-btn" @click.stop="emit('delete')" title="Delete">×</button>
+    
     <!-- Title bar -->
     <div class="system-header" @mousedown.stop>
       <input
@@ -43,7 +46,7 @@ const props = defineProps({
   onResize: Function,
   selected: { type: Boolean, default: false }
 })
-const emit = defineEmits(['click', 'update:label', 'connection-point-click'])
+const emit = defineEmits(['click', 'update:label', 'connection-point-click', 'delete'])
 
 // Local editable label synced with parent
 const localLabel = ref(props.label || 'System')
@@ -178,12 +181,6 @@ function startResize(event) {
   transition: none !important;
 }
 
-.System:hover {
-  transform: translateY(-2px);
-  box-shadow: 
-    0 12px 32px rgba(66, 122, 118, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
-}
 
 /* Header/title styles */
 .system-header {
@@ -257,6 +254,31 @@ function startResize(event) {
 .resize-handle:hover {
   background: var(--c-teal);
   transform: scale(1.2);
+}
+
+/* Delete button */
+.delete-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background: var(--c-peach);
+  color: white;
+  font-weight: 700;
+  line-height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  cursor: pointer;
+  z-index: 20; /* above header */
+}
+
+.delete-btn:hover {
+  background: var(--c-teal);
 }
 
 </style>

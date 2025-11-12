@@ -32,6 +32,7 @@ const showExport = ref(false)
 .canvas {
   grid-column: 2;
   overflow: auto;
+
 }
 
 .export-panel {

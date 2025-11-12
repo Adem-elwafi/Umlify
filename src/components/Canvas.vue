@@ -11,10 +11,12 @@
       </button>
       <button @click="resetZoom" class="zoom-btn reset-btn" title="Reset Zoom">
         <span>⟲</span>
+
       </button>
     </div>
     
     <div class="canvas">
+
       <!-- Elements -->
       <div class="elements-container" :style="{ transform: `scale(${zoomLevel})`, transformOrigin: 'top left' }">
         <div v-for="element in elements" :key="element.id" :data-element-id="element.id">
@@ -29,6 +31,7 @@
             :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
             @click="selectElement(element.id)"
+            @delete="deleteElement(element.id)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
           />
           <Actor
@@ -45,6 +48,7 @@
             @connection-point-click="(side) => handleConnectionPointClick(element.id, side)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
             :class="{'pencil-cursor': connectMode}"
+            @delete="deleteElement(element.id)"
           />
           <UseCase 
             v-else-if="element.type === 'usecase'"
@@ -59,6 +63,7 @@
             @click="selectElement(element.id)"
             @connection-point-click="(side) => handleConnectionPointClick(element.id, side)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
+            @delete="deleteElement(element.id)"
           />
         </div>
       </div>
@@ -87,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import Actor from './Actor.vue'
 import Connector from './connector.vue'
 import UseCase from './UseCase.vue'
@@ -157,7 +162,6 @@ function addUseCase() {
     y: 200
   })
 }
-
 function updatePosition(id, newX, newY) {
   const el = elements.value.find(e => e.id === id)
   if (el) {
@@ -296,6 +300,39 @@ function selectElement(id) {
     // created explicitly via Connect Mode to avoid accidental links.
   }
 }
+
+// Delete logic
+function deleteElement(id) {
+  const idStr = String(id)
+  // Remove element
+  elements.value = elements.value.filter(e => String(e.id) !== idStr)
+  // Remove any connections touching this element
+  connections.value = connections.value.filter(c => String(c.from?.id) !== idStr && String(c.to?.id) !== idStr)
+  // Clear selection and pending connect state if affected
+  selectedElements.value = selectedElements.value.filter(e => e !== idStr)
+  if (connectFrom.value === idStr) {
+    connectFrom.value = null
+    connectFromSide.value = null
+  }
+}
+
+// Optional: keyboard Delete/Backspace to remove selected elements (unless typing)
+function handleKeydown(e) {
+  const active = document.activeElement
+  const isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)
+  if (isTyping) return
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    const toDelete = [...selectedElements.value]
+    toDelete.forEach(id => deleteElement(id))
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
 function exportDiagram() {
   const data = {
     elements: elements.value.map(e => ({
@@ -385,10 +422,10 @@ function exportAsImage() {
 
 <style scoped>
 .canvas-container {
-  width: calc(100% - 260px);
+  width: calc(100% - 350px);
   float: right;
   margin: 1.5rem;
-  margin-left: 0;
+  margin-right: clamp(70px ,70px,30px);
   position: relative;
 
 }
@@ -449,18 +486,38 @@ function exportAsImage() {
 .canvas {
   width: 100%;
   height: calc(100vh - 3rem);
-  border: 3px dashed var(--c-teal-light);
+  border: 4px dashed white ;
   border-radius: 20px;
   position: relative;
-  overflow: scroll;
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.9) 0%, 
-    rgba(245, 229, 225, 0.7) 100%);
+  overflow: auto;
+  background: var(--c-teal);
   backdrop-filter: blur(10px);
   box-shadow: 
     0 20px 60px rgba(23, 65, 67, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.8),
     inset 0 0 40px rgba(249, 180, 135, 0.1);
+  /* Custom Scrollbar Styles */
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-teal) #fef3e5;
+  /* Webkit Scrollbar Customization inside .canvas selector for scoped CSS */
+}
+
+/* Webkit Scrollbar Customization */
+.canvas::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+.canvas::-webkit-scrollbar-track {
+  background: #fef3e5;
+  border-radius: 10px;
+}
+.canvas::-webkit-scrollbar-thumb {
+  background: var(--c-teal);
+  border-radius: 10px;
+  border: 2px solid #fef3e5;
+}
+.canvas::-webkit-scrollbar-thumb:hover {
+  background: var(--c-teal-light);
 }
 
 .elements-container {
@@ -468,6 +525,8 @@ function exportAsImage() {
   inset: 0;
   width: 100%;
   height: 100%;
+  background:var(--c-teal);
+
 }
 
 .uml-element {
