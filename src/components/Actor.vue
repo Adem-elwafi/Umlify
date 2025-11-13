@@ -15,7 +15,14 @@
     <div v-if="selected" class="resize-handle bottom-right" @mousedown.stop="startResize"></div>
     
     <!-- Delete button (shows when selected) -->
-    <button v-if="selected" class="delete-btn" @click.stop="emit('delete')" title="Delete">
+    <button
+      v-if="selected"
+      class="delete-btn"
+      @mousedown.stop
+      @mouseup.stop
+      @click.stop="emit('delete')"
+      title="Delete"
+    >
       ×
     </button>
     
@@ -271,6 +278,7 @@ function startResize(event) {
   justify-content: center;
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
   cursor: pointer;
+  z-index: 20;
 }
 
 .delete-btn:hover {

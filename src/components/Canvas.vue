@@ -15,7 +15,7 @@
       </button>
     </div>
     
-    <div class="canvas">
+    <div class="canvas" @click.self="clearSelectedConnection">
 
       <!-- Elements -->
       <div class="elements-container" :style="{ transform: `scale(${zoomLevel})`, transformOrigin: 'top left' }">
@@ -69,12 +69,30 @@
       </div>
       <!-- Connectors -->
       <Connector
-        v-for="(conn, index) in connections"
-        :key="`${conn.from?.id || 'f'}-${conn.to?.id || 't'}-${index}`"
+        v-for="conn in connections"
+        :key="conn.id || `${conn.from?.id}-${conn.to?.id}`"
         :from="getConnectionPoint(conn.from, conn.fromSide)"
         :to="getConnectionPoint(conn.to, conn.toSide)"
         :type="conn.type"
       />
+
+      <!-- Connection edit anchors at midpoints -->
+      <div
+        v-for="conn in connections"
+        :key="`anchor-${conn.id || `${conn.from?.id}-${conn.to?.id}`}`"
+        class="conn-edit-anchor"
+        :style="getMidpointStyle(conn)"
+      >
+        <button class="conn-dot" title="Edit connection type" @click.stop="selectConnection(conn.id)">•</button>
+      </div>
+
+      <!-- Connection type editor (appears at selected connection midpoint) -->
+      <div v-if="selectedConnection" class="conn-editor" :style="getMidpointStyle(selectedConnection)" @click.stop>
+        <select class="conn-select" :value="selectedConnection.type" @change="e => changeSelectedConnectionType(e.target.value)">
+          <option v-for="t in connectionTypes" :key="t" :value="t">{{ t }}</option>
+        </select>
+        <button class="conn-close" @click="clearSelectedConnection" title="Close">✕</button>
+      </div>
     </div>
 
     <Toolbar
@@ -92,7 +110,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import Actor from './Actor.vue'
 import Connector from './connector.vue'
 import UseCase from './UseCase.vue'
@@ -107,6 +125,22 @@ const connectMode = ref(false)
 const connectFrom = ref(null)
 const connectFromSide = ref(null)
 const zoomLevel = ref(1)
+
+// Helper to generate ids (string ids to avoid type mismatch)
+const makeId = () => (crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`)
+
+// Connection types available for editing
+const connectionTypes = ['association', 'include', 'extend', 'generalization', 'dependency']
+
+// Selected connection for inline type editor
+const selectedConnectionId = ref(null)
+const selectedConnection = computed(() => connections.value.find(c => c.id === selectedConnectionId.value) || null)
+function selectConnection(id) {
+  selectedConnectionId.value = id
+}
+function clearSelectedConnection() {
+  selectedConnectionId.value = null
+}
 
 function zoomIn() {
   if (zoomLevel.value < 2) {
@@ -228,6 +262,20 @@ function getConnectionPoint(element, side = 'right') {
   return { x: element.x, y: element.y }
 }
 
+// Compute midpoint style for connection overlays
+function getMidpointStyle(conn) {
+  const fromPt = getConnectionPoint(conn.from, conn.fromSide)
+  const toPt = getConnectionPoint(conn.to, conn.toSide)
+  const midX = (fromPt.x + toPt.x) / 2
+  const midY = (fromPt.y + toPt.y) / 2
+  return { left: `${midX}px`, top: `${midY}px` }
+}
+
+function changeSelectedConnectionType(newType) {
+  if (!selectedConnection.value) return
+  selectedConnection.value.type = newType
+}
+
 
 function connectElements(id1, id2, side1, side2) {
   console.log('connectElements called with', id1, id2, side1, side2)
@@ -237,6 +285,7 @@ function connectElements(id1, id2, side1, side2) {
   console.log('found from, to:', from, to)
   if (from && to) {
     connections.value.push({
+      id: makeId(),
       from,
       to,
       fromSide: side1,
@@ -308,6 +357,10 @@ function deleteElement(id) {
   elements.value = elements.value.filter(e => String(e.id) !== idStr)
   // Remove any connections touching this element
   connections.value = connections.value.filter(c => String(c.from?.id) !== idStr && String(c.to?.id) !== idStr)
+  // If the selected connection was removed, clear selection
+  if (selectedConnectionId.value && !connections.value.some(c => c.id === selectedConnectionId.value)) {
+    selectedConnectionId.value = null
+  }
   // Clear selection and pending connect state if affected
   selectedElements.value = selectedElements.value.filter(e => e !== idStr)
   if (connectFrom.value === idStr) {
@@ -345,6 +398,7 @@ function exportDiagram() {
       height: e.height
     })),
     connections: connections.value.map(c => ({
+      id: c.id,
       from: c.from.id,
       to: c.to.id,
       fromSide: c.fromSide,
@@ -394,6 +448,7 @@ function importDiagram(data) {
         const from = elements.value.find(e => e.id === c.from)
         const to = elements.value.find(e => e.id === c.to)
         return {
+          id: String(c.id || makeId()),
           from,
           to,
           fromSide: c.fromSide || 'right',
@@ -555,5 +610,72 @@ function exportAsImage() {
     0 12px 32px rgba(66, 122, 118, 0.35);
   transform: translateZ(0) scale(1.05);
   transition: all 0.2s ease;
+}
+
+/* Connection edit UI */
+.conn-edit-anchor {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.conn-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background: var(--c-peach);
+  color: white;
+  line-height: 12px;
+  font-size: 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(23, 65, 67, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .15s ease, background .15s ease;
+}
+.conn-dot:hover {
+  background: var(--c-teal);
+  transform: scale(1.1);
+}
+
+.conn-editor {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 10px));
+  background: white;
+  border: 1px solid rgba(23,65,67,0.15);
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(23,65,67,0.2);
+  padding: 6px 8px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  z-index: 6;
+}
+
+.conn-select {
+  appearance: none;
+  border: 2px solid var(--c-teal);
+  border-radius: 8px;
+  padding: 4px 8px;
+  background: white;
+  color: var(--c-teal);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.conn-close {
+  border: none;
+  background: transparent;
+  color: var(--c-teal);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.conn-close:hover {
+  background: rgba(23,65,67,0.08);
 }
 </style>

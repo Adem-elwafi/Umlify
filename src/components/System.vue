@@ -15,7 +15,14 @@
     <div v-if="selected" class="resize-handle bottom-right" @mousedown.stop="startResize"></div>
     
     <!-- Delete button (shows when selected) -->
-    <button v-if="selected" class="delete-btn" @click.stop="emit('delete')" title="Delete">×</button>
+    <button
+      v-if="selected"
+      class="delete-btn"
+      @mousedown.stop
+      @mouseup.stop
+      @click.stop="emit('delete')"
+      title="Delete"
+    >×</button>
     
     <!-- Title bar -->
     <div class="system-header" @mousedown.stop>
