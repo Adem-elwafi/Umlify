@@ -15,7 +15,19 @@
       </button>
     </div>
     
-    <div class="canvas" @click.self="clearSelectedConnection">
+    <div class="canvas" @click.self="clearSelectedConnection" @mousedown="handleCanvasMouseDown">
+
+      <!-- Selection box visualization -->
+      <div 
+        v-if="isSelecting"
+        class="selection-box"
+        :style="{
+          left: Math.min(selectionBox.startX, selectionBox.currentX) + 'px',
+          top: Math.min(selectionBox.startY, selectionBox.currentY) + 'px',
+          width: Math.abs(selectionBox.currentX - selectionBox.startX) + 'px',
+          height: Math.abs(selectionBox.currentY - selectionBox.startY) + 'px'
+        }"
+      />
 
       <!-- Elements -->
       <div class="elements-container" :style="{ transform: `scale(${zoomLevel})`, transformOrigin: 'top left' }">
@@ -27,7 +39,7 @@
             :y="element.y"
             :width="element.width"
             :height="element.height"
-            :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
+            :onDrag="(newX, newY) => updatePositionWithGroup(element.id, newX, newY)"
             :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
             @click="selectElement(element.id)"
@@ -41,7 +53,7 @@
             :y="element.y"
             :width="element.width"
             :height="element.height"
-            :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
+            :onDrag="(newX, newY) => updatePositionWithGroup(element.id, newX, newY)"
             :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
             @click="selectElement(element.id)"
@@ -57,7 +69,7 @@
             :y="element.y"
             :width="element.width"
             :height="element.height"
-            :onDrag="(newX, newY) => updatePosition(element.id, newX, newY)"
+            :onDrag="(newX, newY) => updatePositionWithGroup(element.id, newX, newY)"
             :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
             @click="selectElement(element.id)"
@@ -126,6 +138,15 @@ const connectFrom = ref(null)
 const connectFromSide = ref(null)
 const zoomLevel = ref(1)
 
+// Multi-selection with drag box
+const isSelecting = ref(false)
+const selectionBox = ref({
+  startX: 0,
+  startY: 0,
+  currentX: 0,
+  currentY: 0
+})
+
 // Helper to generate ids (string ids to avoid type mismatch)
 const makeId = () => (crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`)
 
@@ -156,6 +177,83 @@ function zoomOut() {
 
 function resetZoom() {
   zoomLevel.value = 1
+}
+
+// Selection box drag handlers
+function handleCanvasMouseDown(e) {
+  // Only start selection box on left click on canvas background
+  if (e.button !== 0 || e.target.closest('.element, .ConectingPoint, .conn-edit-anchor, .conn-editor')) {
+    return
+  }
+  
+  const canvas = e.currentTarget
+  const rect = canvas.getBoundingClientRect()
+  const x = (e.clientX - rect.left) / zoomLevel.value
+  const y = (e.clientY - rect.top) / zoomLevel.value
+  
+  isSelecting.value = true
+  selectionBox.value = { startX: x, startY: y, currentX: x, currentY: y }
+  
+  // Clear selection if not holding Ctrl
+  if (!e.ctrlKey) {
+    selectedElements.value = []
+  }
+}
+
+function handleCanvasMouseMove(e) {
+  if (!isSelecting.value) return
+  
+  const canvas = document.querySelector('.canvas')
+  if (!canvas) return
+  
+  const rect = canvas.getBoundingClientRect()
+  const x = (e.clientX - rect.left) / zoomLevel.value
+  const y = (e.clientY - rect.top) / zoomLevel.value
+  
+  selectionBox.value.currentX = x
+  selectionBox.value.currentY = y
+  
+  updateSelectionFromBox()
+}
+
+function handleCanvasMouseUp() {
+  isSelecting.value = false
+}
+
+function updateSelectionFromBox() {
+  const { startX, startY, currentX, currentY } = selectionBox.value
+  const minX = Math.min(startX, currentX)
+  const maxX = Math.max(startX, currentX)
+  const minY = Math.min(startY, currentY)
+  const maxY = Math.max(startY, currentY)
+  
+  const newSelection = []
+  
+  elements.value.forEach(el => {
+    let width = el.width || 200
+    let height = el.height || 100
+    
+    if (el.type === 'actor') {
+      width = el.width || 98
+      height = el.height || 50
+    } else if (el.type === 'usecase') {
+      width = el.width || 166
+      height = el.height || 60
+    } else if (el.type === 'System') {
+      width = el.width || 380
+      height = el.height || 560
+    }
+    
+    const right = el.x + width
+    const bottom = el.y + height
+    
+    // Check if element intersects with selection box
+    if (el.x < maxX && right > minX && el.y < maxY && bottom > minY) {
+      newSelection.push(String(el.id))
+    }
+  })
+  
+  selectedElements.value = newSelection
 }
 
 function toggleConnectMode() {
@@ -199,6 +297,31 @@ function addUseCase() {
 function updatePosition(id, newX, newY) {
   const el = elements.value.find(e => e.id === id)
   if (el) {
+    el.x = newX
+    el.y = newY
+  }
+}
+
+// Group drag: move all selected elements together
+function updatePositionWithGroup(id, newX, newY) {
+  const idStr = String(id)
+  const el = elements.value.find(e => String(e.id) === idStr)
+  if (!el) return
+  
+  const deltaX = newX - el.x
+  const deltaY = newY - el.y
+  
+  // If this element is part of a multi-selection, move all selected elements
+  if (selectedElements.value.includes(idStr) && selectedElements.value.length > 1) {
+    selectedElements.value.forEach(selectedId => {
+      const selectedEl = elements.value.find(e => String(e.id) === selectedId)
+      if (selectedEl) {
+        selectedEl.x += deltaX
+        selectedEl.y += deltaY
+      }
+    })
+  } else {
+    // Single element move
     el.x = newX
     el.y = newY
   }
@@ -340,13 +463,23 @@ function selectElement(id) {
     return
   }
 
-  // non-connect mode selection
-  if (selectedElements.value.includes(idStr)) {
-    selectedElements.value = selectedElements.value.filter(e => e !== idStr)
+  // Check if this is a Ctrl+Click (multi-select)
+  const isCtrlClick = window.event && (window.event.ctrlKey || window.event.metaKey)
+  
+  if (isCtrlClick) {
+    // Toggle selection
+    if (selectedElements.value.includes(idStr)) {
+      selectedElements.value = selectedElements.value.filter(e => e !== idStr)
+    } else {
+      selectedElements.value.push(idStr)
+    }
   } else {
-    selectedElements.value.push(idStr)
-    // In non-connect mode we only toggle selection. Connections are
-    // created explicitly via Connect Mode to avoid accidental links.
+    // Single select (replace selection)
+    if (selectedElements.value.includes(idStr) && selectedElements.value.length === 1) {
+      // Already selected, do nothing
+    } else {
+      selectedElements.value = [idStr]
+    }
   }
 }
 
@@ -375,16 +508,24 @@ function handleKeydown(e) {
   const isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)
   if (isTyping) return
   if (e.key === 'Delete' || e.key === 'Backspace') {
-    const toDelete = [...selectedElements.value]
-    toDelete.forEach(id => deleteElement(id))
+    // Delete all selected elements
+    if (selectedElements.value.length > 0) {
+      const toDelete = [...selectedElements.value]
+      toDelete.forEach(id => deleteElement(id))
+      selectedElements.value = []
+    }
   }
 }
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
+  window.addEventListener('mousemove', handleCanvasMouseMove)
+  window.addEventListener('mouseup', handleCanvasMouseUp)
 })
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeydown)
+  window.removeEventListener('mousemove', handleCanvasMouseMove)
+  window.removeEventListener('mouseup', handleCanvasMouseUp)
 })
 function exportDiagram() {
   const data = {
@@ -576,12 +717,10 @@ function exportAsImage() {
 }
 
 .elements-container {
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
-  background:var(--c-teal);
-
+  background:var(--c-peach);
+  overflow: visible;
 }
 
 .uml-element {
@@ -677,5 +816,15 @@ function exportAsImage() {
 }
 .conn-close:hover {
   background: rgba(23,65,67,0.08);
+}
+
+/* Selection box styling */
+.selection-box {
+  position: absolute;
+  border: 2px dashed #427a76;
+  background: rgba(66, 122, 118, 0.15);
+  pointer-events: none;
+  z-index: 1000;
+  border-radius: 4px;
 }
 </style>

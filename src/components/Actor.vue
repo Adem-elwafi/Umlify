@@ -188,6 +188,7 @@ function startResize(event) {
     0 8px 24px rgba(66, 122, 118, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-width: 150px;
 }
 
 .actor.dragging {
