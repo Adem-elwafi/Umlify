@@ -122,7 +122,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, toRaw } from 'vue'
 import Actor from './Actor.vue'
 import Connector from './connector.vue'
 import UseCase from './UseCase.vue'
@@ -218,6 +218,8 @@ function handleCanvasMouseMove(e) {
 
 function handleCanvasMouseUp() {
   isSelecting.value = false
+  // Commit any pending move/resize as a single undo step
+  commitTransform()
 }
 
 function updateSelectionFromBox() {
@@ -264,37 +266,41 @@ function toggleConnectMode() {
   console.log('connectMode set to', connectMode.value)
 }
 function addActor() {
-  let ActorTxt =  'Actor'
-  elements.value.push({
-    id: Date.now(),
-    type: 'actor',
-    label: 'Actor',
-    x: 400,
-    y: 100
-
+  withUndo(() => {
+    elements.value.push({
+      id: Date.now(),
+      type: 'actor',
+      label: 'Actor',
+      x: 400,
+      y: 100
+    })
   })
 }
 function AddSystem() {
-  elements.value.push({
-    id: Date.now(),
-    type: 'System',
-    label: 'System',
-    x: 500,
-    y: 200
+  withUndo(() => {
+    elements.value.push({
+      id: Date.now(),
+      type: 'System',
+      label: 'System',
+      x: 500,
+      y: 200
+    })
   })
 }
 
 function addUseCase() {
-  let UseCaseTxt = 'useCase' ; 
-  elements.value.push({
-    id: Date.now(),
-    type: 'usecase',
-    label: UseCaseTxt,
-    x: 500,
-    y: 200
+  withUndo(() => {
+    elements.value.push({
+      id: Date.now(),
+      type: 'usecase',
+      label: 'useCase',
+      x: 500,
+      y: 200
+    })
   })
 }
 function updatePosition(id, newX, newY) {
+  beginTransform('move')
   const el = elements.value.find(e => e.id === id)
   if (el) {
     el.x = newX
@@ -304,6 +310,7 @@ function updatePosition(id, newX, newY) {
 
 // Group drag: move all selected elements together
 function updatePositionWithGroup(id, newX, newY) {
+  beginTransform('move')
   const idStr = String(id)
   const el = elements.value.find(e => String(e.id) === idStr)
   if (!el) return
@@ -328,6 +335,7 @@ function updatePositionWithGroup(id, newX, newY) {
 }
 
 function updateSize(id, newWidth, newHeight) {
+  beginTransform('resize')
   const el = elements.value.find(e => e.id === id)
   if (el) {
     el.width = newWidth
@@ -336,12 +344,96 @@ function updateSize(id, newWidth, newHeight) {
 }
 
 function updateLabel(id, newLabel) {
-  const el = elements.value.find(e => e.id === id)
-  if (el) {
-    el.label = newLabel
-  }
+  withUndo(() => {
+    const el = elements.value.find(e => e.id === id)
+    if (el) {
+      el.label = newLabel
+    }
+  })
 }
 const connections = ref([])
+
+// -------------------------
+// History (Undo/Redo)
+// -------------------------
+const undoStack = ref([])
+const redoStack = ref([])
+const transformTx = ref(null) // { kind: 'move'|'resize', before: Snapshot }
+
+// A compact snapshot that normalizes connection references by element id.
+function createSnapshot() {
+  const elCopy = JSON.parse(JSON.stringify(toRaw(elements.value)))
+  const conns = connections.value.map(c => ({
+    id: c.id,
+    fromId: c.from?.id,
+    toId: c.to?.id,
+    fromSide: c.fromSide,
+    toSide: c.toSide,
+    type: c.type
+  }))
+  return { elements: elCopy, connections: conns }
+}
+
+function restoreSnapshot(snap) {
+  const elCopy = JSON.parse(JSON.stringify(snap.elements))
+  elements.value = elCopy
+  connections.value = snap.connections.map(cs => {
+    const from = elements.value.find(e => String(e.id) === String(cs.fromId))
+    const to = elements.value.find(e => String(e.id) === String(cs.toId))
+    return {
+      id: cs.id,
+      from,
+      to,
+      fromSide: cs.fromSide,
+      toSide: cs.toSide,
+      type: cs.type
+    }
+  })
+  // Clear ephemeral UI state
+  selectedElements.value = []
+  selectedConnectionId.value = null
+  connectFrom.value = null
+  connectFromSide.value = null
+}
+
+function withUndo(mutator) {
+  const before = createSnapshot()
+  mutator()
+  undoStack.value.push(before)
+  redoStack.value = []
+}
+
+function beginTransform(kind) {
+  if (!transformTx.value) {
+    transformTx.value = { kind, before: createSnapshot() }
+  }
+}
+function commitTransform() {
+  if (!transformTx.value) return
+  undoStack.value.push(transformTx.value.before)
+  redoStack.value = []
+  transformTx.value = null
+}
+function cancelTransform() {
+  transformTx.value = null
+}
+
+function undo() {
+  if (transformTx.value) commitTransform()
+  if (undoStack.value.length === 0) return
+  const current = createSnapshot()
+  const prev = undoStack.value.pop()
+  redoStack.value.push(current)
+  restoreSnapshot(prev)
+}
+
+function redo() {
+  if (redoStack.value.length === 0) return
+  const current = createSnapshot()
+  const next = redoStack.value.pop()
+  undoStack.value.push(current)
+  restoreSnapshot(next)
+}
 
 function getConnectionPoint(element, side = 'right') {
   // Try to find the actual DOM element and its connection point
@@ -407,13 +499,15 @@ function connectElements(id1, id2, side1, side2) {
   const to = elements.value.find(e => String(e.id) === String(id2))
   console.log('found from, to:', from, to)
   if (from && to) {
-    connections.value.push({
-      id: makeId(),
-      from,
-      to,
-      fromSide: side1,
-      toSide: side2,
-      type: selectedType.value
+    withUndo(() => {
+      connections.value.push({
+        id: makeId(),
+        from,
+        to,
+        fromSide: side1,
+        toSide: side2,
+        type: selectedType.value
+      })
     })
     console.log('connection created', connections.value[connections.value.length - 1])
     return true
@@ -485,6 +579,11 @@ function selectElement(id) {
 
 // Delete logic
 function deleteElement(id) {
+  withUndo(() => rawDeleteElement(id))
+}
+
+// Raw delete used for batching and undo wrapping
+function rawDeleteElement(id) {
   const idStr = String(id)
   // Remove element
   elements.value = elements.value.filter(e => String(e.id) !== idStr)
@@ -506,13 +605,26 @@ function deleteElement(id) {
 function handleKeydown(e) {
   const active = document.activeElement
   const isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)
+  // Undo/Redo shortcuts
+  if (e.ctrlKey && e.key.toLowerCase() === 'z') {
+    e.preventDefault()
+    undo()
+    return
+  }
+  if (e.ctrlKey && e.key.toLowerCase() === 'y') {
+    e.preventDefault()
+    redo()
+    return
+  }
   if (isTyping) return
   if (e.key === 'Delete' || e.key === 'Backspace') {
     // Delete all selected elements
     if (selectedElements.value.length > 0) {
       const toDelete = [...selectedElements.value]
-      toDelete.forEach(id => deleteElement(id))
-      selectedElements.value = []
+      withUndo(() => {
+        toDelete.forEach(id => rawDeleteElement(id))
+        selectedElements.value = []
+      })
     }
   }
 }
@@ -560,47 +672,49 @@ function exportDiagram() {
 }
 
 function importDiagram(data) {
-  try {
-    // Clear existing elements and connections
-    elements.value = []
-    connections.value = []
-    
-    // Import elements first
-    elements.value = data.elements.map(e => ({
-      id: e.id || Date.now(), // Ensure we have an ID
-      type: e.type,
-      label: e.label || (e.type === 'actor' ? 'New Actor' : 'New Use Case'),
-      x: e.x || 100,
-      y: e.y || 100,
-      width: e.width,
-      height: e.height
-    }))
+  withUndo(() => {
+    try {
+      // Clear existing elements and connections
+      elements.value = []
+      connections.value = []
+      
+      // Import elements first
+      elements.value = data.elements.map(e => ({
+        id: e.id || Date.now(), // Ensure we have an ID
+        type: e.type,
+        label: e.label || (e.type === 'actor' ? 'New Actor' : 'New Use Case'),
+        x: e.x || 100,
+        y: e.y || 100,
+        width: e.width,
+        height: e.height
+      }))
 
-    // Import connections after elements are loaded
-    // This ensures we can properly link the connections
-    connections.value = data.connections
-      .filter(c => {
-        // Only import connections where both elements exist
-        const fromExists = elements.value.some(e => e.id === c.from)
-        const toExists = elements.value.some(e => e.id === c.to)
-        return fromExists && toExists
-      })
-      .map(c => {
-        const from = elements.value.find(e => e.id === c.from)
-        const to = elements.value.find(e => e.id === c.to)
-        return {
-          id: String(c.id || makeId()),
-          from,
-          to,
-          fromSide: c.fromSide || 'right',
-          toSide: c.toSide || 'left',
-          type: c.type || 'association'
-        }
-      })
-  } catch (error) {
-    console.error('Error importing diagram:', error)
-    alert('Error importing diagram. Please check the file format.')
-  }
+      // Import connections after elements are loaded
+      // This ensures we can properly link the connections
+      connections.value = data.connections
+        .filter(c => {
+          // Only import connections where both elements exist
+          const fromExists = elements.value.some(e => String(e.id) === String(c.from))
+          const toExists = elements.value.some(e => String(e.id) === String(c.to))
+          return fromExists && toExists
+        })
+        .map(c => {
+          const from = elements.value.find(e => String(e.id) === String(c.from))
+          const to = elements.value.find(e => String(e.id) === String(c.to))
+          return {
+            id: String(c.id || makeId()),
+            from,
+            to,
+            fromSide: c.fromSide || 'right',
+            toSide: c.toSide || 'left',
+            type: c.type || 'association'
+          }
+        })
+    } catch (error) {
+      console.error('Error importing diagram:', error)
+      alert('Error importing diagram. Please check the file format.')
+    }
+  })
 }
 
 function exportAsImage() {
