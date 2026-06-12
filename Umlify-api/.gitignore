@@ -1,0 +1,11 @@
+# Dependency folders
+**/node_modules/
+
+# Environment files containing database URLs & secrets
+**/.env
+**/.env.local
+
+# Build tracking/caches
+**/dist/
+**/.pnpm-debug.log*
+.DS_Store

@@ -1,0 +1,27 @@
+datasource db {
+  provider = "postgresql"
+  // ❌ The 'url' property has been removed from here
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String?
+  password  String
+  createdAt DateTime  @default(now())
+  diagrams  Diagram[]
+}
+
+model Diagram {
+  id        String   @id @default(uuid())
+  title     String   @default("Untitled Diagram")
+  payload   Json     
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
