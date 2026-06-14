@@ -1,170 +1,117 @@
 <template>
-  <div class="signup-container">
-    <div class="signup-card">
-      <div class="signup-header">
-        <h1>UMLify</h1>
-        <p>Create your account</p>
+  <div class="min-h-screen w-screen flex items-center justify-center bg-[#121214] text-gray-100 p-4">
+    <div class="w-full max-w-md bg-[#1a1a1e] border border-gray-800 rounded-xl p-8 shadow-2xl">
+      <div class="text-center mb-8">
+        <div class="inline-flex w-12 h-12 rounded-xl bg-indigo-600 items-center justify-center font-bold text-white text-xl shadow-lg tracking-wider mb-3">U</div>
+        <h2 class="text-2xl font-bold text-white">Get Started</h2>
+        <p class="text-sm text-gray-400 mt-1">Create an account to save UML maps natively</p>
       </div>
-      
-      <form @submit.prevent="handleSignup" class="signup-form">
-        <div class="form-group">
-          <label for="fullname">Full Name</label>
-          <input
-            id="fullname"
-            v-model="fullname"
-            type="text"
-            placeholder="Enter your full name"
+
+      <div v-if="localError || authStore.apiErrorMessage" class="mb-5 p-3.5 bg-rose-950/40 border border-rose-900/50 rounded-lg flex items-start space-x-2 text-rose-400 text-xs leading-relaxed">
+        <span class="mt-0.5 shrink-0">⚠️</span>
+        <p class="font-mono">{{ localError || authStore.apiErrorMessage }}</p>
+      </div>
+
+      <form @submit.prevent="handleSignup" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">Full Name</label>
+          <input 
+            v-model="name" 
+            type="text" 
             required
-            autocomplete="name"
+            class="w-full px-4 py-2.5 rounded-lg bg-[#26262b] border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-all text-sm"
+            placeholder="Adem"
           />
         </div>
 
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            placeholder="Enter your email"
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">Email Address</label>
+          <input 
+            v-model="email" 
+            type="email" 
             required
-            autocomplete="email"
-          />
-        </div>
-        
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            placeholder="Create a password"
-            required
-            autocomplete="new-password"
-            minlength="8"
-          />
-          <span class="helper-text">Minimum 8 characters</span>
-        </div>
-        
-        <div class="form-group">
-          <label for="confirmPassword">Confirm Password</label>
-          <input
-            id="confirmPassword"
-            v-model="confirmPassword"
-            type="password"
-            placeholder="Confirm your password"
-            required
-            autocomplete="new-password"
+            class="w-full px-4 py-2.5 rounded-lg bg-[#26262b] border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-all text-sm"
+            placeholder="student@umlify.com"
           />
         </div>
 
-        <div v-if="errorMessage" class="error-message">
-          {{ errorMessage }}
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">Password</label>
+          <input 
+            v-model="password" 
+            type="password" 
+            required
+            class="w-full px-4 py-2.5 rounded-lg bg-[#26262b] border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-all text-sm"
+            placeholder="Minimum 8 characters"
+          />
         </div>
-        
-        <div class="terms">
-          <label class="terms-checkbox">
-            <input type="checkbox" v-model="acceptTerms" required />
-            <span>I agree to the <a href="#" @click.prevent="showTerms">Terms of Service</a> and <a href="#" @click.prevent="showPrivacy">Privacy Policy</a></span>
-          </label>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">Confirm Password</label>
+          <input 
+            v-model="confirmPassword" 
+            type="password" 
+            required
+            class="w-full px-4 py-2.5 rounded-lg bg-[#26262b] border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-all text-sm"
+            placeholder="Confirm password structure"
+          />
         </div>
-        
-        <button type="submit" class="btn-signup" :disabled="isLoading">
-          {{ isLoading ? 'Creating account...' : 'Create Account' }}
-        </button>
-        
-        <div class="divider">
-          <span>or</span>
-        </div>
-        
-        <button type="button" class="btn-google" @click="handleGoogleSignup">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-            <path d="M9.003 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9.003 18z" fill="#34A853"/>
-            <path d="M3.964 10.712c-.18-.54-.282-1.117-.282-1.71 0-.593.102-1.17.282-1.71V4.96H.957C.347 6.175 0 7.55 0 9.002c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-            <path d="M9.003 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.426 0 9.003 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29c.708-2.127 2.692-3.71 5.036-3.71z" fill="#EA4335"/>
-          </svg>
-          Continue with Google
+
+        <button 
+          type="submit" 
+          :disabled="isLoading"
+          class="w-full py-3 mt-2 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none text-white font-semibold text-sm rounded-lg shadow-lg transition-all"
+        >
+          {{ isLoading ? 'Creating Account...' : 'Register Workspace' }}
         </button>
       </form>
-      
-      <div class="login-link">
-        Already have an account? <a href="#" @click.prevent="handleLogin">Sign in</a>
+
+      <div class="mt-6 text-center text-xs text-gray-400">
+        Already have an account? 
+        <router-link to="/login" class="text-indigo-400 hover:underline font-medium ml-1">Sign In instead</router-link>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/authStore'
 
-const router = useRouter();
+const router = useRouter()
+const authStore = useAuthStore()
 
-const fullname = ref('');
-const email = ref('');
-const password = ref('');
-const confirmPassword = ref('');
-const acceptTerms = ref(false);
-const isLoading = ref(false);
-const errorMessage = ref('');
+const name = ref('')
+const email = ref('')
+const password = ref('')
+const confirmPassword = ref('')
+const localError = ref(null)
+const isLoading = ref(false)
 
 const handleSignup = async () => {
-  errorMessage.value = '';
+  localError.value = null
   
-  // Validate passwords match
-  if (password.value !== confirmPassword.value) {
-    errorMessage.value = 'Passwords do not match';
-    return;
-  }
-
-  // Validate password length
+  // Validation guard check matrices
   if (password.value.length < 8) {
-    errorMessage.value = 'Password must be at least 8 characters';
-    return;
+    localError.value = 'Password matrix configuration must containing at least 8 elements.'
+    return
   }
 
-  if (!acceptTerms.value) {
-    errorMessage.value = 'You must accept the terms';
-    return;
+  if (password.value !== confirmPassword.value) {
+    localError.value = 'Passwords structural confirmation inputs mismatch.'
+    return
   }
 
-  isLoading.value = true;
+  isLoading.value = true
+  const success = await authStore.signup(name.value, email.value, password.value)
+  isLoading.value = false
   
-  // Simulate API call
-  setTimeout(() => {
-    console.log('Signup successful:', { fullname: fullname.value, email: email.value });
-    
-    // Store dummy token to satisfy router guard
-    localStorage.setItem('auth_token', 'session_' + Math.random().toString(36).substr(2, 9));
-    
-    // Navigate to dashboard
-    router.push('/');
-    isLoading.value = false;
-  }, 1000);
-};
-
-const handleGoogleSignup = () => {
-  isLoading.value = true;
-  setTimeout(() => {
-    localStorage.setItem('auth_token', 'google_session_' + Math.random().toString(36).substr(2, 9));
-    router.push('/');
-    isLoading.value = false;
-  }, 800);
-};
-
-const handleLogin = () => {
-  router.push('/login');
-};
-
-const showTerms = () => {
-  alert('Terms of Service: Be kind and UMLify responsibly.');
-};
-
-const showPrivacy = () => {
-  alert('Privacy Policy: Your diagrams are yours.');
-};
+  if (success) {
+    router.push('/')
+  }
+}
 </script>
-
 <style scoped lang="css">
 .signup-container {
   display: flex;

@@ -1,119 +1,79 @@
 <template>
-  <div class="login-container">
-    <div class="login-card">
-      <div class="login-header">
-        <h1>UMLify</h1>
-        <p>Sign in to continue</p>
+  <div class="min-h-screen w-screen flex items-center justify-center bg-[#121214] text-gray-100 p-4">
+    <div class="w-full max-w-md bg-[#1a1a1e] border border-gray-800 rounded-xl p-8 shadow-2xl">
+      <div class="text-center mb-8">
+        <div class="inline-flex w-12 h-12 rounded-xl bg-indigo-600 items-center justify-center font-bold text-white text-xl shadow-lg tracking-wider mb-3">U</div>
+        <h2 class="text-2xl font-bold text-white">Welcome Back</h2>
+        <p class="text-sm text-gray-400 mt-1">Log in to open your UMLify canvases</p>
       </div>
-      
-      <form @submit.prevent="handleLogin" class="login-form">
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            placeholder="Enter your email"
+
+      <div v-if="authStore.apiErrorMessage" class="mb-5 p-3.5 bg-rose-950/40 border border-rose-900/50 rounded-lg flex items-start space-x-2 text-rose-400 text-xs leading-relaxed">
+        <span class="mt-0.5 shrink-0">⚠️</span>
+        <p class="font-mono">{{ authStore.apiErrorMessage }}</p>
+      </div>
+
+      <form @submit.prevent="handleLogin" class="space-y-5">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Email Address</label>
+          <input 
+            v-model="email" 
+            type="email" 
             required
-            autocomplete="email"
+            class="w-full px-4 py-3 rounded-lg bg-[#26262b] border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm"
+            placeholder="name@university.tn"
           />
         </div>
-        
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            placeholder="Enter your password"
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Password</label>
+          <input 
+            v-model="password" 
+            type="password" 
             required
-            autocomplete="current-password"
+            class="w-full px-4 py-3 rounded-lg bg-[#26262b] border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm"
+            placeholder="••••••••"
           />
         </div>
-        
-        <div class="form-options">
-          <label class="remember-me">
-            <input type="checkbox" v-model="rememberMe" />
-            <span>Remember me</span>
-          </label>
-          <a href="#" class="forgot-password" @click.prevent="handleForgotPassword">
-            Forgot password?
-          </a>
-        </div>
-        
-        <button type="submit" class="btn-login" :disabled="isLoading">
-          {{ isLoading ? 'Signing in...' : 'Sign In' }}
-        </button>
-        
-        <div class="divider">
-          <span>or</span>
-        </div>
-        
-        <button type="button" class="btn-google" @click="handleGoogleLogin">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-            <path d="M9.003 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9.003 18z" fill="#34A853"/>
-            <path d="M3.964 10.712c-.18-.54-.282-1.117-.282-1.71 0-.593.102-1.17.282-1.71V4.96H.957C.347 6.175 0 7.55 0 9.002c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-            <path d="M9.003 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.426 0 9.003 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29c.708-2.127 2.692-3.71 5.036-3.71z" fill="#EA4335"/>
-          </svg>
-          Continue with Google
+
+        <button 
+          type="submit" 
+          :disabled="isLoading"
+          class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none text-white font-semibold text-sm rounded-lg shadow-lg transition-all"
+        >
+          {{ isLoading ? 'Authenticating...' : 'Sign In' }}
         </button>
       </form>
-      
-      <div class="signup-link">
-        Don't have an account? <a href="#" @click.prevent="handleSignup">Sign up</a>
+
+      <div class="mt-6 text-center text-xs text-gray-400">
+        Don't have an account? 
+        <router-link to="/signup" class="text-indigo-400 hover:underline font-medium ml-1">Create an account</router-link>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/authStore'
 
-const router = useRouter();
+const router = useRouter()
+const authStore = useAuthStore()
 
-const email = ref('');
-const password = ref('');
-const rememberMe = ref(false);
-const isLoading = ref(false);
+const email = ref('')
+const password = ref('')
+const isLoading = ref(false)
 
 const handleLogin = async () => {
-  if (!email.value || !password.value) return;
+  isLoading.value = true
+  const success = await authStore.login(email.value, password.value)
+  isLoading.value = false
   
-  isLoading.value = true;
-  
-  // Simulate API call
-  setTimeout(() => {
-    console.log('Login successful:', { email: email.value });
-    
-    // Store dummy token to satisfy router guard
-    localStorage.setItem('auth_token', 'session_' + Math.random().toString(36).substr(2, 9));
-    
-    // Navigate to dashboard
-    router.push('/');
-    isLoading.value = false;
-  }, 1000);
-};
-
-const handleGoogleLogin = () => {
-  isLoading.value = true;
-  setTimeout(() => {
-    localStorage.setItem('auth_token', 'google_session_' + Math.random().toString(36).substr(2, 9));
-    router.push('/');
-    isLoading.value = false;
-  }, 800);
-};
-
-const handleForgotPassword = () => {
-  alert('Password reset link sent to ' + email.value);
-};
-
-const handleSignup = () => {
-  router.push('/signup');
-};
+  if (success) {
+    router.push('/')
+  }
+}
 </script>
-
 <style scoped lang="css">
 .login-container {
   display: flex;
