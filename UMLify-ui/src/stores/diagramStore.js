@@ -1,17 +1,29 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
+import axios from 'axios';
+import { useAuthStore } from './authStore';
 
 export const useDiagramStore = defineStore('diagram', () => {
+  // Centralised Core Reactive Canvas States
   const elements = ref([]);
   const connections = ref([]);
   const selectedElements = ref([]);
   const selectedConnectionId = ref(null);
   const zoomLevel = ref(1);
   const connectMode = ref(false);
-  
+
+  // Asynchronous Cloud Persistence States
+  const currentDiagramId = ref(null);
+  const currentDiagramTitle = ref('Untitled Diagram');
+  const savedDiagramsList = ref([]);
+  const networkErrorMessage = ref(null);
+  const globalSaveStatusMessage = ref('');
+
+  // Undo/Redo Historical Engine Stacks
   const undoStack = ref([]);
   const redoStack = ref([]);
 
+  // Snapshot Memento Helpers
   const createSnapshot = () => {
     return JSON.parse(JSON.stringify({
       elements: elements.value,
@@ -63,44 +75,142 @@ export const useDiagramStore = defineStore('diagram', () => {
     selectedConnectionId.value = null;
   };
 
+  const resetDiagram = () => {
+    elements.value = [];
+    connections.value = [];
+    selectedElements.value = [];
+    selectedConnectionId.value = null;
+    currentDiagramId.value = null;
+    currentDiagramTitle.value = 'Untitled Diagram';
+    globalSaveStatusMessage.value = '';
+    networkErrorMessage.value = null;
+  };
+
+  // Helper config to fetch auth headers reactively from authStore
+  const getAuthHeaders = () => {
+    const authStore = useAuthStore();
+    return {
+      headers: {
+        Authorization: `Bearer ${authStore.token}`
+      }
+    };
+  };
+
+  // ==========================================
+  // 🌐 ASYNCHRONOUS CLOUD AXIOS ACTIONS
+  // ==========================================
+  
+  const fetchUserDiagrams = async () => {
+    networkErrorMessage.value = null;
+    try {
+      const response = await axios.get('http://localhost:5000/api/diagrams', getAuthHeaders());
+      savedDiagramsList.value = response.data || [];
+    } catch (err) {
+      networkErrorMessage.value = err.response?.data?.message || 'Failed to list saved diagrams from cloud repo.';
+    }
+  };
+
+  const saveCurrentDiagram = async (title) => {
+    networkErrorMessage.value = null;
+    globalSaveStatusMessage.value = 'Saving...';
+    
+    if (title && title.trim()) {
+      currentDiagramTitle.value = title.trim();
+    }
+
+    const payloadBundle = {
+      diagramId: currentDiagramId.value,
+      title: currentDiagramTitle.value,
+      payload: {
+        elements: elements.value,
+        connections: connections.value.map(c => ({
+          id: c.id,
+          fromId: c.from?.id,
+          toId: c.to?.id,
+          fromSide: c.fromSide,
+          toSide: c.toSide,
+          type: c.type
+        })),
+        zoomLevel: zoomLevel.value
+      }
+    };
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/diagrams/save', payloadBundle, getAuthHeaders());
+      if (response.data && response.data.diagramId) {
+        currentDiagramId.value = response.data.diagramId;
+        globalSaveStatusMessage.value = 'Saved Successfully!';
+        await fetchUserDiagrams(); // Refresh metadata dashboard drawer
+        setTimeout(() => { globalSaveStatusMessage.value = '' }, 3000);
+        return true;
+      }
+    } catch (err) {
+      globalSaveStatusMessage.value = '';
+      networkErrorMessage.value = err.response?.data?.message || 'Cloud backup transmission failure.';
+    }
+    return false;
+  };
+
+  const loadDiagramById = async (id) => {
+    networkErrorMessage.value = null;
+    try {
+      const response = await axios.get(`http://localhost:5000/api/diagrams/${id}`, getAuthHeaders());
+      const record = response.data;
+      if (record && record.payload) {
+        // Clear viewport active state properties
+        elements.value = JSON.parse(JSON.stringify(record.payload.elements || []));
+        zoomLevel.value = Number(record.payload.zoomLevel) || 1;
+        currentDiagramId.value = record.id;
+        currentDiagramTitle.value = record.title || 'Untitled Diagram';
+        
+        // Re-construct line relational pointers to matched element items
+        connections.value = (record.payload.connections || []).map(cs => {
+          const fromNode = elements.value.find(e => String(e.id) === String(cs.fromId));
+          const toNode = elements.value.find(e => String(e.id) === String(cs.toId));
+          return {
+            id: cs.id,
+            from: fromNode,
+            to: toNode,
+            fromSide: cs.fromSide,
+            toSide: cs.toSide,
+            type: cs.type || 'association'
+          };
+        }).filter(c => c.from && c.to);
+
+        selectedElements.value = [];
+        selectedConnectionId.value = null;
+        undoStack.value = [];
+        redoStack.value = [];
+        return true;
+      }
+    } catch (err) {
+      networkErrorMessage.value = err.response?.data?.message || 'Failed to acquire target payload data.';
+    }
+    return false;
+  };
+
+  // Canvas local layout factories
   const addActor = () => {
     saveToHistory();
-    elements.value.push({
-      id: Date.now(),
-      type: 'actor', // Case-matched to template
-      label: 'Actor',
-      x: 400, y: 100
-    });
+    elements.value.push({ id: `act_${Date.now()}`, type: 'actor', label: 'Actor', x: 200, y: 150 });
   };
 
   const addUseCase = () => {
     saveToHistory();
-    elements.value.push({
-      id: Date.now(),
-      type: 'usecase', // Case-matched to template
-      label: 'useCase',
-      x: 500, y: 200
-    });
+    elements.value.push({ id: `uc_${Date.now()}`, type: 'usecase', label: 'UseCase', x: 350, y: 200 });
   };
 
   const addSystem = () => {
     saveToHistory();
-    elements.value.push({
-      id: Date.now(),
-      type: 'System', // Case-matched to template
-      label: 'System',
-      x: 500, y: 200
-    });
+    elements.value.push({ id: `sys_${Date.now()}`, type: 'System', label: 'System', x: 300, y: 100, width: 300, height: 400 });
   };
 
   const updatePositionWithGroup = (id, newX, newY) => {
     const idStr = String(id);
     const el = elements.value.find(e => String(e.id) === idStr);
     if (!el) return;
-    
     const deltaX = newX - el.x;
     const deltaY = newY - el.y;
-    
     if (selectedElements.value.includes(idStr) && selectedElements.value.length > 1) {
       selectedElements.value.forEach(selectedId => {
         const selectedEl = elements.value.find(e => String(e.id) === selectedId);
@@ -117,18 +227,13 @@ export const useDiagramStore = defineStore('diagram', () => {
 
   const updateSize = (id, newWidth, newHeight) => {
     const el = elements.value.find(e => e.id === id);
-    if (el) {
-      el.width = newWidth;
-      el.height = newHeight;
-    }
+    if (el) { el.width = newWidth; el.height = newHeight; }
   };
 
   const updateLabel = (id, newLabel) => {
     saveToHistory();
     const el = elements.value.find(e => e.id === id);
-    if (el) {
-      el.label = newLabel;
-    }
+    if (el) { el.label = newLabel; }
   };
 
   const connectElements = (id1, id2, side1 = 'right', side2 = 'left', type = 'association') => {
@@ -136,12 +241,8 @@ export const useDiagramStore = defineStore('diagram', () => {
     const to = elements.value.find(e => String(e.id) === String(id2));
     if (from && to) {
       connections.value.push({
-        id: crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-        from,
-        to,
-        fromSide: side1,
-        toSide: side2,
-        type
+        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        from, to, fromSide: side1, toSide: side2, type
       });
       return true;
     }
@@ -156,14 +257,6 @@ export const useDiagramStore = defineStore('diagram', () => {
     selectedElements.value = selectedElements.value.filter(e => e !== idStr);
   };
 
-  const resetDiagram = () => {
-    saveToHistory();
-    elements.value = [];
-    connections.value = [];
-    selectedElements.value = [];
-    selectedConnectionId.value = null;
-  };
-
   return {
     elements,
     connections,
@@ -171,12 +264,17 @@ export const useDiagramStore = defineStore('diagram', () => {
     selectedConnectionId,
     zoomLevel,
     connectMode,
-    undoStack,
-    redoStack,
-    createSnapshot,
-    saveToHistory,
+    currentDiagramId,
+    currentDiagramTitle,
+    savedDiagramsList,
+    networkErrorMessage,
+    globalSaveStatusMessage,
     undo,
     redo,
+    resetDiagram,
+    fetchUserDiagrams,
+    saveCurrentDiagram,
+    loadDiagramById,
     addActor,
     addUseCase,
     addSystem,
@@ -184,7 +282,6 @@ export const useDiagramStore = defineStore('diagram', () => {
     updateSize,
     updateLabel,
     connectElements,
-    deleteElement,
-    resetDiagram
+    deleteElement
   };
 });

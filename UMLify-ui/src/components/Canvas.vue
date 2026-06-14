@@ -106,18 +106,12 @@
       </div>
     </div>
 
-    <Toolbar
-      v-model:selectedType="selectedType"
-      :onAddActor="addActor"
-      :onAddUseCase="addUseCase"
-      :onAddSystem="AddSystem"
-      :onExport="exportDiagram"
-      :onImport="importDiagram"
-      :onExportImage="exportAsImage"
-      :connectMode="connectMode"
-      :onToggleConnect="toggleConnectMode"
-      :onLogout="onLogout"
-    />
+<Toolbar
+  v-model="selectedType"
+  @local-export="exportDiagram"
+  @local-import="importDiagram"
+  @local-snapshot="exportAsImage"
+/>
   </div>
 </template>
 
@@ -351,6 +345,8 @@ function exportAsImage() {
 .canvas-container {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
   position: relative;
   overflow: hidden;
   background-color: var(--canvasBg);
@@ -410,8 +406,8 @@ function exportAsImage() {
 }
 
 .drawing-area {
+  flex: 1;
   width: 100%;
-  height: 100%;
   position: relative;
   overflow: auto;
   background: var(--c-peach);
