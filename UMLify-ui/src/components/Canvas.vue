@@ -19,20 +19,19 @@
       @mousedown="handleCanvasMouseDown"
     >
       <div 
-        v-if="isSelecting"
-        class="selection-box"
-        :style="{
-          left: Math.min(selectionBox.startX, selectionBox.currentX) + 'px',
-          top: Math.min(selectionBox.startY, selectionBox.currentY) + 'px',
-          width: Math.abs(selectionBox.currentX - selectionBox.startX) + 'px',
-          height: Math.abs(selectionBox.currentY - selectionBox.startY) + 'px'
-        }"
-      />
-
-      <div 
         class="elements-container" 
         :style="{ transform: `scale(${zoomLevel})`, transformOrigin: 'top left' }"
       >
+        <div 
+          v-if="isSelecting"
+          class="selection-box"
+          :style="{
+            left: boxLeft + 'px',
+            top: boxTop + 'px',
+            width: boxWidth + 'px',
+            height: boxHeight + 'px'
+          }"
+        />
         <div 
           v-for="element in elements" 
           :key="element.id" 
@@ -146,6 +145,10 @@ const connectFromSide = ref(null);
 
 const isSelecting = ref(false);
 const selectionBox = ref({ startX: 0, startY: 0, currentX: 0, currentY: 0 });
+const boxLeft = ref(0);
+const boxTop = ref(0);
+const boxWidth = ref(0);
+const boxHeight = ref(0);
 
 const connectionTypes = ['association', 'include', 'extend', 'generalization', 'dependency'];
 const selectedConnection = computed(() => connections.value.find(c => c.id === selectedConnectionId.value) || null);
@@ -255,28 +258,50 @@ const getElementStyle = (element) => {
 // 🔍 DRIFT-FREE MULTI-SELECTION MARQUEE MATH
 // ==========================================
 function handleCanvasMouseDown(e) {
+  // Guard interceptor: block selections if clicking existing nodes, connectors, or utility anchors
   if (e.button !== 0 || e.target.closest('.element, .ConectingPoint, .conn-edit-anchor, .conn-editor')) return;
+  
   const canvas = e.currentTarget;
   const rect = canvas.getBoundingClientRect();
   
-  // Normalize client click anchors by subtracting viewport bounds and adjusting for scrolling and zoom scale metrics
+  // ✨ STEP 1: Deduct client offsets and divide screen coordinates by the zoomLevel divisor matrix
   const x = (e.clientX - rect.left + canvas.scrollLeft) / zoomLevel.value;
   const y = (e.clientY - rect.top + canvas.scrollTop) / zoomLevel.value;
   
   isSelecting.value = true;
+  
+  // Set clean initialized base coordinate anchors
   selectionBox.value = { startX: x, startY: y, currentX: x, currentY: y };
-  if (!e.ctrlKey) selectedElements.value = [];
+  boxLeft.value = x;
+  boxTop.value = y;
+  boxWidth.value = 0;
+  boxHeight.value = 0;
+  
+  if (!e.ctrlKey) {
+    selectedElements.value = [];
+  }
 }
-
 function handleCanvasMouseMove(e) {
   if (!isSelecting.value || isDraggingElements.value) return;
+  
   const canvas = document.querySelector('.drawing-area');
   if (!canvas) return;
   const rect = canvas.getBoundingClientRect();
   
-  // Continuously normalize coordinate tracking against zoom scale constraints during drag operations
-  selectionBox.value.currentX = (e.clientX - rect.left + canvas.scrollLeft) / zoomLevel.value;
-  selectionBox.value.currentY = (e.clientY - rect.top + canvas.scrollTop) / zoomLevel.value;
+  // ✨ STEP 2: Normalize the moving cursor coordinates against the active zoom factor metrics
+  const currentX = (e.clientX - rect.left + canvas.scrollLeft) / zoomLevel.value;
+  const currentY = (e.clientY - rect.top + canvas.scrollTop) / zoomLevel.value;
+  
+  selectionBox.value.currentX = currentX;
+  selectionBox.value.currentY = currentY;
+  
+  // ✨ STEP 3: Compute exact width/height absolute differentials
+  boxWidth.value = Math.abs(currentX - selectionBox.value.startX);
+  boxHeight.value = Math.abs(currentY - selectionBox.value.startY);
+  
+  // ✨ STEP 4: Handle inverted selections safely (dragging backwards/upwards) using Math.min
+  boxLeft.value = Math.min(selectionBox.value.startX, currentX);
+  boxTop.value = Math.min(selectionBox.value.startY, currentY);
   
   updateSelectionFromBox();
 }
@@ -286,24 +311,25 @@ function handleCanvasMouseUp() {
 }
 
 function updateSelectionFromBox() {
-  const { startX, startY, currentX, currentY } = selectionBox.value;
-  const minX = Math.min(startX, currentX);
-  const maxX = Math.max(startX, currentX);
-  const minY = Math.min(startY, currentY);
-  const maxY = Math.max(startY, currentY);
+  const minX = boxLeft.value;
+  const maxX = boxLeft.value + boxWidth.value;
+  const minY = boxTop.value;
+  const maxY = boxTop.value + boxHeight.value;
   const newSelection = [];
   
   elements.value.forEach(el => {
+    // Standard explicit node dimension lookups matching current viewport properties
     const w = el.width || (el.type === 'actor' ? 80 : el.type === 'System' ? 300 : 140);
     const h = el.height || (el.type === 'actor' ? 120 : el.type === 'System' ? 400 : 80);
-    // Bounding metrics comparison checks match up with normalized coordinates
+    
+    // Compare normalized box perimeters against element space coordinates safely
     if (el.x < maxX && el.x + w > minX && el.y < maxY && el.y + h > minY) {
       newSelection.push(String(el.id));
     }
   });
+  
   selectedElements.value = newSelection;
 }
-
 // ==========================================
 // 🗄️ SIDEBAR HTML5 DRAG AND DROP PERSISTENCE
 // ==========================================
