@@ -37,9 +37,9 @@
           v-for="element in elements" 
           :key="element.id" 
           :data-element-id="element.id"
-          class="absolute element-draggable-wrapper"
+          class="absolute element-draggable-wrapper select-none"
           :style="getElementStyle(element)"
-          @mousedown.stop="initiateElementDrag($event, element)"
+          @mousedown.stop="initiateElementsDrag($event, element)"
         >
           <System
             v-if="element.type === 'System'"
@@ -151,17 +151,19 @@ const connectionTypes = ['association', 'include', 'extend', 'generalization', '
 const selectedConnection = computed(() => connections.value.find(c => c.id === selectedConnectionId.value) || null);
 
 // ==========================================
-// 🚀 HIGH-PERFORMANCE NON-LAGGING DRAG PHYSICS
+// 🚀 OPTIMIZED MULTI-ELEMENT DRAGGING PHYSICS
 // ==========================================
 const isDraggingElements = ref(false);
 const activeTrackedElements = ref([]); 
 let dragStartMouseX = 0;
 let dragStartMouseY = 0;
+let animationFrameId = null;
 
-const initiateElementDrag = (event, element) => {
+const initiateElementsDrag = (event, element) => {
   if (connectMode.value || event.button !== 0) return;
   
   const idStr = String(element.id);
+  // If clicked element isn't part of active highlights, update selection context
   if (!selectedElements.value.includes(idStr)) {
     if (event.ctrlKey) {
       selectedElements.value.push(idStr);
@@ -174,7 +176,7 @@ const initiateElementDrag = (event, element) => {
   dragStartMouseX = event.clientX;
   dragStartMouseY = event.clientY;
 
-  // Cache baseline configuration geometries
+  // Cache initial element coordinates to safely compute deltas later
   activeTrackedElements.value = elements.value
     .filter(el => selectedElements.value.includes(String(el.id)))
     .map(el => ({
@@ -192,20 +194,28 @@ const initiateElementDrag = (event, element) => {
 const handleElementDragMove = (event) => {
   if (!isDraggingElements.value) return;
 
-  // Calculate un-tracked coordinates scaled precisely by zoom matrix divisors
+  // Calculate coordinates scaled precisely by dividing mouse deltas by zoomLevel
   const deltaX = (event.clientX - dragStartMouseX) / zoomLevel.value;
   const deltaY = (event.clientY - dragStartMouseY) / zoomLevel.value;
 
   activeTrackedElements.value.forEach(item => {
     item.currentX = item.baseX + deltaX;
     item.currentY = item.baseY + deltaY;
-
-    // Direct DOM mutation bypassing Pinia proxy triggers to achieve 144Hz performance
-    const domWrapper = document.querySelector(`[data-element-id="${item.id}"]`);
-    if (domWrapper) {
-      domWrapper.style.transform = `translate3d(${item.currentX}px, ${item.currentY}px, 0)`;
-    }
   });
+
+  // Use requestAnimationFrame to defer transformations to GPU repaint ticks
+  if (!animationFrameId) {
+    animationFrameId = requestAnimationFrame(() => {
+      activeTrackedElements.value.forEach(item => {
+        const domWrapper = document.querySelector(`[data-element-id="${item.id}"]`);
+        if (domWrapper) {
+          // Direct DOM transform mutation bypassing Pinia proxy triggers to achieve 144Hz performance
+          domWrapper.style.transform = `translate3d(${item.currentX}px, ${item.currentY}px, 0)`;
+        }
+      });
+      animationFrameId = null;
+    });
+  }
 };
 
 const handleElementDragMouseUp = () => {
@@ -214,9 +224,18 @@ const handleElementDragMouseUp = () => {
 
   window.removeEventListener('mousemove', handleElementDragMove);
   window.removeEventListener('mouseup', handleElementDragMouseUp);
+  
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+  }
 
-  // Flush mutations to the global store once dragging completely stops
-  diagramStore.saveToHistory();
+  // Save full canvas snapshot state to history before final commit mutation
+  if (typeof diagramStore.saveToHistory === 'function') {
+    diagramStore.saveToHistory();
+  }
+
+  // Dispatch final flat position updates back to Pinia sequentially inside one block
   activeTrackedElements.value.forEach(item => {
     diagramStore.updatePositionWithGroup(item.id, item.currentX, item.currentY);
   });
@@ -233,7 +252,60 @@ const getElementStyle = (element) => {
 };
 
 // ==========================================
-// 🗄️ SIDEBAR HTML5 DRAG AND DROP ZONE
+// 🔍 DRIFT-FREE MULTI-SELECTION MARQUEE MATH
+// ==========================================
+function handleCanvasMouseDown(e) {
+  if (e.button !== 0 || e.target.closest('.element, .ConectingPoint, .conn-edit-anchor, .conn-editor')) return;
+  const canvas = e.currentTarget;
+  const rect = canvas.getBoundingClientRect();
+  
+  // Normalize client click anchors by subtracting viewport bounds and adjusting for scrolling and zoom scale metrics
+  const x = (e.clientX - rect.left + canvas.scrollLeft) / zoomLevel.value;
+  const y = (e.clientY - rect.top + canvas.scrollTop) / zoomLevel.value;
+  
+  isSelecting.value = true;
+  selectionBox.value = { startX: x, startY: y, currentX: x, currentY: y };
+  if (!e.ctrlKey) selectedElements.value = [];
+}
+
+function handleCanvasMouseMove(e) {
+  if (!isSelecting.value || isDraggingElements.value) return;
+  const canvas = document.querySelector('.drawing-area');
+  if (!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  
+  // Continuously normalize coordinate tracking against zoom scale constraints during drag operations
+  selectionBox.value.currentX = (e.clientX - rect.left + canvas.scrollLeft) / zoomLevel.value;
+  selectionBox.value.currentY = (e.clientY - rect.top + canvas.scrollTop) / zoomLevel.value;
+  
+  updateSelectionFromBox();
+}
+
+function handleCanvasMouseUp() { 
+  isSelecting.value = false; 
+}
+
+function updateSelectionFromBox() {
+  const { startX, startY, currentX, currentY } = selectionBox.value;
+  const minX = Math.min(startX, currentX);
+  const maxX = Math.max(startX, currentX);
+  const minY = Math.min(startY, currentY);
+  const maxY = Math.max(startY, currentY);
+  const newSelection = [];
+  
+  elements.value.forEach(el => {
+    const w = el.width || (el.type === 'actor' ? 80 : el.type === 'System' ? 300 : 140);
+    const h = el.height || (el.type === 'actor' ? 120 : el.type === 'System' ? 400 : 80);
+    // Bounding metrics comparison checks match up with normalized coordinates
+    if (el.x < maxX && el.x + w > minX && el.y < maxY && el.y + h > minY) {
+      newSelection.push(String(el.id));
+    }
+  });
+  selectedElements.value = newSelection;
+}
+
+// ==========================================
+// 🗄️ SIDEBAR HTML5 DRAG AND DROP PERSISTENCE
 // ==========================================
 const handleDragOver = (event) => {
   event.dataTransfer.dropEffect = 'move';
@@ -248,10 +320,13 @@ const handleDrop = (event) => {
 
   const rect = canvasArea.getBoundingClientRect();
   
+  // Apply zoom division constraints to locate drop position
   const droppedX = (event.clientX - rect.left + canvasArea.scrollLeft) / zoomLevel.value;
   const droppedY = (event.clientY - rect.top + canvasArea.scrollTop) / zoomLevel.value;
 
-  diagramStore.saveToHistory();
+  if (typeof diagramStore.saveToHistory === 'function') {
+    diagramStore.saveToHistory();
+  }
   
   const generatedId = `${elementType.toLowerCase()}_${Date.now()}`;
   const elementPayload = {
@@ -267,60 +342,31 @@ const handleDrop = (event) => {
   elements.value.push(elementPayload);
 };
 
+// Utilities & Interface Lookups
 function selectConnection(id) { selectedConnectionId.value = id; }
 function clearSelectedConnection() { selectedConnectionId.value = null; }
 function zoomIn() { if (zoomLevel.value < 2) zoomLevel.value = Math.min(2, zoomLevel.value + 0.1); }
 function zoomOut() { if (zoomLevel.value > 0.5) zoomLevel.value = Math.max(0.5, zoomLevel.value - 0.1); }
 function resetZoom() { zoomLevel.value = 1; }
 
-function handleCanvasMouseDown(e) {
-  if (e.button !== 0 || e.target.closest('.element, .ConectingPoint, .conn-edit-anchor, .conn-editor')) return;
-  const canvas = e.currentTarget;
-  const rect = canvas.getBoundingClientRect();
-  const x = (e.clientX - rect.left + canvas.scrollLeft) / zoomLevel.value;
-  const y = (e.clientY - rect.top + canvas.scrollTop) / zoomLevel.value;
-  isSelecting.value = true;
-  selectionBox.value = { startX: x, startY: y, currentX: x, currentY: y };
-  if (!e.ctrlKey) selectedElements.value = [];
+function toggleConnectMode() {
+  connectMode.value = !connectMode.value;
+  connectFrom.value = null;
+  connectFromSide.value = null;
+  selectedElements.value = [];
 }
 
-function handleCanvasMouseMove(e) {
-  if (!isSelecting.value) return;
-  const canvas = document.querySelector('.drawing-area');
-  if (!canvas) return;
-  const rect = canvas.getBoundingClientRect();
-  selectionBox.value.currentX = (e.clientX - rect.left + canvas.scrollLeft) / zoomLevel.value;
-  selectionBox.value.currentY = (e.clientY - rect.top + canvas.scrollTop) / zoomLevel.value;
-  updateSelectionFromBox();
-}
-
-function handleCanvasMouseUp() { isSelecting.value = false; }
-
-function updateSelectionFromBox() {
-  const { startX, startY, currentX, currentY } = selectionBox.value;
-  const minX = Math.min(startX, currentX);
-  const maxX = Math.max(startX, currentX);
-  const minY = Math.min(startY, currentY);
-  const maxY = Math.max(startY, currentY);
-  const newSelection = [];
-  
-  elements.value.forEach(el => {
-    const w = el.width || (el.type === 'actor' ? 80 : el.type === 'System' ? 300 : 140);
-    const h = el.height || (el.type === 'actor' ? 120 : el.type === 'System' ? 400 : 80);
-    if (el.x < maxX && el.x + w > minX && el.y < maxY && el.y + h > minY) {
-      newSelection.push(String(el.id));
-    }
-  });
-  selectedElements.value = newSelection;
+function changeSelectedConnectionType(newType) {
+  if (selectedConnection.value) selectedConnection.value.type = newType;
 }
 
 function getConnectionPoint(element, side = 'right') {
   if (!element) return { x: 0, y: 0 };
   const elementContainer = document.querySelector(`[data-element-id="${element.id}"]`);
   if (elementContainer) {
-    const cp = elementContainer.querySelector(`.ConectingPoint.${side}`);
-    if (cp) {
-      const rect = cp.getBoundingClientRect();
+    const connectionPoint = elementContainer.querySelector(`.ConectingPoint.${side}`);
+    if (connectionPoint) {
+      const rect = connectionPoint.getBoundingClientRect();
       const canvasRect = document.querySelector('.drawing-area').getBoundingClientRect();
       return {
         x: rect.left - canvasRect.left + (rect.width / 2),
@@ -328,21 +374,21 @@ function getConnectionPoint(element, side = 'right') {
       };
     }
   }
-  const w = element.width || (element.type === 'actor' ? 80 : 140);
-  const h = element.height || (element.type === 'actor' ? 120 : 80);
-  const pos = {
-    top: { x: element.x + w / 2, y: element.y - 7 },
-    bottom: { x: element.x + w / 2, y: element.y + h + 7 },
-    left: { x: element.x - 7, y: element.y + h / 2 },
-    right: { x: element.x + w + 7, y: element.y + h / 2 }
+  const width = element.width || (element.type === 'actor' ? 80 : element.type === 'usecase' ? 140 : 300);
+  const height = element.height || (element.type === 'actor' ? 120 : element.type === 'usecase' ? 80 : 400);
+  const positions = {
+    top: { x: element.x + width / 2, y: element.y - 7 },
+    bottom: { x: element.x + width / 2, y: element.y + height + 7 },
+    left: { x: element.x - 7, y: element.y + height / 2 },
+    right: { x: element.x + width + 7, y: element.y + height / 2 }
   };
-  return pos[side] || pos.right;
+  return positions[side] || positions.right;
 }
 
 function getMidpointStyle(conn) {
-  const f = getConnectionPoint(conn.from, conn.fromSide);
-  const t = getConnectionPoint(conn.to, conn.toSide);
-  return { left: `${(f.x + t.x) / 2}px`, top: `${(f.y + t.y) / 2}px` };
+  const fromPt = getConnectionPoint(conn.from, conn.fromSide);
+  const toPt = getConnectionPoint(conn.to, conn.toSide);
+  return { left: `${(fromPt.x + toPt.x) / 2}px`, top: `${(fromPt.y + toPt.y) / 2}px` };
 }
 
 function handleConnectionPointClick(id, side) {
@@ -366,6 +412,21 @@ function handleConnectionPointClick(id, side) {
   selectedElements.value = [];
 }
 
+function selectElement(id) {
+  const idStr = String(id);
+  if (connectMode.value) return;
+  const isCtrlClick = window.event && (window.event.ctrlKey || window.event.metaKey);
+  if (isCtrlClick) {
+    if (selectedElements.value.includes(idStr)) {
+      selectedElements.value = selectedElements.value.filter(e => e !== idStr);
+    } else {
+      selectedElements.value.push(idStr);
+    }
+  } else {
+    selectedElements.value = [idStr];
+  }
+}
+
 function handleKeydown(e) {
   const active = document.activeElement;
   const isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
@@ -374,7 +435,7 @@ function handleKeydown(e) {
   if (isTyping) return;
   if (e.key === 'Delete' || e.key === 'Backspace') {
     if (selectedElements.value.length > 0) {
-      [...selectedElements.value].forEach(id => deleteElement(id));
+      [...selectedElements.value].forEach(id => diagramStore.deleteElement(id));
       selectedElements.value = [];
     }
   }
@@ -396,14 +457,17 @@ function exportDiagram() {
     elements: elements.value.map(e => ({ id: e.id, type: e.type, label: e.label, x: e.x, y: e.y, width: e.width, height: e.height })),
     connections: connections.value.map(c => ({ id: c.id, from: c.from?.id, to: c.to?.id, fromSide: c.fromSide, toSide: c.toSide, type: c.type }))
   };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+  link.href = url;
   link.download = 'uml-diagram.json';
   link.click();
+  URL.revokeObjectURL(url);
 }
 
 function importDiagram(data) {
-  diagramStore.saveToHistory();
+  if (typeof diagramStore.saveToHistory === 'function') diagramStore.saveToHistory();
   elements.value = data.elements.map(e => ({ id: e.id, type: e.type, label: e.label, x: e.x, y: e.y, width: e.width, height: e.height }));
   connections.value = data.connections.map(c => ({
     id: c.id,
@@ -416,8 +480,9 @@ function importDiagram(data) {
 }
 
 function exportAsImage() {
-  const el = document.getElementById('uml-canvas');
-  if (el) html2canvas(el).then(canvas => {
+  const canvasElement = document.getElementById('uml-canvas');
+  if (!canvasElement) return;
+  html2canvas(canvasElement).then(canvas => {
     const link = document.createElement('a');
     link.download = 'uml-diagram.png';
     link.href = canvas.toDataURL('image/png');
