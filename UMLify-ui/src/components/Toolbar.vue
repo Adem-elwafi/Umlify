@@ -1,71 +1,36 @@
-<script setup>
-import { ref } from 'vue';
-import { useDiagramStore } from '../stores/diagramStore';
-import { useAuthStore } from '../stores/authStore';
-
-// Two-way binding for the selected connection type
-const selectedType = defineModel();
-
-const emit = defineEmits(['local-export', 'local-import', 'local-snapshot']);
-
-const diagramStore = useDiagramStore();
-const authStore = useAuthStore();
-const fileLoader = ref(null);
-
-const handleCloudSave = async () => {
-  await diagramStore.saveCurrentDiagram(diagramStore.currentDiagramTitle);
-};
-
-const triggerFileInput = () => {
-  fileLoader.value?.click();
-};
-
-const handleFileImport = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    try {
-      const parsedData = JSON.parse(event.target.result);
-      emit('local-import', parsedData);
-    } catch (err) {
-      alert('Invalid document syntax rules detected.');
-    }
-  };
-  reader.readAsText(file);
-};
-
-const emitLocalExport = () => emit('local-export');
-const emitLocalSnapshot = () => emit('local-snapshot');
-
-const handleLogOutFlow = () => {
-  diagramStore.resetDiagram();
-  authStore.logout();
-};
-</script>
-
 <template>
   <div class="w-full min-h-[60px] bg-[#1a1a1e] border-t border-gray-800 p-4 flex flex-wrap items-center justify-between gap-4 select-none shadow-[0_-4px_20px_rgba(0,0,0,0.2)] z-50">
     
     <div class="flex items-center space-x-2">
-      <button 
-        @click="diagramStore.addActor()" 
-        class="bg-[#26262b] border border-gray-700 hover:border-gray-600 text-gray-200 text-xs font-semibold px-3 py-1.5 rounded-lg active:scale-95 transition-all cursor-pointer"
+      <div 
+        draggable="true"
+        @dragstart="handleDragStart($event, 'actor')"
+        class="bg-[#26262b] border border-gray-700 hover:border-gray-600 text-gray-200 text-xs font-semibold px-3 py-1.5 rounded-lg active:scale-95 transition-all cursor-grab active:cursor-grabbing flex items-center space-x-1 select-none"
+        title="Drag onto Canvas to create Actor"
       >
-        👤 Actor
-      </button>
-      <button 
-        @click="diagramStore.addUseCase()" 
-        class="bg-[#26262b] border border-gray-700 hover:border-gray-600 text-gray-200 text-xs font-semibold px-3 py-1.5 rounded-lg active:scale-95 transition-all cursor-pointer"
+        <span>👤</span>
+        <span>Actor</span>
+      </div>
+      
+      <div 
+        draggable="true"
+        @dragstart="handleDragStart($event, 'usecase')"
+        class="bg-[#26262b] border border-gray-700 hover:border-gray-600 text-gray-200 text-xs font-semibold px-3 py-1.5 rounded-lg active:scale-95 transition-all cursor-grab active:cursor-grabbing flex items-center space-x-1 select-none"
+        title="Drag onto Canvas to create Use Case"
       >
-        ⭕ Use Case
-      </button>
-      <button 
-        @click="diagramStore.addSystem()" 
-        class="bg-[#26262b] border border-gray-700 hover:border-gray-600 text-gray-200 text-xs font-semibold px-3 py-1.5 rounded-lg active:scale-95 transition-all cursor-pointer"
+        <span>⭕</span>
+        <span>Use Case</span>
+      </div>
+
+      <div 
+        draggable="true"
+        @dragstart="handleDragStart($event, 'System')"
+        class="bg-[#26262b] border border-gray-700 hover:border-gray-600 text-gray-200 text-xs font-semibold px-3 py-1.5 rounded-lg active:scale-95 transition-all cursor-grab active:cursor-grabbing flex items-center space-x-1 select-none"
+        title="Drag onto Canvas to create System Boundary"
       >
-        🔲 System
-      </button>
+        <span>🔲</span>
+        <span>System</span>
+      </div>
       
       <div class="h-6 w-px bg-gray-700 mx-2" />
       
@@ -107,16 +72,13 @@ const handleLogOutFlow = () => {
         <span>Save Project</span>
       </button>
 
-      <transition name="fade">
         <span 
           v-if="diagramStore.globalSaveStatusMessage" 
-          :class="['text-[11px] font-mono tracking-wide font-bold px-1.5 py-0.5 rounded', 
-            diagramStore.globalSaveStatusMessage.includes('Successful') ? 'text-emerald-400 bg-emerald-950/40' : 'text-amber-400 bg-amber-950/30'
-          ]"
+          class="text-[11px] font-mono opacity-90 tracking-wide font-bold px-1.5 py-0.5 rounded"
+          :class="diagramStore.globalSaveStatusMessage.includes('Successful') ? 'text-emerald-400 bg-emerald-950/40' : 'text-amber-400 bg-amber-950/30'"
         >
           {{ diagramStore.globalSaveStatusMessage }}
         </span>
-      </transition>
     </div>
 
     <div class="flex items-center space-x-2">
@@ -133,6 +95,53 @@ const handleLogOutFlow = () => {
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref } from 'vue';
+import { useDiagramStore } from '../stores/diagramStore';
+import { useAuthStore } from '../stores/authStore';
+
+const emit = defineEmits(['local-export', 'local-import', 'local-snapshot']);
+const selectedType = defineModel({ default: 'association' });
+
+const diagramStore = useDiagramStore();
+const authStore = useAuthStore();
+const fileLoader = ref(null);
+
+const handleDragStart = (event, elementType) => {
+  event.dataTransfer.effectAllowed = 'move';
+  event.dataTransfer.setData('text/plain', elementType);
+};
+
+const handleCloudSave = async () => {
+  await diagramStore.saveCurrentDiagram(diagramStore.currentDiagramTitle);
+};
+
+const triggerFileInput = () => { fileLoader.value?.click(); };
+
+const handleFileImport = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const parsedData = JSON.parse(event.target.result);
+      emit('local-import', parsedData);
+    } catch (err) {
+      alert('Invalid document syntax rules detected.');
+    }
+  };
+  reader.readAsText(file);
+};
+
+const emitLocalExport = () => emit('local-export');
+const emitLocalSnapshot = () => emit('local-snapshot');
+
+const handleLogOutFlow = () => {
+  diagramStore.resetDiagram();
+  authStore.logout();
+};
+</script>
 
 <style scoped>
 .fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }

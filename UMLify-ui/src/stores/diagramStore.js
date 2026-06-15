@@ -275,6 +275,7 @@ export const useDiagramStore = defineStore('diagram', () => {
     fetchUserDiagrams,
     saveCurrentDiagram,
     loadDiagramById,
+    saveToHistory,
     addActor,
     addUseCase,
     addSystem,
