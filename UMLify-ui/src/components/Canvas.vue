@@ -141,12 +141,17 @@
     </div>
 
     <!-- Toolbar Entry Point -->
-    <Toolbar
-      v-model="selectedType"
-      @local-export="exportDiagram"
-      @local-import="importDiagram"
-      @local-snapshot="exportAsImage"
-    />
+    <div 
+      class="transition-all duration-300 ease-in-out"
+      :class="isSidebarDrawerOpen ? '-translate-x-24 opacity-0 pointer-events-none' : 'translate-x-0 opacity-100'"
+    >
+      <Toolbar
+        v-model="selectedType"
+        @local-export="exportDiagram"
+        @local-import="importDiagram"
+        @local-snapshot="exportAsImage"
+      />
+    </div>
 
     <!-- Element Property Inspector Sidebar -->
     <transition name="fade">
@@ -224,7 +229,10 @@ import Toolbar from './Toolbar.vue';
 import System from './System.vue'; 
 import html2canvas from 'html2canvas'; 
 
-const props = defineProps({ onLogout: Function });
+const props = defineProps({ 
+  onLogout: Function,
+  isSidebarDrawerOpen: Boolean
+});
 
 const diagramStore = useDiagramStore();
 const { elements, connections, selectedElements, selectedConnectionId, zoomLevel, connectMode } = storeToRefs(diagramStore);

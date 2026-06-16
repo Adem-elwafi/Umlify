@@ -5,10 +5,10 @@
       <div class="flex items-center gap-4">
         <button 
           @click="isSidebarDrawerOpen = !isSidebarDrawerOpen"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-medium transition-all active:scale-95 cursor-pointer shadow-xs select-none"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-medium transition-all active:scale-95 cursor-pointer shadow-xs select-none group"
           title="Toggle Cloud Directory Drawer"
         >
-          <span>📂</span>
+          <Folder class="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-900" />
           <span>Cloud Files</span>
         </button>
 
@@ -29,7 +29,7 @@
             ? 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs font-medium transition-all cursor-pointer shadow-sm select-none' 
             : 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-medium transition-all active:scale-95 cursor-pointer shadow-xs select-none'"
         >
-          <span>💻</span>
+          <Terminal class="w-3.5 h-3.5" />
           <span>{{ isTerminalOpen ? 'Hide Terminal' : 'AI Terminal' }}</span>
         </button>
       </div>
@@ -53,8 +53,13 @@
         ]"
       >
         <div class="p-4 border-b border-zinc-100 flex justify-between items-center bg-zinc-50/50 text-[11px] font-bold uppercase tracking-wider text-zinc-400 select-none">
-          <span>Cloud Projects Directory</span>
-          <button @click="isSidebarDrawerOpen = false" class="text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer">✕</button>
+          <div class="flex items-center gap-2">
+            <Folder class="w-3.5 h-3.5" />
+            <span>Cloud Projects Directory</span>
+          </div>
+          <button @click="isSidebarDrawerOpen = false" class="text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer">
+            <X class="w-4 h-4" />
+          </button>
         </div>
 
         <div class="p-4">
@@ -77,10 +82,10 @@
             :key="diag.id"
             @click="handleSelectCloudDiagram(diag.id)"
             :class="[
-              'p-3 mx-2 rounded-xl transition-all cursor-pointer select-none group flex items-center justify-between',
+              'p-3 mx-2 rounded-xl transition-all cursor-pointer select-none group flex items-center justify-between border',
               diagramStore.currentDiagramId === diag.id 
-                ? 'bg-blue-50/40 border border-blue-200/60 text-blue-900' 
-                : 'bg-transparent border border-transparent hover:bg-zinc-50/80 text-zinc-700 hover:text-zinc-900'
+                ? 'bg-zinc-100 border-zinc-200 text-zinc-900' 
+                : 'bg-transparent border-transparent hover:bg-zinc-50/80 text-zinc-700 hover:text-zinc-900 hover:border-zinc-100'
             ]"
           >
             <div class="truncate mr-2">
@@ -89,14 +94,25 @@
                 {{ new Date(diag.updatedAt || diag.createdAt).toLocaleDateString() }}
               </p>
             </div>
-            <span class="text-[10px] opacity-0 group-hover:opacity-100 text-zinc-400 font-bold tracking-tighter transition-all translate-x-1 group-hover:translate-x-0">LOAD</span>
+            <FileJson class="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
+          </div>
+        </div>
+
+        <!-- Trash/Delete Zone Placeholder -->
+        <div class="p-4 border-t border-zinc-100 mt-auto">
+          <div class="w-full py-3 border border-dashed border-zinc-200 rounded-xl flex flex-col items-center justify-center gap-1.5 text-zinc-400 group hover:border-rose-200 hover:bg-rose-50/30 transition-all">
+            <Trash2 class="w-4 h-4 group-hover:text-rose-500" />
+            <span class="text-[9px] uppercase font-bold tracking-widest group-hover:text-rose-600">Drop to Delete</span>
           </div>
         </div>
       </div>
 
       <!-- Main Drawing Area Container -->
       <div class="flex-1 h-full relative bg-[radial-gradient(#e4e4e7_1px,transparent_1px)] [background-size:16px_16px] bg-zinc-50 transition-all duration-300 overflow-hidden">
-        <Canvas :onLogout="handleSignOutFlow" />
+        <Canvas 
+          :onLogout="handleSignOutFlow" 
+          :isSidebarDrawerOpen="isSidebarDrawerOpen"
+        />
       </div>
 
       <!-- AI Terminal Pane Layout Wrapper -->
@@ -118,6 +134,13 @@ import { useDiagramStore } from '../stores/diagramStore';
 import { useAuthStore } from '../stores/authStore';
 import Canvas from '../components/Canvas.vue';
 import TerminalEditor from '../components/TerminalEditor.vue';
+import { 
+  Folder, 
+  Terminal, 
+  X, 
+  Trash2, 
+  FileJson 
+} from 'lucide-vue-next';
 
 const diagramStore = useDiagramStore();
 const authStore = useAuthStore();
