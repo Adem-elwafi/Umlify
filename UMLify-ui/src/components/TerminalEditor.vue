@@ -1,48 +1,78 @@
 <template>
-  <div class="h-full flex flex-col bg-slate-950 font-mono text-sm border-l border-gray-800 text-slate-200">
-    <div class="p-3 bg-slate-900 border-b border-gray-800 flex justify-between items-center shrink-0">
-      <div class="flex items-center space-x-2">
-        <span class="w-3 h-3 rounded-full bg-red-500"></span>
-        <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
-        <span class="w-3 h-3 rounded-full bg-green-500"></span>
-        <span class="ml-2 font-bold text-xs text-slate-400 tracking-wider uppercase">AI JSON Compiler</span>
+  <div class="w-full h-full bg-zinc-950 border-l border-zinc-900 flex flex-col p-4 font-sans text-zinc-300">
+    <!-- Panel Header -->
+    <div class="flex items-center justify-between mb-4 shrink-0">
+      <div class="flex items-center space-x-3">
+        <div class="flex space-x-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-zinc-800"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-zinc-800"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-zinc-800"></span>
+        </div>
+        <h2 class="text-[10px] font-bold tracking-wider uppercase text-zinc-500 select-none font-mono">
+          AI Architecture Compiler
+        </h2>
       </div>
-      <button 
-        @click="compileDiagram" 
-        class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition text-white text-xs font-semibold rounded shadow-md flex items-center space-x-1"
-      >
-        <span>⚡ Compile Architecture</span>
-      </button>
+      <div class="flex items-center space-x-2">
+        <div v-if="successMessage" class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] animate-pulse"></div>
+        <div v-else class="w-2 h-2 rounded-full bg-zinc-800"></div>
+        <span class="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">{{ successMessage ? 'Active' : 'Standby' }}</span>
+      </div>
     </div>
 
-    <div class="p-3 bg-slate-900/50 border-b border-gray-800 text-xs text-slate-400 leading-relaxed shrink-0">
-      <span class="text-indigo-400 font-semibold">ℹ️ AI Blueprint Scheme:</span>
-      Ensure your payload provides an array containing an <code class="text-amber-400">elements: []</code> node collection and a <code class="text-amber-400">connections: []</code> vector line mapping.
+    <!-- Info Section -->
+    <div class="mb-4 p-3 bg-zinc-900/30 border border-zinc-800/50 rounded-xl shrink-0">
+      <p class="text-[10px] text-zinc-500 leading-relaxed">
+        <span class="text-zinc-300 font-bold uppercase mr-1.5">Blueprint Protocol:</span>
+        Input a valid JSON payload containing <code class="text-zinc-300 font-mono">elements</code> and <code class="text-zinc-300 font-mono">connections</code> arrays to instantiate the vector architecture.
+      </p>
     </div>
 
-    <div class="flex-1 relative p-2 min-h-0">
+    <!-- Main Input Area -->
+    <div class="flex-1 min-h-0 mb-4 relative group">
+      <div class="absolute inset-0 bg-gradient-to-b from-zinc-900/20 to-transparent pointer-events-none rounded-lg"></div>
       <textarea
         v-model="jsonInput"
-        placeholder='Paste AI JSON layout pattern here... e.g.,&#10;{&#10;  "elements": [&#10;    { "type": "Actor", "label": "Student", "x": 100, "y": 150 },&#10;    { "type": "UseCase", "label": "Generate Diagram", "x": 350, "y": 140 }&#10;  ],&#10;  "connections": [&#10;    { "from": 0, "to": 1 }&#10;  ]&#10;}'
-        class="w-full h-full p-4 bg-transparent text-emerald-400 placeholder-slate-600 focus:outline-none resize-none overflow-y-auto leading-relaxed tab-size-2"
+        placeholder='{&#10;  "elements": [...],&#10;  "connections": [...]&#10;}'
+        class="w-full h-full bg-zinc-900/50 border border-zinc-800/80 rounded-lg p-4 text-xs font-mono text-zinc-100 placeholder-zinc-700 focus:outline-none focus:border-zinc-700 focus:ring-1 focus:ring-zinc-800 transition-all shadow-inner resize-none overflow-y-auto leading-relaxed tab-size-2"
         spellcheck="false"
       ></textarea>
     </div>
 
-    <div class="shrink-0 border-t border-gray-800 bg-slate-900 max-h-40 overflow-y-auto p-3">
-      <div v-if="errorLog" class="text-rose-400 bg-rose-950/40 p-2.5 rounded border border-rose-900/50 text-xs">
-        <p class="font-bold mb-1">❌ Compilation Failed Matrix Error:</p>
-        <p class="whitespace-pre-wrap">{{ errorLog }}</p>
-      </div>
-      <div v-else-if="successMessage" class="text-emerald-400 bg-emerald-950/30 p-2.5 rounded border border-emerald-900/40 text-xs flex items-center space-x-2">
-        <span>✅</span>
-        <span>{{ successMessage }}</span>
-      </div>
-      <div v-else class="text-slate-500 text-xs italic flex items-center space-x-2">
-        <span>></span>
-        <span>Terminal ready. Awaiting telemetry source transmission...</span>
-      </div>
+    <!-- Feedback Area -->
+    <div class="mb-4 shrink-0">
+      <transition name="fade" mode="out-in">
+        <div v-if="errorLog" class="bg-rose-950/20 border border-rose-900/30 p-3 rounded-lg">
+          <div class="flex items-center space-x-2 mb-1">
+            <span class="text-rose-500 text-[10px]">●</span>
+            <span class="text-[10px] font-bold text-rose-500 uppercase tracking-wider">Compilation Error</span>
+          </div>
+          <p class="text-[11px] text-rose-400/80 font-mono leading-tight whitespace-pre-wrap">{{ errorLog }}</p>
+        </div>
+        <div v-else-if="successMessage" class="bg-emerald-950/20 border border-emerald-900/30 p-3 rounded-lg">
+          <div class="flex items-center space-x-2 mb-1">
+            <span class="text-emerald-500 text-[10px]">●</span>
+            <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Success</span>
+          </div>
+          <p class="text-[11px] text-emerald-400/80 font-mono leading-tight">{{ successMessage }}</p>
+        </div>
+        <div v-else class="flex items-center space-x-2 px-1">
+          <span class="text-zinc-800 text-[10px]">❯</span>
+          <span class="text-[10px] font-medium text-zinc-600 font-mono">Ready for telemetry transmission...</span>
+        </div>
+      </transition>
     </div>
+
+    <!-- Action Block -->
+    <button 
+      @click="compileDiagram" 
+      :disabled="!jsonInput.trim()"
+      class="w-full py-2.5 bg-zinc-100 hover:bg-zinc-200 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none text-zinc-950 font-semibold text-xs rounded-lg shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer group"
+    >
+      <svg class="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+      <span>Compile Architecture</span>
+    </button>
   </div>
 </template>
 
@@ -73,7 +103,6 @@ const compileDiagram = () => {
     }
 
     // 1. SAFE STATE INITIALIZATION
-    // Use store action to clear state and maintain history stack
     diagramStore.resetDiagram()
 
     // Map referencing dictionary for index matching pipelines
@@ -84,16 +113,15 @@ const compileDiagram = () => {
       const generatedId = `${el.type?.toLowerCase() || 'node'}-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`
       elementIdMapping[index] = generatedId
 
-      // Alignment mapping for Canvas.vue templates
       let normalizedType = el.type || 'usecase'
       const lowerType = String(normalizedType).toLowerCase()
 
       if (lowerType === 'actor') {
-        normalizedType = 'actor'      // Lowercase for Actor.vue
+        normalizedType = 'actor'
       } else if (lowerType === 'usecase' || lowerType === 'use-case') {
-        normalizedType = 'usecase'    // Lowercase for UseCase.vue
+        normalizedType = 'usecase'
       } else if (lowerType === 'system') {
-        normalizedType = 'System'     // Capitalized for System.vue
+        normalizedType = 'System'
       }
 
       const nodePayload = {
@@ -106,27 +134,23 @@ const compileDiagram = () => {
         height: Number(el.height) || (normalizedType === 'actor' ? 120 : normalizedType === 'System' ? 400 : 80)
       }
       
-      // Direct state mutation into the reactive store array
       diagramStore.elements.push(nodePayload)
     })
 
-    // 3. CONNECTIONS RESOLUTION USING COMPLETE OBJECT REFERENCES
+    // 3. CONNECTIONS RESOLUTION
     if (payload.connections && Array.isArray(payload.connections)) {
       payload.connections.forEach(conn => {
         const fromId = elementIdMapping[conn.from]
         const toId = elementIdMapping[conn.to]
 
-        // Find the complete node reference within the newly spawned diagramStore.elements array
-        // This ensures the drawing layer can compute vector positions correctly
         const fromNode = diagramStore.elements.find(e => String(e.id) === String(fromId))
         const toNode = diagramStore.elements.find(e => String(e.id) === String(toId))
 
         if (fromNode && toNode) {
-          // Push mapped object entities using clear reactive bindings
           diagramStore.connections.push({
             id: crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-            from: fromNode, // Full object reference
-            to: toNode,     // Full object reference
+            from: fromNode,
+            to: toNode,
             fromSide: conn.fromSide || 'right',
             toSide: conn.toSide || 'left',
             type: conn.type || 'association'
@@ -135,7 +159,7 @@ const compileDiagram = () => {
       })
     }
 
-    successMessage.value = `Compilation Successful! Rendered ${diagramStore.elements.length} components and ${diagramStore.connections.length} relational vectors.`
+    successMessage.value = `Rendered ${diagramStore.elements.length} components and ${diagramStore.connections.length} relational vectors.`
   } catch (err) {
     errorLog.value = err.message || "Invalid JSON syntactic topology formatting rule detected."
   }
@@ -147,4 +171,6 @@ const compileDiagram = () => {
   tab-size: 2;
   -moz-tab-size: 2;
 }
+.fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
 </style>
