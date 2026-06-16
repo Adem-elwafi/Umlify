@@ -468,25 +468,44 @@ function getConnectionPoint(element, side = 'right') {
       const canvasRect = canvasArea.getBoundingClientRect();
       return {
         x: rect.left - canvasRect.left + (rect.width / 2) + canvasArea.scrollLeft,
-        y: rect.top - canvasRect.top + (rect.height / 2) + canvasArea.scrollTop
+        y: rect.top - canvasRect.top + (rect.height / 2) + canvasArea.scrollTop,
+        side: side
       };
     }
   }
   const width = element.width || (element.type === 'actor' ? 80 : element.type === 'usecase' ? 140 : 300);
   const height = element.height || (element.type === 'actor' ? 120 : element.type === 'usecase' ? 80 : 400);
   const positions = {
-    top: { x: element.x + width / 2, y: element.y - 7 },
-    bottom: { x: element.x + width / 2, y: element.y + height + 7 },
-    left: { x: element.x - 7, y: element.y + height / 2 },
-    right: { x: element.x + width + 7, y: element.y + height / 2 }
+    top: { x: element.x + width / 2, y: element.y - 7, side: 'top' },
+    bottom: { x: element.x + width / 2, y: element.y + height + 7, side: 'bottom' },
+    left: { x: element.x - 7, y: element.y + height / 2, side: 'left' },
+    right: { x: element.x + width + 7, y: element.y + height / 2, side: 'right' }
   };
-  return positions[side] || positions.right;
+  return positions[side] || { ...positions.right, side: 'right' };
 }
 
 function getMidpointStyle(conn) {
   const fromPt = getConnectionPoint(conn.from, conn.fromSide);
   const toPt = getConnectionPoint(conn.to, conn.toSide);
-  return { left: `${(fromPt.x + toPt.x) / 2}px`, top: `${(fromPt.y + toPt.y) / 2}px` };
+  
+  // Align midpoint style with orthogonal logic
+  let midX, midY;
+  const isFromHorizontal = ['left', 'right'].includes(fromPt.side);
+  const isToHorizontal = ['left', 'right'].includes(toPt.side);
+
+  if (isFromHorizontal && isToHorizontal) {
+    midX = fromPt.x + (toPt.x - fromPt.x) / 2;
+    midY = (fromPt.y + toPt.y) / 2;
+  } else if (!isFromHorizontal && !isToHorizontal) {
+    midX = (fromPt.x + toPt.x) / 2;
+    midY = fromPt.y + (toPt.y - fromPt.y) / 2;
+  } else {
+    // Mixed edge - approximate middle of the L-shape
+    midX = toPt.x;
+    midY = fromPt.y;
+  }
+
+  return { left: `${midX}px`, top: `${midY}px` };
 }
 
 function handleConnectionPointClick(id, side) {
