@@ -45,12 +45,6 @@
     >
       ×
     </button>
-    
-    <!-- Connection Points -->
-    <div class="ConectingPoint top absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full border border-zinc-300 bg-white hover:border-blue-500 hover:bg-blue-50 shadow-xs flex items-center justify-center text-[8px] text-zinc-400 hover:text-blue-600 transition-all cursor-crosshair z-20 opacity-0 hover:opacity-100" @mousedown.stop @mouseup.stop="handleConnectionPointClick('top')"></div>
-    <div class="ConectingPoint bottom absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full border border-zinc-300 bg-white hover:border-blue-500 hover:bg-blue-50 shadow-xs flex items-center justify-center text-[8px] text-zinc-400 hover:text-blue-600 transition-all cursor-crosshair z-20 opacity-0 hover:opacity-100" @mousedown.stop @mouseup.stop="handleConnectionPointClick('bottom')"></div>
-    <div class="ConectingPoint left absolute top-1/2 -left-1.5 -translate-y-1/2 w-3 h-3 rounded-full border border-zinc-300 bg-white hover:border-blue-500 hover:bg-blue-50 shadow-xs flex items-center justify-center text-[8px] text-zinc-400 hover:text-blue-600 transition-all cursor-crosshair z-20 opacity-0 hover:opacity-100" @mousedown.stop @mouseup.stop="handleConnectionPointClick('left')"></div>
-    <div class="ConectingPoint right absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 rounded-full border border-zinc-300 bg-white hover:border-blue-500 hover:bg-blue-50 shadow-xs flex items-center justify-center text-[8px] text-zinc-400 hover:text-blue-600 transition-all cursor-crosshair z-20 opacity-0 hover:opacity-100" @mousedown.stop @mouseup.stop="handleConnectionPointClick('right')"></div>
   </div>
 </template>
 
@@ -67,7 +61,7 @@ const props = defineProps({
   onResize: Function,
   selected: { type: Boolean, default: false }
 })
-const emit = defineEmits(['click', 'update:label', 'connection-point-click', 'delete'])
+const emit = defineEmits(['click', 'update:label', 'delete'])
 
 const localLabel = ref(props.label || 'Actor')
 
@@ -77,10 +71,6 @@ watch(() => props.label, (newLabel) => {
 
 function updateLabel() {
   emit('update:label', localLabel.value)
-}
-
-function handleConnectionPointClick(side) {
-  emit('connection-point-click', side)
 }
 
 const dragging = ref(false)

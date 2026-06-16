@@ -1,6 +1,6 @@
 <template>
   <!-- Floating Pill Dock -->
-  <div class="fixed left-4 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-md border border-zinc-200 shadow-xl shadow-zinc-200/30 rounded-2xl p-2 flex flex-col gap-1.5 z-50 w-13 items-center">
+  <div class="absolute left-6 bottom-10 bg-white/80 backdrop-blur-md border border-zinc-200 shadow-xl shadow-zinc-200/30 rounded-2xl p-2 flex flex-col gap-1.5 z-50 w-13 items-center">
     
     <!-- Element Spawners -->
     <div 
@@ -32,19 +32,6 @@
 
     <div class="w-6 h-px bg-zinc-200 my-0.5" />
 
-    <!-- Connection Toggler -->
-    <button 
-      @click="diagramStore.connectMode = !diagramStore.connectMode" 
-      :class="diagramStore.connectMode 
-        ? 'w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-900 border border-zinc-800 text-white shadow-md cursor-pointer transition-all' 
-        : 'w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-zinc-600 cursor-pointer transition-all'"
-      :title="diagramStore.connectMode ? 'Exit Connection Mode' : 'Link Line Mode'"
-    >
-      <component :is="diagramStore.connectMode ? Pencil : Link" class="w-4 h-4" />
-    </button>
-
-    <div class="w-6 h-px bg-zinc-200 my-0.5" />
-
     <!-- Local File Actions -->
     <button @click="emitLocalExport" class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-zinc-600 cursor-pointer transition-all group" title="Export JSON">
       <Download class="w-4 h-4 group-hover:text-zinc-900" />
@@ -65,7 +52,7 @@
   </div>
 
   <!-- Project Controls Panel (Floating next to the element dock) -->
-  <div class="fixed left-20 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-md border border-zinc-200 shadow-xl shadow-zinc-200/20 rounded-2xl p-4 flex flex-col gap-3 z-50 w-48 transition-all duration-300">
+  <div class="absolute left-24 bottom-10 bg-white/90 backdrop-blur-md border border-zinc-200 shadow-xl shadow-zinc-200/20 rounded-2xl p-4 flex flex-col gap-3 z-50 w-48 transition-all duration-300">
     <div class="flex flex-col gap-1">
       <label class="text-[9px] uppercase tracking-wider text-zinc-400 font-bold px-1">Diagram Title</label>
       <input 
@@ -97,23 +84,6 @@
         </div>
       </transition>
     </div>
-
-    <!-- Relationship Type Selector (Contextual) -->
-    <transition name="fade">
-      <div v-if="diagramStore.connectMode" class="mt-2 p-2 bg-zinc-50 rounded-xl border border-zinc-100 flex flex-col gap-2">
-        <label class="text-[9px] uppercase tracking-wider text-zinc-400 font-bold">Line Type</label>
-        <select 
-          v-model="selectedType" 
-          class="bg-white border border-zinc-200 text-[11px] text-zinc-700 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer w-full"
-        >
-          <option value="association">Association</option>
-          <option value="include">Include</option>
-          <option value="extend">Extend</option>
-          <option value="generalization">Generalization</option>
-          <option value="dependency">Dependency</option>
-        </select>
-      </div>
-    </transition>
   </div>
 
   <input type="file" ref="fileLoader" @change="handleFileImport" class="hidden" accept=".json" />

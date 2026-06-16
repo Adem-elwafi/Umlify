@@ -2,7 +2,6 @@
   <div 
     id="uml-canvas" 
     class="w-full h-full relative overflow-hidden bg-[#fafafa] flex flex-col select-none" 
-    :class="{'pencil-cursor': connectMode}"
     @dragover.prevent="handleDragOver"
     @drop="handleDrop"
   >
@@ -72,9 +71,7 @@
             :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
             @click.stop="selectElement(element.id)"
-            @connection-point-click="(side) => handleConnectionPointClick(element.id, side)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
-            :class="{'pencil-cursor': connectMode}"
             @delete="deleteElement(element.id)"
           />
           <UseCase 
@@ -88,41 +85,71 @@
             :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
             @click.stop="selectElement(element.id)"
-            @connection-point-click="(side) => handleConnectionPointClick(element.id, side)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
             @delete="deleteElement(element.id)"
           />
+
+          <!-- Interactive Connection Anchors (Task 2: Hover perimeter handles) -->
+          <div class="absolute inset-0 pointer-events-none group">
+            <div 
+              v-for="side in ['top', 'right', 'bottom', 'left']" 
+              :key="side"
+              :data-anchor-side="side"
+              class="absolute w-3 h-3 rounded-full border border-zinc-300 bg-white shadow-xs flex items-center justify-center text-[9px] font-bold text-zinc-400 hover:text-blue-600 hover:border-blue-500 active:scale-75 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-auto cursor-crosshair z-30"
+              :class="{
+                'top-0 left-1/2': side === 'top',
+                'top-1/2 right-0 translate-x-1/2': side === 'right',
+                'bottom-0 left-1/2 translate-y-1/2': side === 'bottom',
+                'top-1/2 left-0': side === 'left'
+              }"
+              @mousedown.stop="initiateConnectionDrag($event, element, side)"
+            >
+              <span class="pointer-events-none">+</span>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- Relational Connectors -->
-      <Connector
-        v-for="conn in connections"
-        :key="conn.id || `${conn.from?.id}-${conn.to?.id}`"
-        :from="getConnectionPoint(conn.from, conn.fromSide)"
-        :to="getConnectionPoint(conn.to, conn.toSide)"
-        :type="conn.type"
-      />
+        <!-- Real-time Temp Orthogonal Vector Path -->
+        <svg v-if="activeDraggingLink" class="absolute top-0 left-0 w-full h-full pointer-events-none z-[1000] overflow-visible">
+          <path 
+            :d="draggingPath" 
+            fill="none" 
+            stroke="#3b82f6" 
+            stroke-width="1.5" 
+            stroke-dasharray="4,4"
+            class="drop-shadow-sm"
+          />
+        </svg>
 
-      <!-- Connection Edit Anchors (Task 2: High-fidelity micro-targets) -->
-      <div
-        v-for="conn in connections"
-        :key="`anchor-${conn.id || `${conn.from?.id}-${conn.to?.id}`}`"
-        class="absolute -translate-x-1/2 -translate-y-1/2 z-10"
-        :style="getMidpointStyle(conn)"
-      >
-        <button 
-          class="w-3 h-3 rounded-full border border-zinc-300 bg-white hover:border-blue-500 hover:bg-blue-50 shadow-xs flex items-center justify-center text-[8px] text-zinc-400 hover:text-blue-600 transition-all cursor-crosshair z-20 active:scale-90" 
-          title="Edit connection type" 
-          @click.stop="selectConnection(conn.id)"
-        >•</button>
+        <!-- Relational Connectors -->
+        <Connector
+          v-for="conn in connections"
+          :key="conn.id || `${conn.from?.id}-${conn.to?.id}`"
+          :from="getConnectionPoint(conn.from, conn.fromSide)"
+          :to="getConnectionPoint(conn.to, conn.toSide)"
+          :type="conn.type"
+        />
+
+        <!-- Connection Edit Anchors (Task 2: High-fidelity micro-targets) -->
+        <div
+          v-for="conn in connections"
+          :key="`anchor-${conn.id || `${conn.from?.id}-${conn.to?.id}`}`"
+          class="absolute -translate-x-1/2 -translate-y-1/2 z-10"
+          :style="getMidpointStyle(conn)"
+        >
+          <button 
+            class="w-3 h-3 rounded-full border border-zinc-300 bg-white hover:border-blue-500 hover:bg-blue-50 shadow-xs flex items-center justify-center text-[8px] text-zinc-400 hover:text-blue-600 transition-all cursor-crosshair z-20 active:scale-90" 
+            title="Edit connection type" 
+            @click.stop="selectConnection(conn.id)"
+          >•</button>
+        </div>
       </div>
 
       <!-- Contextual Connection Editor Overlay -->
       <div 
         v-if="selectedConnection" 
         class="absolute bg-white/90 backdrop-blur-md border border-zinc-200/80 shadow-lg shadow-zinc-200/40 rounded-xl p-2 flex items-center gap-1.5 z-40 transform -translate-x-1/2 -translate-y-[calc(100%+10px)]" 
-        :style="getMidpointStyle(selectedConnection)" 
+        :style="getEditorStyle(selectedConnection)" 
         @click.stop
       >
         <select 
@@ -235,12 +262,10 @@ const props = defineProps({
 });
 
 const diagramStore = useDiagramStore();
-const { elements, connections, selectedElements, selectedConnectionId, zoomLevel, connectMode } = storeToRefs(diagramStore);
+const { elements, connections, selectedElements, selectedConnectionId, zoomLevel } = storeToRefs(diagramStore);
 const { updateSize, updateLabel, deleteElement, connectElements, undo, redo, saveToHistory } = diagramStore;
 
 const selectedType = ref('association');
-const connectFrom = ref(null);
-const connectFromSide = ref(null);
 
 const isSelecting = ref(false);
 const selectionBox = ref({ startX: 0, startY: 0, currentX: 0, currentY: 0 });
@@ -260,6 +285,80 @@ const inspectorElement = computed(() => {
 });
 
 // ==========================================
+// 🔗 INTERACTIVE CONNECTION ENGINE (Task 3)
+// ==========================================
+const activeDraggingLink = ref(null);
+
+const initiateConnectionDrag = (event, element, side) => {
+  const rect = event.currentTarget.getBoundingClientRect();
+  const canvasArea = document.querySelector('#uml-canvas div[class*="overflow-auto"]');
+  const canvasRect = canvasArea.getBoundingClientRect();
+  
+  const startX = (rect.left - canvasRect.left + rect.width / 2 + canvasArea.scrollLeft) / zoomLevel.value;
+  const startY = (rect.top - canvasRect.top + rect.height / 2 + canvasArea.scrollTop) / zoomLevel.value;
+
+  activeDraggingLink.value = {
+    sourceId: element.id,
+    sourceSide: side,
+    startX,
+    startY,
+    currentX: startX,
+    currentY: startY
+  };
+
+  window.addEventListener('mousemove', handleConnectionMouseMove);
+  window.addEventListener('mouseup', handleConnectionMouseUp);
+};
+
+const handleConnectionMouseMove = (event) => {
+  if (!activeDraggingLink.value) return;
+  const canvasArea = document.querySelector('#uml-canvas div[class*="overflow-auto"]');
+  const rect = canvasArea.getBoundingClientRect();
+  
+  activeDraggingLink.value.currentX = (event.clientX - rect.left + canvasArea.scrollLeft) / zoomLevel.value;
+  activeDraggingLink.value.currentY = (event.clientY - rect.top + canvasArea.scrollTop) / zoomLevel.value;
+};
+
+const handleConnectionMouseUp = (event) => {
+  if (!activeDraggingLink.value) return;
+
+  const target = event.target.closest('[data-anchor-side]');
+  if (target) {
+    const targetWrapper = target.closest('[data-element-id]');
+    const targetElementId = targetWrapper ? targetWrapper.dataset.elementId : null;
+    const targetSide = target.dataset.anchorSide;
+    
+    if (targetElementId && targetElementId !== String(activeDraggingLink.value.sourceId)) {
+      diagramStore.connectElements(
+        activeDraggingLink.value.sourceId,
+        targetElementId,
+        activeDraggingLink.value.sourceSide,
+        targetSide,
+        selectedType.value
+      );
+    }
+  }
+
+  activeDraggingLink.value = null;
+  window.removeEventListener('mousemove', handleConnectionMouseMove);
+  window.removeEventListener('mouseup', handleConnectionMouseUp);
+};
+
+const draggingPath = computed(() => {
+  if (!activeDraggingLink.value) return '';
+  const { startX, startY, currentX, currentY, sourceSide } = activeDraggingLink.value;
+  
+  // Real-time Orthogonal Path Tracking
+  if (sourceSide === 'left' || sourceSide === 'right') {
+    const midX = startX + (currentX - startX) / 2;
+    return `M ${startX} ${startY} H ${midX} V ${currentY} H ${currentX}`;
+  } else {
+    const midY = startY + (currentY - startY) / 2;
+    return `M ${startX} ${startY} V ${midY} H ${currentX} V ${currentY}`;
+  }
+});
+
+// ==========================================
 // 🚀 OPTIMIZED MULTI-ELEMENT DRAGGING PHYSICS
 // ==========================================
 const isDraggingElements = ref(false);
@@ -269,7 +368,7 @@ let dragStartMouseY = 0;
 let animationFrameId = null;
 
 const initiateElementsDrag = (event, element) => {
-  if (connectMode.value || event.button !== 0) return;
+  if (event.button !== 0) return;
   
   const idStr = String(element.id);
   if (!selectedElements.value.includes(idStr)) {
@@ -357,7 +456,7 @@ const getElementStyle = (element) => {
 // 🔍 DRIFT-FREE MULTI-SELECTION MARQUEE MATH
 // ==========================================
 function handleCanvasMouseDown(e) {
-  if (e.button !== 0 || e.target.closest('.element, .ConectingPoint, .conn-edit-anchor, .conn-editor')) return;
+  if (e.button !== 0 || e.target.closest('.element, [data-anchor-side], .conn-edit-anchor, .conn-editor')) return;
   
   const canvas = e.currentTarget;
   const rect = canvas.getBoundingClientRect();
@@ -377,9 +476,9 @@ function handleCanvasMouseDown(e) {
   }
 }
 function handleCanvasMouseMove(e) {
-  if (!isSelecting.value || isDraggingElements.value) return;
+  if (!isSelecting.value || isDraggingElements.value || activeDraggingLink.value) return;
   
-  const canvas = document.querySelector('.drawing-area') || document.querySelector('#uml-canvas div[class*="overflow-auto"]');
+  const canvas = document.querySelector('#uml-canvas div[class*="overflow-auto"]');
   if (!canvas) return;
   const rect = canvas.getBoundingClientRect();
   
@@ -429,7 +528,7 @@ const handleDrop = (event) => {
   const elementType = event.dataTransfer.getData('text/plain');
   if (!['actor', 'usecase', 'System'].includes(elementType)) return;
 
-  const canvasArea = document.querySelector('.drawing-area') || document.querySelector('#uml-canvas div[class*="overflow-auto"]');
+  const canvasArea = document.querySelector('#uml-canvas div[class*="overflow-auto"]');
   if (!canvasArea) return;
 
   const rect = canvasArea.getBoundingClientRect();
@@ -467,27 +566,13 @@ function changeSelectedConnectionType(newType) {
 
 function getConnectionPoint(element, side = 'right') {
   if (!element) return { x: 0, y: 0 };
-  const elementContainer = document.querySelector(`[data-element-id="${element.id}"]`);
-  if (elementContainer) {
-    const connectionPoint = elementContainer.querySelector(`.ConectingPoint.${side}`);
-    if (connectionPoint) {
-      const rect = connectionPoint.getBoundingClientRect();
-      const canvasArea = document.querySelector('.drawing-area') || document.querySelector('#uml-canvas div[class*="overflow-auto"]');
-      const canvasRect = canvasArea.getBoundingClientRect();
-      return {
-        x: rect.left - canvasRect.left + (rect.width / 2) + canvasArea.scrollLeft,
-        y: rect.top - canvasRect.top + (rect.height / 2) + canvasArea.scrollTop,
-        side: side
-      };
-    }
-  }
   const width = element.width || (element.type === 'actor' ? 80 : element.type === 'usecase' ? 140 : 300);
   const height = element.height || (element.type === 'actor' ? 120 : element.type === 'usecase' ? 80 : 400);
   const positions = {
-    top: { x: element.x + width / 2, y: element.y - 7, side: 'top' },
-    bottom: { x: element.x + width / 2, y: element.y + height + 7, side: 'bottom' },
-    left: { x: element.x - 7, y: element.y + height / 2, side: 'left' },
-    right: { x: element.x + width + 7, y: element.y + height / 2, side: 'right' }
+    top: { x: element.x + width / 2, y: element.y, side: 'top' },
+    bottom: { x: element.x + width / 2, y: element.y + height, side: 'bottom' },
+    left: { x: element.x, y: element.y + height / 2, side: 'left' },
+    right: { x: element.x + width, y: element.y + height / 2, side: 'right' }
   };
   return positions[side] || { ...positions.right, side: 'right' };
 }
@@ -508,7 +593,6 @@ function getMidpointStyle(conn) {
     midX = (fromPt.x + toPt.x) / 2;
     midY = fromPt.y + (toPt.y - fromPt.y) / 2;
   } else {
-    // Mixed edge - approximate middle of the L-shape
     midX = toPt.x;
     midY = fromPt.y;
   }
@@ -516,30 +600,15 @@ function getMidpointStyle(conn) {
   return { left: `${midX}px`, top: `${midY}px` };
 }
 
-function handleConnectionPointClick(id, side) {
-  const idStr = String(id);
-  if (!connectMode.value) return;
-  if (!connectFrom.value) {
-    connectFrom.value = idStr;
-    connectFromSide.value = side;
-    selectedElements.value = [idStr];
-    return;
-  }
-  if (connectFrom.value === idStr) {
-    connectFrom.value = null;
-    connectFromSide.value = null;
-    selectedElements.value = [];
-    return;
-  }
-  diagramStore.connectElements(connectFrom.value, idStr, connectFromSide.value, side, selectedType.value);
-  connectFrom.value = null;
-  connectFromSide.value = null;
-  selectedElements.value = [];
+function getEditorStyle(conn) {
+  const style = getMidpointStyle(conn);
+  const left = parseFloat(style.left) * zoomLevel.value;
+  const top = parseFloat(style.top) * zoomLevel.value;
+  return { left: `${left}px`, top: `${top}px` };
 }
 
 function selectElement(id) {
   const idStr = String(id);
-  if (connectMode.value) return;
   const isCtrlClick = window.event && (window.event.ctrlKey || window.event.metaKey);
   if (isCtrlClick) {
     if (selectedElements.value.includes(idStr)) {

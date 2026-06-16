@@ -10,7 +10,6 @@ export const useDiagramStore = defineStore('diagram', () => {
   const selectedElements = ref([]);
   const selectedConnectionId = ref(null);
   const zoomLevel = ref(1);
-  const connectMode = ref(false);
 
   // Asynchronous Cloud Persistence States
   const currentDiagramId = ref(null);
@@ -263,7 +262,6 @@ export const useDiagramStore = defineStore('diagram', () => {
     selectedElements,
     selectedConnectionId,
     zoomLevel,
-    connectMode,
     currentDiagramId,
     currentDiagramTitle,
     savedDiagramsList,
