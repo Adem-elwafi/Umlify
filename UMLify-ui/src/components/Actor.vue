@@ -1,7 +1,10 @@
 <template>
   <div
-    class="actor element"
-    :class="{ selected, dragging, resizing }"
+    class="actor element absolute cursor-grab active:cursor-grabbing transition-all select-none"
+    :class="[
+      selected ? 'z-20' : 'border border-zinc-200 shadow-sm rounded-xl bg-white z-10',
+      { 'scale-[1.02]': selected, 'opacity-80': dragging }
+    ]"
     :style="{ 
       left: x + 'px', 
       top: y + 'px',
@@ -11,13 +14,30 @@
     @mousedown="startDrag"
     @mouseup="handleMouseUp"
   >
+    <!-- Vector Asset Container -->
+    <div class="flex flex-col items-center p-3">
+      <div class="w-10 h-10 flex items-center justify-center bg-zinc-50 rounded-lg border border-zinc-100 mb-1">
+        <svg viewBox="0 0 24 24" class="w-6 h-6 text-zinc-600" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      </div>
+      
+      <input 
+        type="text" 
+        v-model="localLabel" 
+        @input="updateLabel"
+        class="text-[11px] font-medium text-zinc-800 tracking-tight text-center truncate w-full bg-transparent border-none outline-none focus:ring-0"
+      >
+    </div>
+
     <!-- Resize handles (only show when selected) -->
-    <div v-if="selected" class="resize-handle bottom-right" @mousedown.stop="startResize"></div>
+    <div v-if="selected" class="w-2.5 h-2.5 bg-white border border-blue-600 rounded-md shadow-sm cursor-nwse-resize hover:bg-blue-50 transition-all select-none z-30 active:scale-90 absolute -bottom-1 -right-1" @mousedown.stop="startResize"></div>
     
     <!-- Delete button (shows when selected) -->
     <button
       v-if="selected"
-      class="delete-btn"
+      class="w-5 h-5 flex items-center justify-center bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-[9px] shadow-md border border-zinc-800 transition-all cursor-pointer active:scale-95 absolute -top-2 -right-2 z-30"
       @mousedown.stop
       @mouseup.stop
       @click.stop="emit('delete')"
@@ -26,30 +46,11 @@
       ×
     </button>
     
-    <!-- 4 Connection Points: top, bottom, left, right -->
-    <div 
-      class="ConectingPoint top" 
-      @mousedown.stop
-      @mouseup.stop="handleConnectionPointClick('top')"
-    ></div>
-    <div 
-      class="ConectingPoint bottom" 
-      @mousedown.stop
-      @mouseup.stop="handleConnectionPointClick('bottom')"
-    ></div>
-    <div 
-      class="ConectingPoint left" 
-      @mousedown.stop
-      @mouseup.stop="handleConnectionPointClick('left')"
-    ></div>
-    <div 
-      class="ConectingPoint right" 
-      @mousedown.stop
-      @mouseup.stop="handleConnectionPointClick('right')"
-    ></div>
-    
-    <input type="text" v-model="localLabel" @input="updateLabel">
-
+    <!-- Connection Points -->
+    <div class="ConectingPoint top absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full border border-zinc-300 bg-white hover:border-blue-500 hover:bg-blue-50 shadow-xs flex items-center justify-center text-[8px] text-zinc-400 hover:text-blue-600 transition-all cursor-crosshair z-20 opacity-0 hover:opacity-100" @mousedown.stop @mouseup.stop="handleConnectionPointClick('top')"></div>
+    <div class="ConectingPoint bottom absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full border border-zinc-300 bg-white hover:border-blue-500 hover:bg-blue-50 shadow-xs flex items-center justify-center text-[8px] text-zinc-400 hover:text-blue-600 transition-all cursor-crosshair z-20 opacity-0 hover:opacity-100" @mousedown.stop @mouseup.stop="handleConnectionPointClick('bottom')"></div>
+    <div class="ConectingPoint left absolute top-1/2 -left-1.5 -translate-y-1/2 w-3 h-3 rounded-full border border-zinc-300 bg-white hover:border-blue-500 hover:bg-blue-50 shadow-xs flex items-center justify-center text-[8px] text-zinc-400 hover:text-blue-600 transition-all cursor-crosshair z-20 opacity-0 hover:opacity-100" @mousedown.stop @mouseup.stop="handleConnectionPointClick('left')"></div>
+    <div class="ConectingPoint right absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 rounded-full border border-zinc-300 bg-white hover:border-blue-500 hover:bg-blue-50 shadow-xs flex items-center justify-center text-[8px] text-zinc-400 hover:text-blue-600 transition-all cursor-crosshair z-20 opacity-0 hover:opacity-100" @mousedown.stop @mouseup.stop="handleConnectionPointClick('right')"></div>
   </div>
 </template>
 
@@ -70,7 +71,6 @@ const emit = defineEmits(['click', 'update:label', 'connection-point-click', 'de
 
 const localLabel = ref(props.label || 'Actor')
 
-// Watch for external prop changes
 watch(() => props.label, (newLabel) => {
   localLabel.value = newLabel
 })
@@ -87,53 +87,32 @@ const dragging = ref(false)
 const resizing = ref(false)
 const moved = ref(false)
 
-function handleClick() {
-  // Only emit click if we didn't just finish a drag
-  if (!dragging.value) {
-    console.log('Actor clicked, id?', props)
-    emit('click')
-  }
-}
 function handleMouseUp() {
-  // Only emit click if we didn't move the element (not a drag)
   if (!moved.value) {
-    console.log('Actor clicked, props:', props)
     emit('click')
   }
-  // reset moved for next interaction
   moved.value = false
 }
 
 function startDrag(event) {
-  // Don't start drag if clicking on input field
-  if (event.target.tagName === 'INPUT') {
-    return
-  }
+  if (event.target.tagName === 'INPUT') return
   
   dragging.value = true
-  
-  // Remember initial positions
   const startX = event.clientX
   const startY = event.clientY
   const initialX = props.x
   const initialY = props.y
 
   const move = (e) => {
-    // Calculate how far we've moved
     const dx = e.clientX - startX
     const dy = e.clientY - startY
-    
-      // mark that we've moved enough to be a drag
-      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved.value = true
-    
-    // Update position based on initial position plus movement
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved.value = true
     props.onDrag(initialX + dx, initialY + dy)
   }
 
   const stop = () => {
     window.removeEventListener('mousemove', move)
     window.removeEventListener('mouseup', stop)
-    // small timeout to avoid immediate click firing in some browsers
     setTimeout(() => { dragging.value = false }, 0)
   }
 
@@ -143,24 +122,18 @@ function startDrag(event) {
 
 function startResize(event) {
   event.stopPropagation()
-  
   resizing.value = true
-  
   const startX = event.clientX
   const startY = event.clientY
-  const initialWidth = props.width || 98
-  const initialHeight = props.height || 50
+  const initialWidth = props.width || 120
+  const initialHeight = props.height || 100
 
   const resize = (e) => {
     const dx = e.clientX - startX
     const dy = e.clientY - startY
-    
-    const newWidth = Math.max(60, initialWidth + dx)
-    const newHeight = Math.max(40, initialHeight + dy)
-    
-    if (props.onResize) {
-      props.onResize(newWidth, newHeight)
-    }
+    const newWidth = Math.max(80, initialWidth + dx)
+    const newHeight = Math.max(80, initialHeight + dy)
+    if (props.onResize) props.onResize(newWidth, newHeight)
   }
 
   const stopResize = () => {
@@ -173,117 +146,3 @@ function startResize(event) {
   window.addEventListener('mouseup', stopResize)
 }
 </script>
-
-<style scoped>
-.actor {
-  position: absolute;
-  padding: 12px 16px;
-  background: var(--c-beige-transparent);
-  border: 3px solid var(--c-teal);
-  border-radius: 12px;
-  cursor: grab;
-  user-select: none;
-  backdrop-filter: blur(8px);
-  box-shadow: 
-    0 8px 24px rgba(66, 122, 118, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  min-width: 150px;
-}
-
-.actor.dragging {
-  transition: none;
-  cursor: grabbing;
-}
-
-.actor.resizing {
-  transition: none;
-}
-
-.actor:hover {
-  transform: translateY(-2px);
-  box-shadow: 
-    0 12px 32px rgba(66, 122, 118, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
-}
-
-.actor input {
-  border: none;
-  background: transparent;
-  text-align: center;
-  width: 100%;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--c-dark-teal);
-  outline: none;
-  cursor: text;
-  padding: 4px;
-}
-
-.actor input:focus {
-  background: rgba(249, 180, 135, 0.2);
-  border-radius: 6px;
-  box-shadow: 0 0 0 2px rgba(249, 180, 135, 0.4);
-}
-
-/* highlight selected elements */
-.selected {
-  border-color: var(--c-peach);
-  background: rgba(249, 180, 135, 0.25);
-  box-shadow: 
-    0 0 30px rgba(249, 180, 135, 0.6),
-    0 12px 32px rgba(66, 122, 118, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  transform: translateZ(0) scale(1.05);
-  transition: all 0.2s ease;
-}
-
-/* Resize handle */
-.resize-handle {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  background: var(--c-peach);
-  border: 2px solid white;
-  border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  cursor: nwse-resize;
-  z-index: 10;
-}
-
-.resize-handle.bottom-right {
-  bottom: -6px;
-  right: -6px;
-}
-
-.resize-handle:hover {
-  background: var(--c-teal);
-  transform: scale(1.2);
-}
-
-/* Delete button */
-.delete-btn {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 2px solid white;
-  background: var(--c-peach);
-  color: white;
-  font-weight: 700;
-  line-height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  cursor: pointer;
-  z-index: 20;
-}
-
-.delete-btn:hover {
-  background: var(--c-teal);
-}
-
-</style>
