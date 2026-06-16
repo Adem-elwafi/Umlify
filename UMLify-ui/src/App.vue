@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full w-full bg-canvasBg text-gray-100 flex flex-col overflow-hidden">
+  <div class="h-screen w-screen bg-[#fafafa] text-[#09090b] font-sans antialiased overflow-hidden select-none">
     <router-view v-slot="{ Component }">
       <transition name="fade" mode="out-in">
         <component :is="Component" class="h-full w-full" />
@@ -9,16 +9,14 @@
 </template>
 
 <script setup>
-// Purely layout logic; all state configurations are cleanly distributed to routing paths
+// Presentational setup layer maintaining zero tracking overrides
 </script>
 
 <style scoped>
-/* Smooth cross-fade transition animations between auth and canvas pages */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease;
+  transition: opacity 0.15s ease;
 }
-
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
