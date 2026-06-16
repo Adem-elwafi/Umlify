@@ -1,99 +1,116 @@
 <template>
-  <div class="w-full min-h-[60px] bg-[#1a1a1e] border-t border-gray-800 p-4 flex flex-wrap items-center justify-between gap-4 select-none shadow-[0_-4px_20px_rgba(0,0,0,0.2)] z-50">
+  <!-- Floating Pill Dock -->
+  <div class="fixed left-4 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-md border border-zinc-200/80 shadow-xl shadow-zinc-200/30 rounded-2xl p-2.5 flex flex-col items-center gap-3 z-50 w-14">
     
-    <div class="flex items-center space-x-2">
-      <div 
-        draggable="true"
-        @dragstart="handleDragStart($event, 'actor')"
-        class="bg-[#26262b] border border-gray-700 hover:border-gray-600 text-gray-200 text-xs font-semibold px-3 py-1.5 rounded-lg active:scale-95 transition-all cursor-grab active:cursor-grabbing flex items-center space-x-1 select-none"
-        title="Drag onto Canvas to create Actor"
-      >
-        <span>👤</span>
-        <span>Actor</span>
-      </div>
-      
-      <div 
-        draggable="true"
-        @dragstart="handleDragStart($event, 'usecase')"
-        class="bg-[#26262b] border border-gray-700 hover:border-gray-600 text-gray-200 text-xs font-semibold px-3 py-1.5 rounded-lg active:scale-95 transition-all cursor-grab active:cursor-grabbing flex items-center space-x-1 select-none"
-        title="Drag onto Canvas to create Use Case"
-      >
-        <span>⭕</span>
-        <span>Use Case</span>
-      </div>
-
-      <div 
-        draggable="true"
-        @dragstart="handleDragStart($event, 'System')"
-        class="bg-[#26262b] border border-gray-700 hover:border-gray-600 text-gray-200 text-xs font-semibold px-3 py-1.5 rounded-lg active:scale-95 transition-all cursor-grab active:cursor-grabbing flex items-center space-x-1 select-none"
-        title="Drag onto Canvas to create System Boundary"
-      >
-        <span>🔲</span>
-        <span>System</span>
-      </div>
-      
-      <div class="h-6 w-px bg-gray-700 mx-2" />
-      
-      <button 
-        @click="diagramStore.connectMode = !diagramStore.connectMode" 
-        :class="[
-          'border text-xs font-semibold px-3 py-1.5 rounded-lg active:scale-95 transition-all cursor-pointer', 
-          diagramStore.connectMode ? 'bg-indigo-600 border-indigo-500 text-white shadow-md' : 'bg-[#26262b] border-gray-700 hover:border-gray-600 text-gray-200'
-        ]"
-      >
-        {{ diagramStore.connectMode ? '✏️ Connecting...' : '🔗 Link Line Mode' }}
-      </button>
-
-      <select 
-        v-if="diagramStore.connectMode" 
-        v-model="selectedType" 
-        class="bg-[#26262b] border border-gray-700 text-xs text-gray-200 rounded px-2 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer"
-      >
-        <option value="association">Association</option>
-        <option value="include">&lt;&lt;include&gt;&gt;</option>
-        <option value="extend">&lt;&lt;extend&gt;&gt;</option>
-        <option value="generalization">Generalization</option>
-        <option value="dependency">Dependency</option>
-      </select>
+    <!-- Element Spawners -->
+    <div 
+      draggable="true"
+      @dragstart="handleDragStart($event, 'actor')"
+      class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-sm select-none transition-all active:scale-95 cursor-grab"
+      title="Add Actor (Drag to Canvas)"
+    >
+      👤
+    </div>
+    
+    <div 
+      draggable="true"
+      @dragstart="handleDragStart($event, 'usecase')"
+      class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-sm select-none transition-all active:scale-95 cursor-grab"
+      title="Add Use Case (Drag to Canvas)"
+    >
+      ⭕
     </div>
 
-    <div class="flex items-center space-x-3 bg-[#26262b] px-3 py-1.5 rounded-lg border border-gray-700/60">
+    <div 
+      draggable="true"
+      @dragstart="handleDragStart($event, 'System')"
+      class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-sm select-none transition-all active:scale-95 cursor-grab"
+      title="Add System Boundary (Drag to Canvas)"
+    >
+      🔲
+    </div>
+
+    <div class="w-6 h-px bg-zinc-200" />
+
+    <!-- Connection Toggler -->
+    <button 
+      @click="diagramStore.connectMode = !diagramStore.connectMode" 
+      :class="diagramStore.connectMode 
+        ? 'w-9 h-9 flex items-center justify-center rounded-xl bg-blue-600 border border-blue-500 text-white shadow-md text-sm cursor-pointer transition-all' 
+        : 'w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-zinc-600 text-sm cursor-pointer transition-all'"
+      :title="diagramStore.connectMode ? 'Exit Connection Mode' : 'Link Line Mode'"
+    >
+      {{ diagramStore.connectMode ? '✏️' : '🔗' }}
+    </button>
+
+    <div class="w-6 h-px bg-zinc-200" />
+
+    <!-- Local File Actions -->
+    <button @click="emitLocalExport" class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-xs text-zinc-600 cursor-pointer transition-all" title="Export JSON">📤</button>
+    <button @click="triggerFileInput" class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-xs text-zinc-600 cursor-pointer transition-all" title="Import JSON">📥</button>
+    <button @click="emitLocalSnapshot" class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-xs text-zinc-600 cursor-pointer transition-all" title="PNG Snapshot">📸</button>
+    
+    <div class="w-6 h-px bg-zinc-200" />
+
+    <!-- Sign Out -->
+    <button @click="handleLogOutFlow" class="w-9 h-9 flex items-center justify-center rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200/60 text-rose-600 text-xs cursor-pointer transition-all" title="Sign Out">
+      🚪
+    </button>
+  </div>
+
+  <!-- Project Controls Panel (Floating next to the element dock) -->
+  <div class="fixed left-20 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-md border border-zinc-200/80 shadow-xl shadow-zinc-200/20 rounded-2xl p-4 flex flex-col gap-3 z-50 w-48 transition-all duration-300">
+    <div class="flex flex-col gap-1">
+      <label class="text-[9px] uppercase tracking-wider text-zinc-400 font-bold px-1">Diagram Title</label>
       <input 
         v-model="diagramStore.currentDiagramTitle"
         type="text"
         placeholder="Untitled Diagram"
-        class="bg-transparent border-none text-xs text-white font-medium focus:outline-none w-44 placeholder-gray-500"
+        class="bg-transparent border-none text-[11px] text-zinc-900 font-semibold focus:outline-none placeholder-zinc-300 w-full px-1"
       />
+    </div>
+
+    <div class="h-px bg-zinc-100 w-full" />
+
+    <div class="flex flex-col gap-2">
       <button 
         @click="handleCloudSave"
-        class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-semibold px-3 py-1 rounded shadow-md transition-all flex items-center space-x-1 cursor-pointer"
+        class="bg-zinc-900 hover:bg-black text-white text-[11px] font-bold py-2 rounded-xl shadow-lg shadow-zinc-200 transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
       >
-        <span>💾</span>
-        <span>Save Project</span>
+        <span>💾</span> Save Project
       </button>
-
-        <span 
+      
+      <transition name="fade">
+        <div 
           v-if="diagramStore.globalSaveStatusMessage" 
-          class="text-[11px] font-mono opacity-90 tracking-wide font-bold px-1.5 py-0.5 rounded"
-          :class="diagramStore.globalSaveStatusMessage.includes('Successful') ? 'text-emerald-400 bg-emerald-950/40' : 'text-amber-400 bg-amber-950/30'"
+          class="text-[10px] font-medium px-2 py-1.5 rounded-lg flex items-center gap-1.5"
+          :class="diagramStore.globalSaveStatusMessage.includes('Successful') ? 'text-emerald-600 bg-emerald-50 border border-emerald-100' : 'text-amber-600 bg-amber-50 border border-amber-100'"
         >
+          <span class="text-xs">{{ diagramStore.globalSaveStatusMessage.includes('Successful') ? '✓' : '⚠️' }}</span>
           {{ diagramStore.globalSaveStatusMessage }}
-        </span>
+        </div>
+      </transition>
     </div>
 
-    <div class="flex items-center space-x-2">
-      <button @click="emitLocalExport" class="bg-transparent hover:bg-gray-800 text-xs px-2.5 py-1.5 rounded font-medium text-gray-300 transition-all cursor-pointer" title="Download Local JSON Schema">Export JSON</button>
-      <button @click="triggerFileInput" class="bg-transparent hover:bg-gray-800 text-xs px-2.5 py-1.5 rounded font-medium text-gray-300 transition-all cursor-pointer" title="Load Local JSON File">Import JSON</button>
-      <button @click="emitLocalSnapshot" class="bg-transparent hover:bg-gray-800 text-xs px-2.5 py-1.5 rounded font-medium text-gray-300 transition-all cursor-pointer" title="Capture PNG Viewport">PNG Snapshot</button>
-      <input type="file" ref="fileLoader" @change="handleFileImport" class="hidden" accept=".json" />
-      
-      <div class="h-6 w-px bg-gray-700 mx-2" />
-      
-      <button @click="handleLogOutFlow" class="bg-rose-600/10 hover:bg-rose-600/20 text-rose-400 border border-rose-900/40 px-3 py-1.5 rounded text-xs font-semibold tracking-wide transition-all cursor-pointer">
-        Sign Out
-      </button>
-    </div>
+    <!-- Relationship Type Selector (Contextual) -->
+    <transition name="fade">
+      <div v-if="diagramStore.connectMode" class="mt-2 p-2 bg-zinc-50 rounded-xl border border-zinc-100 flex flex-col gap-2">
+        <label class="text-[9px] uppercase tracking-wider text-zinc-400 font-bold">Line Type</label>
+        <select 
+          v-model="selectedType" 
+          class="bg-white border border-zinc-200 text-[11px] text-zinc-700 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer w-full"
+        >
+          <option value="association">Association</option>
+          <option value="include">Include</option>
+          <option value="extend">Extend</option>
+          <option value="generalization">Generalization</option>
+          <option value="dependency">Dependency</option>
+        </select>
+      </div>
+    </transition>
   </div>
+
+  <input type="file" ref="fileLoader" @change="handleFileImport" class="hidden" accept=".json" />
 </template>
 
 <script setup>
