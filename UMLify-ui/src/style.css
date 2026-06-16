@@ -1,35 +1,35 @@
 @import "tailwindcss";
 
-@theme {
-  --color-bg: #fafafa;
-  --color-surface: #ffffff;
-  --color-hairline: rgba(228, 228, 231, 0.8);
-  --color-accent: #2563eb;
-  --color-accent-soft: #dbeafe;
-  --color-fg: #09090b;
-}
+/* 
+  UMLify Global Styles - Tailwind v4 
+  Established in Visual Overhaul Part 1
+*/
 
 body {
   margin: 0;
   padding: 0;
   background-color: #fafafa;
-  color: #09090b;
-  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+  color: #18181b;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Subtle Technical Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #e4e4e7;
-  border-radius: 9999px;
+  background: #d8d4d4; /* zinc-300 */
+  border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #d4d4d8;
+  background: #a1a1aa; /* zinc-400 */
 }

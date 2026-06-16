@@ -20,7 +20,7 @@
       @mousedown="handleCanvasMouseDown"
     >
       <div 
-        class="absolute top-0 left-0 w-[5000px] h-[5000px] bg-transparent overflow-visible" 
+        class="absolute top-0 left-0 w-[5000px] h-[5000px] bg-transparent overflow-visible sheet-grid" 
         :style="{ transform: `scale(${zoomLevel})`, transformOrigin: 'top left' }"
       >
         <!-- Selection Marquee (During Dragging) -->
@@ -592,5 +592,10 @@ function exportAsImage() {
 <style scoped>
 .pencil-cursor, .pencil-cursor * {
   cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%23000' d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/></svg>") 8 24, auto !important;
+}
+
+.sheet-grid {
+  background-image: radial-gradient(#d4d4d8 1px, transparent 1px);
+  background-size: 16px 16px;
 }
 </style>

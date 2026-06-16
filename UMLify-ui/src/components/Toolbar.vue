@@ -1,65 +1,71 @@
 <template>
   <!-- Floating Pill Dock -->
-  <div class="fixed left-4 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-md border border-zinc-200/80 shadow-xl shadow-zinc-200/30 rounded-2xl p-2.5 flex flex-col items-center gap-3 z-50 w-14">
+  <div class="fixed left-4 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-md border border-zinc-200 shadow-xl shadow-zinc-200/30 rounded-2xl p-2 flex flex-col gap-1.5 z-50 w-13 items-center">
     
     <!-- Element Spawners -->
     <div 
       draggable="true"
       @dragstart="handleDragStart($event, 'actor')"
-      class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-sm select-none transition-all active:scale-95 cursor-grab"
+      class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 transition-all active:scale-95 cursor-grab group"
       title="Add Actor (Drag to Canvas)"
     >
-      👤
+      <User class="w-5 h-5 text-zinc-600 group-hover:text-zinc-900" />
     </div>
     
     <div 
       draggable="true"
       @dragstart="handleDragStart($event, 'usecase')"
-      class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-sm select-none transition-all active:scale-95 cursor-grab"
+      class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 transition-all active:scale-95 cursor-grab group"
       title="Add Use Case (Drag to Canvas)"
     >
-      ⭕
+      <CircleDot class="w-5 h-5 text-zinc-600 group-hover:text-zinc-900" />
     </div>
 
     <div 
       draggable="true"
       @dragstart="handleDragStart($event, 'System')"
-      class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-sm select-none transition-all active:scale-95 cursor-grab"
+      class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 transition-all active:scale-95 cursor-grab group"
       title="Add System Boundary (Drag to Canvas)"
     >
-      🔲
+      <Box class="w-5 h-5 text-zinc-600 group-hover:text-zinc-900" />
     </div>
 
-    <div class="w-6 h-px bg-zinc-200" />
+    <div class="w-6 h-px bg-zinc-200 my-0.5" />
 
     <!-- Connection Toggler -->
     <button 
       @click="diagramStore.connectMode = !diagramStore.connectMode" 
       :class="diagramStore.connectMode 
-        ? 'w-9 h-9 flex items-center justify-center rounded-xl bg-blue-600 border border-blue-500 text-white shadow-md text-sm cursor-pointer transition-all' 
-        : 'w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-zinc-600 text-sm cursor-pointer transition-all'"
+        ? 'w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-900 border border-zinc-800 text-white shadow-md cursor-pointer transition-all' 
+        : 'w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-zinc-600 cursor-pointer transition-all'"
       :title="diagramStore.connectMode ? 'Exit Connection Mode' : 'Link Line Mode'"
     >
-      {{ diagramStore.connectMode ? '✏️' : '🔗' }}
+      <component :is="diagramStore.connectMode ? Pencil : Link" class="w-4 h-4" />
     </button>
 
-    <div class="w-6 h-px bg-zinc-200" />
+    <div class="w-6 h-px bg-zinc-200 my-0.5" />
 
     <!-- Local File Actions -->
-    <button @click="emitLocalExport" class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-xs text-zinc-600 cursor-pointer transition-all" title="Export JSON">📤</button>
-    <button @click="triggerFileInput" class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-xs text-zinc-600 cursor-pointer transition-all" title="Import JSON">📥</button>
-    <button @click="emitLocalSnapshot" class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-xs text-zinc-600 cursor-pointer transition-all" title="PNG Snapshot">📸</button>
+    <button @click="emitLocalExport" class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-zinc-600 cursor-pointer transition-all group" title="Export JSON">
+      <Download class="w-4 h-4 group-hover:text-zinc-900" />
+    </button>
+    <button @click="triggerFileInput" class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-zinc-600 cursor-pointer transition-all group" title="Import JSON">
+      <Upload class="w-4 h-4 group-hover:text-zinc-900" />
+    </button>
+    <button @click="emitLocalSnapshot" class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-zinc-600 cursor-pointer transition-all group" title="PNG Snapshot">
+      <Camera class="w-4 h-4 group-hover:text-zinc-900" />
+    </button>
     
-    <div class="w-6 h-px bg-zinc-200" />
+    <div class="w-6 h-px bg-zinc-200 my-0.5" />
 
     <!-- Sign Out -->
-    <button @click="handleLogOutFlow" class="w-9 h-9 flex items-center justify-center rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200/60 text-rose-600 text-xs cursor-pointer transition-all" title="Sign Out">
-      🚪
+    <button @click="handleLogOutFlow" class="w-9 h-9 flex items-center justify-center rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200/60 text-rose-600 cursor-pointer transition-all group" title="Sign Out">
+      <LogOut class="w-4 h-4 group-hover:text-rose-700" />
     </button>
   </div>
 
   <!-- Project Controls Panel (Floating next to the element dock) -->
-  <div class="fixed left-20 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-md border border-zinc-200/80 shadow-xl shadow-zinc-200/20 rounded-2xl p-4 flex flex-col gap-3 z-50 w-48 transition-all duration-300">
+  <div class="fixed left-20 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-md border border-zinc-200 shadow-xl shadow-zinc-200/20 rounded-2xl p-4 flex flex-col gap-3 z-50 w-48 transition-all duration-300">
     <div class="flex flex-col gap-1">
       <label class="text-[9px] uppercase tracking-wider text-zinc-400 font-bold px-1">Diagram Title</label>
       <input 
@@ -77,7 +83,7 @@
         @click="handleCloudSave"
         class="bg-zinc-900 hover:bg-black text-white text-[11px] font-bold py-2 rounded-xl shadow-lg shadow-zinc-200 transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
       >
-        <span>💾</span> Save Project
+        <Save class="w-3.5 h-3.5" /> Save Project
       </button>
       
       <transition name="fade">
@@ -117,6 +123,18 @@
 import { ref } from 'vue';
 import { useDiagramStore } from '../stores/diagramStore';
 import { useAuthStore } from '../stores/authStore';
+import { 
+  User, 
+  CircleDot, 
+  Box, 
+  Pencil, 
+  Link, 
+  Download, 
+  Upload, 
+  Camera, 
+  LogOut,
+  Save
+} from 'lucide-vue-next';
 
 const emit = defineEmits(['local-export', 'local-import', 'local-snapshot']);
 const selectedType = defineModel({ default: 'association' });

@@ -1,28 +1,23 @@
 <template>
   <svg class="connector">
-    <defs>
-      <filter id="shadow">
-        <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#427A76" flood-opacity="0.3"/>
-      </filter>
-    </defs>
+    <!-- Task: Render strictly as high-visibility dark zinc profiles (#18181b) -->
     <line
       :x1="from.x"
       :y1="from.y"
       :x2="to.x"
       :y2="to.y"
-      stroke="white"
-      stroke-width="3"
-      stroke-dasharray="5,5"
-      filter="url(#shadow)"
+      class="stroke-[#18181b]"
+      stroke-width="2"
+      stroke-dasharray="6,4"
     />
+    
     <text
       :x="(from.x + to.x) / 2"
       :y="(from.y + to.y) / 2 - 12"
-      font-size="13"
+      font-size="11"
       font-weight="700"
-      fill="#174143"
       text-anchor="middle"
-      class="connector-label"
+      class="connector-label fill-[#18181b] tracking-tight"
     >
       {{ type }}
     </text>
@@ -49,7 +44,8 @@ const props = defineProps({
 
 .connector-label {
   paint-order: stroke;
-  stroke: rgba(245, 229, 225, 0.9);
+  /* Using background color for halo to maintain visibility over lines */
+  stroke: #fafafa;
   stroke-width: 4px;
   stroke-linejoin: round;
 }
