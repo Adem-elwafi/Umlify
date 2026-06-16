@@ -1,30 +1,32 @@
 <template>
   <div 
     id="uml-canvas" 
-    class="canvas-container" 
+    class="w-full h-full relative overflow-hidden bg-[#fafafa] flex flex-col select-none" 
     :class="{'pencil-cursor': connectMode}"
     @dragover.prevent="handleDragOver"
     @drop="handleDrop"
   >
-    <div class="zoom-controls">
-      <button @click="zoomIn" class="zoom-btn" title="Zoom In"><span>+</span></button>
-      <span class="zoom-level font-mono">{{ Math.round(zoomLevel * 100) }}%</span>
-      <button @click="zoomOut" class="zoom-btn" title="Zoom Out"><span>−</span></button>
-      <button @click="resetZoom" class="zoom-btn reset-btn" title="Reset Zoom"><span>⟲</span></button>
+    <!-- Zoom Controls -->
+    <div class="absolute top-6 right-6 flex items-center gap-2 bg-white/80 backdrop-blur-md border border-zinc-200/80 p-1.5 rounded-xl shadow-sm z-30">
+      <button @click="zoomIn" class="w-8 h-8 flex items-center justify-center bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 rounded-lg text-zinc-600 transition-all active:scale-95 cursor-pointer text-sm font-bold" title="Zoom In"><span>+</span></button>
+      <span class="min-w-[48px] text-center text-[11px] font-bold text-zinc-500 font-mono">{{ Math.round(zoomLevel * 100) }}%</span>
+      <button @click="zoomOut" class="w-8 h-8 flex items-center justify-center bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 rounded-lg text-zinc-600 transition-all active:scale-95 cursor-pointer text-sm font-bold" title="Zoom Out"><span>−</span></button>
+      <button @click="resetZoom" class="w-8 h-8 flex items-center justify-center bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 rounded-lg text-zinc-400 transition-all active:scale-95 cursor-pointer text-xs" title="Reset Zoom"><span>⟲</span></button>
     </div>
     
     <div 
-      class="drawing-area" 
+      class="flex-1 w-full relative overflow-auto bg-transparent" 
       @click.self="clearSelectedConnection" 
       @mousedown="handleCanvasMouseDown"
     >
       <div 
-        class="elements-container" 
+        class="absolute top-0 left-0 w-[5000px] h-[5000px] bg-transparent overflow-visible" 
         :style="{ transform: `scale(${zoomLevel})`, transformOrigin: 'top left' }"
       >
+        <!-- Selection Marquee (During Dragging) -->
         <div 
           v-if="isSelecting"
-          class="selection-box"
+          class="absolute border border-dashed border-blue-400 bg-blue-50/20 pointer-events-none z-[1000]"
           :style="{
             left: boxLeft + 'px',
             top: boxTop + 'px',
@@ -32,14 +34,19 @@
             height: boxHeight + 'px'
           }"
         />
+
+        <!-- Element Renderers -->
         <div 
           v-for="element in elements" 
           :key="element.id" 
           :data-element-id="element.id"
-          class="absolute element-draggable-wrapper select-none"
+          class="absolute element-draggable-wrapper select-none will-change-transform"
           :style="getElementStyle(element)"
           @mousedown.stop="initiateElementsDrag($event, element)"
         >
+          <!-- Task 1: Premium Hairline Selection Highlight -->
+          <div v-if="selectedElements.includes(String(element.id))" class="absolute inset-0 pointer-events-none border border-blue-500 rounded-xl ring-1 ring-blue-500/20 z-20"></div>
+
           <System
             v-if="element.type === 'System'"
             :label="element.label"
@@ -88,6 +95,7 @@
         </div>
       </div>
 
+      <!-- Relational Connectors -->
       <Connector
         v-for="conn in connections"
         :key="conn.id || `${conn.from?.id}-${conn.to?.id}`"
@@ -96,29 +104,112 @@
         :type="conn.type"
       />
 
+      <!-- Connection Edit Anchors (Task 2: High-fidelity micro-targets) -->
       <div
         v-for="conn in connections"
         :key="`anchor-${conn.id || `${conn.from?.id}-${conn.to?.id}`}`"
-        class="conn-edit-anchor"
+        class="absolute -translate-x-1/2 -translate-y-1/2 z-10"
         :style="getMidpointStyle(conn)"
       >
-        <button class="conn-dot" title="Edit connection type" @click.stop="selectConnection(conn.id)">•</button>
+        <button 
+          class="w-3 h-3 rounded-full border border-zinc-300 bg-white hover:border-blue-500 hover:bg-blue-50 shadow-xs flex items-center justify-center text-[8px] text-zinc-400 hover:text-blue-600 transition-all cursor-crosshair z-20 active:scale-90" 
+          title="Edit connection type" 
+          @click.stop="selectConnection(conn.id)"
+        >•</button>
       </div>
 
-      <div v-if="selectedConnection" class="conn-editor" :style="getMidpointStyle(selectedConnection)" @click.stop>
-        <select class="conn-select" :value="selectedConnection.type" @change="e => changeSelectedConnectionType(e.target.value)">
+      <!-- Contextual Connection Editor Overlay -->
+      <div 
+        v-if="selectedConnection" 
+        class="absolute bg-white/90 backdrop-blur-md border border-zinc-200/80 shadow-lg shadow-zinc-200/40 rounded-xl p-2 flex items-center gap-1.5 z-40 transform -translate-x-1/2 -translate-y-[calc(100%+10px)]" 
+        :style="getMidpointStyle(selectedConnection)" 
+        @click.stop
+      >
+        <select 
+          class="bg-zinc-50 border border-zinc-200 text-[11px] font-medium text-zinc-800 rounded-lg px-2.5 py-1 focus:outline-none focus:ring-1 focus:ring-zinc-400 cursor-pointer transition-all" 
+          :value="selectedConnection.type" 
+          @change="e => changeSelectedConnectionType(e.target.value)"
+        >
           <option v-for="t in connectionTypes" :key="t" :value="t">{{ t }}</option>
         </select>
-        <button class="conn-close" @click="clearSelectedConnection" title="Close">✕</button>
+        <button 
+          class="w-5 h-5 flex items-center justify-center bg-transparent hover:bg-zinc-100 text-zinc-400 hover:text-zinc-600 rounded-md text-[10px] transition-all cursor-pointer" 
+          @click="clearSelectedConnection" 
+          title="Close"
+        >✕</button>
       </div>
     </div>
 
+    <!-- Toolbar Entry Point -->
     <Toolbar
       v-model="selectedType"
       @local-export="exportDiagram"
       @local-import="importDiagram"
       @local-snapshot="exportAsImage"
     />
+
+    <!-- Element Property Inspector Sidebar -->
+    <transition name="fade">
+      <div v-if="inspectorElement" class="absolute right-6 top-24 w-64 bg-white/95 backdrop-blur-md border border-zinc-200/80 shadow-xl shadow-zinc-200/30 rounded-2xl p-4 flex flex-col gap-4 z-40" @mousedown.stop>
+        <div class="flex flex-col gap-1">
+          <label class="text-[10px] font-bold tracking-wider uppercase text-zinc-400 font-mono select-none">Element Label</label>
+          <input 
+            v-model="inspectorElement.label"
+            type="text"
+            class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs font-medium text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 transition-all shadow-xs"
+            placeholder="Node Name"
+          />
+          <div class="text-[11px] font-mono font-medium text-zinc-400 mt-1 select-none flex items-center gap-1">
+            <span>ID:</span>
+            <span class="truncate uppercase">{{ inspectorElement.id.split('_')[1] || inspectorElement.id.slice(-6) }}</span>
+          </div>
+        </div>
+
+        <div class="h-px bg-zinc-100 w-full" />
+
+        <div class="flex flex-col gap-2">
+          <label class="text-[10px] font-bold tracking-wider uppercase text-zinc-400 font-mono select-none">Geometric Parameters</label>
+          
+          <div class="grid grid-cols-2 gap-2 text-[11px]">
+            <div class="flex flex-col gap-1">
+              <span class="text-zinc-400 text-[9px] uppercase font-bold">Position X</span>
+              <input 
+                v-model.number="inspectorElement.x"
+                type="number"
+                class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-400 transition-all"
+              />
+            </div>
+            <div class="flex flex-col gap-1">
+              <span class="text-zinc-400 text-[9px] uppercase font-bold">Position Y</span>
+              <input 
+                v-model.number="inspectorElement.y"
+                type="number"
+                class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-400 transition-all"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-[11px] mt-1">
+            <div class="flex flex-col gap-1">
+              <span class="text-zinc-400 text-[9px] uppercase font-bold">Width</span>
+              <input 
+                v-model.number="inspectorElement.width"
+                type="number"
+                class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-400 transition-all"
+              />
+            </div>
+            <div class="flex flex-col gap-1">
+              <span class="text-zinc-400 text-[9px] uppercase font-bold">Height</span>
+              <input 
+                v-model.number="inspectorElement.height"
+                type="number"
+                class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-400 transition-all"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -153,6 +244,13 @@ const boxHeight = ref(0);
 const connectionTypes = ['association', 'include', 'extend', 'generalization', 'dependency'];
 const selectedConnection = computed(() => connections.value.find(c => c.id === selectedConnectionId.value) || null);
 
+const inspectorElement = computed(() => {
+  if (selectedElements.value.length === 1) {
+    return elements.value.find(e => String(e.id) === String(selectedElements.value[0])) || null;
+  }
+  return null;
+});
+
 // ==========================================
 // 🚀 OPTIMIZED MULTI-ELEMENT DRAGGING PHYSICS
 // ==========================================
@@ -166,7 +264,6 @@ const initiateElementsDrag = (event, element) => {
   if (connectMode.value || event.button !== 0) return;
   
   const idStr = String(element.id);
-  // If clicked element isn't part of active highlights, update selection context
   if (!selectedElements.value.includes(idStr)) {
     if (event.ctrlKey) {
       selectedElements.value.push(idStr);
@@ -179,7 +276,6 @@ const initiateElementsDrag = (event, element) => {
   dragStartMouseX = event.clientX;
   dragStartMouseY = event.clientY;
 
-  // Cache initial element coordinates to safely compute deltas later
   activeTrackedElements.value = elements.value
     .filter(el => selectedElements.value.includes(String(el.id)))
     .map(el => ({
@@ -197,7 +293,6 @@ const initiateElementsDrag = (event, element) => {
 const handleElementDragMove = (event) => {
   if (!isDraggingElements.value) return;
 
-  // Calculate coordinates scaled precisely by dividing mouse deltas by zoomLevel
   const deltaX = (event.clientX - dragStartMouseX) / zoomLevel.value;
   const deltaY = (event.clientY - dragStartMouseY) / zoomLevel.value;
 
@@ -206,13 +301,11 @@ const handleElementDragMove = (event) => {
     item.currentY = item.baseY + deltaY;
   });
 
-  // Use requestAnimationFrame to defer transformations to GPU repaint ticks
   if (!animationFrameId) {
     animationFrameId = requestAnimationFrame(() => {
       activeTrackedElements.value.forEach(item => {
         const domWrapper = document.querySelector(`[data-element-id="${item.id}"]`);
         if (domWrapper) {
-          // Direct DOM transform mutation bypassing Pinia proxy triggers to achieve 144Hz performance
           domWrapper.style.transform = `translate3d(${item.currentX}px, ${item.currentY}px, 0)`;
         }
       });
@@ -233,12 +326,10 @@ const handleElementDragMouseUp = () => {
     animationFrameId = null;
   }
 
-  // Save full canvas snapshot state to history before final commit mutation
   if (typeof diagramStore.saveToHistory === 'function') {
     diagramStore.saveToHistory();
   }
 
-  // Dispatch final flat position updates back to Pinia sequentially inside one block
   activeTrackedElements.value.forEach(item => {
     diagramStore.updatePositionWithGroup(item.id, item.currentX, item.currentY);
   });
@@ -258,19 +349,15 @@ const getElementStyle = (element) => {
 // 🔍 DRIFT-FREE MULTI-SELECTION MARQUEE MATH
 // ==========================================
 function handleCanvasMouseDown(e) {
-  // Guard interceptor: block selections if clicking existing nodes, connectors, or utility anchors
   if (e.button !== 0 || e.target.closest('.element, .ConectingPoint, .conn-edit-anchor, .conn-editor')) return;
   
   const canvas = e.currentTarget;
   const rect = canvas.getBoundingClientRect();
   
-  // ✨ STEP 1: Deduct client offsets and divide screen coordinates by the zoomLevel divisor matrix
   const x = (e.clientX - rect.left + canvas.scrollLeft) / zoomLevel.value;
   const y = (e.clientY - rect.top + canvas.scrollTop) / zoomLevel.value;
   
   isSelecting.value = true;
-  
-  // Set clean initialized base coordinate anchors
   selectionBox.value = { startX: x, startY: y, currentX: x, currentY: y };
   boxLeft.value = x;
   boxTop.value = y;
@@ -284,22 +371,19 @@ function handleCanvasMouseDown(e) {
 function handleCanvasMouseMove(e) {
   if (!isSelecting.value || isDraggingElements.value) return;
   
-  const canvas = document.querySelector('.drawing-area');
+  const canvas = document.querySelector('.drawing-area') || document.querySelector('#uml-canvas div[class*="overflow-auto"]');
   if (!canvas) return;
   const rect = canvas.getBoundingClientRect();
   
-  // ✨ STEP 2: Normalize the moving cursor coordinates against the active zoom factor metrics
   const currentX = (e.clientX - rect.left + canvas.scrollLeft) / zoomLevel.value;
   const currentY = (e.clientY - rect.top + canvas.scrollTop) / zoomLevel.value;
   
   selectionBox.value.currentX = currentX;
   selectionBox.value.currentY = currentY;
   
-  // ✨ STEP 3: Compute exact width/height absolute differentials
   boxWidth.value = Math.abs(currentX - selectionBox.value.startX);
   boxHeight.value = Math.abs(currentY - selectionBox.value.startY);
   
-  // ✨ STEP 4: Handle inverted selections safely (dragging backwards/upwards) using Math.min
   boxLeft.value = Math.min(selectionBox.value.startX, currentX);
   boxTop.value = Math.min(selectionBox.value.startY, currentY);
   
@@ -318,11 +402,9 @@ function updateSelectionFromBox() {
   const newSelection = [];
   
   elements.value.forEach(el => {
-    // Standard explicit node dimension lookups matching current viewport properties
     const w = el.width || (el.type === 'actor' ? 80 : el.type === 'System' ? 300 : 140);
     const h = el.height || (el.type === 'actor' ? 120 : el.type === 'System' ? 400 : 80);
     
-    // Compare normalized box perimeters against element space coordinates safely
     if (el.x < maxX && el.x + w > minX && el.y < maxY && el.y + h > minY) {
       newSelection.push(String(el.id));
     }
@@ -330,9 +412,7 @@ function updateSelectionFromBox() {
   
   selectedElements.value = newSelection;
 }
-// ==========================================
-// 🗄️ SIDEBAR HTML5 DRAG AND DROP PERSISTENCE
-// ==========================================
+
 const handleDragOver = (event) => {
   event.dataTransfer.dropEffect = 'move';
 };
@@ -341,12 +421,11 @@ const handleDrop = (event) => {
   const elementType = event.dataTransfer.getData('text/plain');
   if (!['actor', 'usecase', 'System'].includes(elementType)) return;
 
-  const canvasArea = document.querySelector('.drawing-area');
+  const canvasArea = document.querySelector('.drawing-area') || document.querySelector('#uml-canvas div[class*="overflow-auto"]');
   if (!canvasArea) return;
 
   const rect = canvasArea.getBoundingClientRect();
   
-  // Apply zoom division constraints to locate drop position
   const droppedX = (event.clientX - rect.left + canvasArea.scrollLeft) / zoomLevel.value;
   const droppedY = (event.clientY - rect.top + canvasArea.scrollTop) / zoomLevel.value;
 
@@ -368,19 +447,11 @@ const handleDrop = (event) => {
   elements.value.push(elementPayload);
 };
 
-// Utilities & Interface Lookups
 function selectConnection(id) { selectedConnectionId.value = id; }
 function clearSelectedConnection() { selectedConnectionId.value = null; }
 function zoomIn() { if (zoomLevel.value < 2) zoomLevel.value = Math.min(2, zoomLevel.value + 0.1); }
 function zoomOut() { if (zoomLevel.value > 0.5) zoomLevel.value = Math.max(0.5, zoomLevel.value - 0.1); }
 function resetZoom() { zoomLevel.value = 1; }
-
-function toggleConnectMode() {
-  connectMode.value = !connectMode.value;
-  connectFrom.value = null;
-  connectFromSide.value = null;
-  selectedElements.value = [];
-}
 
 function changeSelectedConnectionType(newType) {
   if (selectedConnection.value) selectedConnection.value.type = newType;
@@ -393,10 +464,11 @@ function getConnectionPoint(element, side = 'right') {
     const connectionPoint = elementContainer.querySelector(`.ConectingPoint.${side}`);
     if (connectionPoint) {
       const rect = connectionPoint.getBoundingClientRect();
-      const canvasRect = document.querySelector('.drawing-area').getBoundingClientRect();
+      const canvasArea = document.querySelector('.drawing-area') || document.querySelector('#uml-canvas div[class*="overflow-auto"]');
+      const canvasRect = canvasArea.getBoundingClientRect();
       return {
-        x: rect.left - canvasRect.left + (rect.width / 2),
-        y: rect.top - canvasRect.top + (rect.height / 2)
+        x: rect.left - canvasRect.left + (rect.width / 2) + canvasArea.scrollLeft,
+        y: rect.top - canvasRect.top + (rect.height / 2) + canvasArea.scrollTop
       };
     }
   }
@@ -518,18 +590,7 @@ function exportAsImage() {
 </script>
 
 <style scoped>
-.canvas-container { width: 100%; height: 100%; position: relative; overflow: hidden; background-color: #121214; display: flex; flex-direction: column; }
-.zoom-controls { position: absolute; top: 20px; right: 20px; display: flex; align-items: center; gap: 8px; background: rgba(38, 38, 43, 0.9); padding: 8px 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); z-index: 30; border: 1px solid #374151; backdrop-filter: blur(10px); }
-.zoom-btn { width: 32px; height: 32px; border: 1px solid #4b5563; background: #1f2937; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; color: #e5e7eb; transition: all 0.2s ease; }
-.zoom-btn:hover { background: #374151; border-color: #6b7280; color: white; transform: scale(1.05); }
-.zoom-btn:active { transform: scale(0.95); }
-.zoom-level { min-width: 50px; text-align: center; font-weight: 600; color: #d1d5db; font-size: 13px; }
-.drawing-area { flex: 1; width: 100%; position: relative; overflow: auto; background: transparent; }
-.elements-container { width: 5000px; height: 5000px; position: absolute; top: 0; left: 0; background: transparent; overflow: visible; }
-.element-draggable-wrapper { will-change: transform; transition: none; }
-.conn-edit-anchor { position: absolute; transform: translate(-50%, -50%); z-index: 5; }
-.conn-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #4f46e5; background: #1f2937; color: #e5e7eb; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.conn-editor { position: absolute; transform: translate(-50%, calc(-100% - 10px)); background: #1a1a1e; border: 1px solid #374151; border-radius: 10px; padding: 6px 8px; display: flex; gap: 6px; z-index: 6; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-.conn-select { background: #26262b; border: 1px solid #4b5563; border-radius: 8px; padding: 4px 8px; color: #e5e7eb; font-size: 12px; }
-.selection-box { position: absolute; border: 1px dashed #6366f1; background: rgba(99, 102, 241, 0.1); pointer-events: none; z-index: 1000; }
+.pencil-cursor, .pencil-cursor * {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%23000' d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/></svg>") 8 24, auto !important;
+}
 </style>
