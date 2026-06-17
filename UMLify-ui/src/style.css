@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary-slate: #213C51;
+  --color-accent-blue: #6594B1;
+  --color-accent-violet: #DDAED3;
+  --color-secondary-gray: #EEEEEE;
+}
+
 /* 
   UMLify Global Styles - Tailwind v4 
   Established in Visual Overhaul Part 1

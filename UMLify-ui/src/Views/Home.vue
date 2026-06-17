@@ -1,24 +1,50 @@
 <template>
   <div class="h-full w-full flex flex-col bg-zinc-50 select-none overflow-hidden font-sans">
     <!-- Master Workspace Header -->
-    <header class="h-14 w-full bg-white border-b border-zinc-200/80 px-6 flex justify-between items-center shrink-0 z-30 shadow-xs">
+    <header class="h-14 w-full bg-primary-slate border-b border-primary-slate/50 px-6 flex justify-between items-center shrink-0 z-30 shadow-xs">
       <div class="flex items-center gap-4">
         <button 
           @click="isSidebarDrawerOpen = !isSidebarDrawerOpen"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-medium transition-all active:scale-95 cursor-pointer shadow-xs select-none group"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/10 text-zinc-100 text-xs font-medium transition-all active:scale-95 cursor-pointer shadow-xs select-none group"
           title="Toggle Cloud Directory Drawer"
         >
-          <Folder class="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-900" />
+          <Folder class="w-3.5 h-3.5 text-zinc-300 group-hover:text-white" />
           <span>Cloud Files</span>
         </button>
 
         <div class="flex items-center gap-2">
-          <div class="w-6 h-6 rounded bg-zinc-900 flex items-center justify-center font-bold text-white text-xs select-none">U</div>
-          <h1 class="text-sm font-semibold tracking-tight text-zinc-900 select-none font-sans">UMLify Workspace</h1>
+          <div class="w-6 h-6 rounded bg-white/10 flex items-center justify-center font-bold text-white text-xs select-none">U</div>
+          <h1 class="text-sm font-semibold tracking-tight text-white select-none font-sans">UMLify Workspace</h1>
+          
+          <!-- Typography Modifier Hook -->
+          <div class="ml-2 flex items-center gap-1 px-2 py-1 bg-white/10 border border-white/10 rounded-lg text-[10px] font-medium text-zinc-300 cursor-default">
+            <Type class="w-3 h-3" />
+            <span>Inter</span>
+            <ChevronDown class="w-2.5 h-2.5" />
+          </div>
         </div>
       </div>
 
-      <div v-if="diagramStore.networkErrorMessage" class="px-4 py-1.5 bg-rose-50 border border-rose-100 rounded-lg text-rose-600 text-[10px] font-mono max-w-xl truncate">
+      <!-- Operational Telemetry Controls -->
+      <div class="flex items-center bg-white/10 border border-white/10 rounded-xl p-1 gap-1 shadow-xs">
+        <button 
+          @click="diagramStore.undo()"
+          :class="['w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 hover:shadow-sm text-zinc-100 transition-all active:scale-90', diagramStore.undoStack.length === 0 ? 'opacity-40 pointer-events-none' : '']"
+          title="Undo (Ctrl+Z)"
+        >
+          <Undo2 class="w-4 h-4" />
+        </button>
+        <div class="w-px h-4 bg-white/10 mx-0.5" />
+        <button 
+          @click="diagramStore.redo()"
+          :class="['w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 hover:shadow-sm text-zinc-100 transition-all active:scale-90', diagramStore.redoStack.length === 0 ? 'opacity-40 pointer-events-none' : '']"
+          title="Redo (Ctrl+Y)"
+        >
+          <Redo2 class="w-4 h-4" />
+        </button>
+      </div>
+
+      <div v-if="diagramStore.networkErrorMessage" class="px-4 py-1.5 bg-rose-500/10 border border-rose-500/20 rounded-lg text-rose-300 text-[10px] font-mono max-w-xl truncate">
         ⚠️ {{ diagramStore.networkErrorMessage }}
       </div>
       
@@ -26,8 +52,8 @@
         <button 
           @click="isTerminalOpen = !isTerminalOpen"
           :class="isTerminalOpen 
-            ? 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs font-medium transition-all cursor-pointer shadow-sm select-none' 
-            : 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-medium transition-all active:scale-95 cursor-pointer shadow-xs select-none'"
+            ? 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent-blue text-white text-xs font-medium transition-all cursor-pointer shadow-sm select-none' 
+            : 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/10 text-zinc-100 text-xs font-medium transition-all active:scale-95 cursor-pointer shadow-xs select-none'"
         >
           <Terminal class="w-3.5 h-3.5" />
           <span>{{ isTerminalOpen ? 'Hide Terminal' : 'AI Terminal' }}</span>
@@ -139,7 +165,11 @@ import {
   Terminal, 
   X, 
   Trash2, 
-  FileJson 
+  FileJson,
+  Undo2,
+  Redo2,
+  ChevronDown,
+  Type
 } from 'lucide-vue-next';
 
 const diagramStore = useDiagramStore();

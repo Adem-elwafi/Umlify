@@ -13,10 +13,10 @@
     <!-- Main Boundary Box -->
     <div 
       class="w-full h-full border border-dashed rounded-2xl relative transition-all"
-      :class="selected ? 'border-zinc-300 bg-zinc-50/20' : 'border-zinc-300 bg-zinc-50/5'"
+      :class="selected ? 'border-primary-slate/40 bg-secondary-gray/20' : 'border-primary-slate/20 bg-secondary-gray/5'"
     >
       <!-- Namespace Label Badge -->
-      <div class="absolute -top-2.5 left-4 bg-white border border-zinc-200 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider text-zinc-500 select-none shadow-xs" @mousedown.stop>
+      <div class="absolute -top-2.5 left-4 bg-white border border-primary-slate/20 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider text-primary-slate select-none shadow-xs" @mousedown.stop>
         <input
           type="text"
           v-model="localLabel"
@@ -26,12 +26,12 @@
       </div>
 
       <!-- Resize handles (only show when selected) -->
-      <div v-if="selected" class="w-2.5 h-2.5 bg-white border border-blue-600 rounded-md shadow-sm cursor-nwse-resize hover:bg-blue-50 transition-all select-none z-30 active:scale-90 absolute -bottom-1 -right-1" @mousedown.stop="startResize"></div>
+      <div v-if="selected" class="w-2.5 h-2.5 bg-white border border-accent-blue rounded-md shadow-sm cursor-nwse-resize hover:bg-accent-blue/10 transition-all select-none z-30 active:scale-90 absolute -bottom-1 -right-1" @mousedown.stop="startResize"></div>
       
       <!-- Delete button (shows when selected) -->
       <button
         v-if="selected"
-        class="w-5 h-5 flex items-center justify-center bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-[9px] shadow-md border border-zinc-800 transition-all cursor-pointer active:scale-95 absolute -top-2 -right-2 z-30"
+        class="w-5 h-5 flex items-center justify-center bg-primary-slate hover:bg-primary-slate/90 text-white rounded-lg text-[9px] shadow-md border border-primary-slate/20 transition-all cursor-pointer active:scale-95 absolute -top-2 -right-2 z-30"
         @mousedown.stop
         @mouseup.stop
         @click.stop="emit('delete')"

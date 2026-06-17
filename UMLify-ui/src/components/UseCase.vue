@@ -2,7 +2,7 @@
   <div
     class="uml-element element absolute cursor-grab active:cursor-grabbing transition-all select-none flex items-center justify-center bg-white border rounded-full px-4 py-2"
     :class="[
-      selected ? 'z-20 scale-[1.02]' : 'border-zinc-200/80 shadow-xs hover:border-zinc-300 z-10',
+      selected ? 'z-20 scale-[1.02]' : 'border-primary-slate/20 shadow-xs hover:border-primary-slate/40 z-10',
       { 'opacity-80': dragging }
     ]"
     :style="{ 
@@ -22,12 +22,12 @@
     >
 
     <!-- Resize handles (only show when selected) -->
-    <div v-if="selected" class="w-2.5 h-2.5 bg-white border border-blue-600 rounded-md shadow-sm cursor-nwse-resize hover:bg-blue-50 transition-all select-none z-30 active:scale-90 absolute -bottom-1 -right-1" @mousedown.stop="startResize"></div>
+    <div v-if="selected" class="w-2.5 h-2.5 bg-white border border-accent-blue rounded-md shadow-sm cursor-nwse-resize hover:bg-accent-blue/10 transition-all select-none z-30 active:scale-90 absolute -bottom-1 -right-1" @mousedown.stop="startResize"></div>
 
     <!-- Delete button (shows when selected) -->
     <button
       v-if="selected"
-      class="w-5 h-5 flex items-center justify-center bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-[9px] shadow-md border border-zinc-800 transition-all cursor-pointer active:scale-95 absolute -top-2 -right-2 z-30"
+      class="w-5 h-5 flex items-center justify-center bg-primary-slate hover:bg-primary-slate/90 text-white rounded-lg text-[9px] shadow-md border border-primary-slate/20 transition-all cursor-pointer active:scale-95 absolute -top-2 -right-2 z-30"
       @mousedown.stop
       @mouseup.stop
       @click.stop="emit('delete')"

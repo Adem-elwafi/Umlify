@@ -3,7 +3,7 @@
     <path 
       :d="pathString" 
       fill="none" 
-      class="stroke-[#18181b]" 
+      stroke="var(--color-primary-slate)" 
       stroke-width="2.5" 
       :stroke-dasharray="isDash ? '6,4' : 'none'"
     />
@@ -14,7 +14,8 @@
       font-size="11"
       font-weight="700"
       text-anchor="middle"
-      class="connector-label fill-[#18181b] tracking-tight"
+      fill="var(--color-primary-slate)"
+      class="connector-label tracking-tight"
     >
       {{ type }}
     </text>

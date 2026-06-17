@@ -2,7 +2,7 @@
   <div
     class="actor element absolute cursor-grab active:cursor-grabbing transition-all select-none"
     :class="[
-      selected ? 'z-20' : 'border border-zinc-200 shadow-sm rounded-xl bg-white z-10',
+      selected ? 'z-20' : 'border border-primary-slate/20 shadow-sm rounded-xl bg-white z-10',
       { 'scale-[1.02]': selected, 'opacity-80': dragging }
     ]"
     :style="{ 
@@ -16,8 +16,8 @@
   >
     <!-- Vector Asset Container -->
     <div class="flex flex-col items-center p-3">
-      <div class="w-10 h-10 flex items-center justify-center bg-zinc-50 rounded-lg border border-zinc-100 mb-1">
-        <svg viewBox="0 0 24 24" class="w-6 h-6 text-zinc-600" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="w-10 h-10 flex items-center justify-center bg-zinc-50 rounded-lg border border-primary-slate/10 mb-1">
+        <svg viewBox="0 0 24 24" class="w-6 h-6 text-primary-slate" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
           <circle cx="12" cy="7" r="4" />
         </svg>
@@ -32,12 +32,12 @@
     </div>
 
     <!-- Resize handles (only show when selected) -->
-    <div v-if="selected" class="w-2.5 h-2.5 bg-white border border-blue-600 rounded-md shadow-sm cursor-nwse-resize hover:bg-blue-50 transition-all select-none z-30 active:scale-90 absolute -bottom-1 -right-1" @mousedown.stop="startResize"></div>
+    <div v-if="selected" class="w-2.5 h-2.5 bg-white border border-accent-blue rounded-md shadow-sm cursor-nwse-resize hover:bg-accent-blue/10 transition-all select-none z-30 active:scale-90 absolute -bottom-1 -right-1" @mousedown.stop="startResize"></div>
     
     <!-- Delete button (shows when selected) -->
     <button
       v-if="selected"
-      class="w-5 h-5 flex items-center justify-center bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-[9px] shadow-md border border-zinc-800 transition-all cursor-pointer active:scale-95 absolute -top-2 -right-2 z-30"
+      class="w-5 h-5 flex items-center justify-center bg-primary-slate hover:bg-primary-slate/90 text-white rounded-lg text-[9px] shadow-md border border-primary-slate/20 transition-all cursor-pointer active:scale-95 absolute -top-2 -right-2 z-30"
       @mousedown.stop
       @mouseup.stop
       @click.stop="emit('delete')"
