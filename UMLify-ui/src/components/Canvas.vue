@@ -25,7 +25,7 @@
         <!-- Selection Marquee (During Dragging) -->
         <div 
           v-if="isSelecting"
-          class="absolute border border-dashed border-blue-400 bg-blue-50/20 pointer-events-none z-[1000]"
+          class="absolute border border-dashed border-accent-blue bg-accent-blue/10 pointer-events-none z-[1000]"
           :style="{
             left: boxLeft + 'px',
             top: boxTop + 'px',
@@ -44,7 +44,7 @@
           @mousedown.stop="initiateElementsDrag($event, element)"
         >
           <!-- Task 1: Premium Hairline Selection Highlight -->
-          <div v-if="selectedElements.includes(String(element.id))" class="absolute inset-0 pointer-events-none border border-blue-500 rounded-xl ring-1 ring-blue-500/20 z-20"></div>
+          <div v-if="selectedElements.includes(String(element.id))" class="absolute inset-0 pointer-events-none border border-accent-blue rounded-xl ring-1 ring-accent-blue/20 z-20"></div>
 
           <System
             v-if="element.type === 'System'"
@@ -95,7 +95,7 @@
               v-for="side in ['top', 'right', 'bottom', 'left']" 
               :key="side"
               :data-anchor-side="side"
-              class="absolute w-3 h-3 rounded-full border border-zinc-300 bg-white shadow-xs flex items-center justify-center text-[9px] font-bold text-zinc-400 hover:text-blue-600 hover:border-blue-500 active:scale-75 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-auto cursor-crosshair z-30"
+              class="absolute w-3 h-3 rounded-full border border-zinc-300 bg-white shadow-xs flex items-center justify-center text-[9px] font-bold text-zinc-400 hover:text-accent-blue hover:border-accent-blue active:scale-75 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-auto cursor-crosshair z-30"
               :class="{
                 'top-0 left-1/2': side === 'top',
                 'top-1/2 right-0 translate-x-1/2': side === 'right',
@@ -114,7 +114,7 @@
           <path 
             :d="draggingPath" 
             fill="none" 
-            stroke="#3b82f6" 
+            stroke="var(--color-accent-blue)" 
             stroke-width="1.5" 
             stroke-dasharray="4,4"
             class="drop-shadow-sm"
@@ -138,7 +138,7 @@
           :style="getMidpointStyle(conn)"
         >
           <button 
-            class="w-3 h-3 rounded-full border border-zinc-300 bg-white hover:border-blue-500 hover:bg-blue-50 shadow-xs flex items-center justify-center text-[8px] text-zinc-400 hover:text-blue-600 transition-all cursor-crosshair z-20 active:scale-90" 
+            class="w-3 h-3 rounded-full border border-zinc-300 bg-white hover:border-accent-blue hover:bg-accent-blue/10 shadow-xs flex items-center justify-center text-[8px] text-zinc-400 hover:text-accent-blue transition-all cursor-crosshair z-20 active:scale-90" 
             title="Edit connection type" 
             @click.stop="selectConnection(conn.id)"
           >•</button>
@@ -401,8 +401,9 @@ const handleElementDragMove = (event) => {
   const deltaY = (event.clientY - dragStartMouseY) / zoomLevel.value;
 
   activeTrackedElements.value.forEach(item => {
-    item.currentX = item.baseX + deltaX;
-    item.currentY = item.baseY + deltaY;
+    // Quantize absolute positions to a structured 16px grid matrix
+    item.currentX = Math.round((item.baseX + deltaX) / 16) * 16;
+    item.currentY = Math.round((item.baseY + deltaY) / 16) * 16;
   });
 
   if (!animationFrameId) {
@@ -688,7 +689,7 @@ function exportAsImage() {
 }
 
 .sheet-grid {
-  background-image: radial-gradient(#d4d4d8 1px, transparent 1px);
+  background-image: radial-gradient(var(--color-secondary-gray) 1px, transparent 1px);
   background-size: 16px 16px;
 }
 </style>
