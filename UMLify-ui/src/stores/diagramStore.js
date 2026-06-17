@@ -267,6 +267,8 @@ export const useDiagramStore = defineStore('diagram', () => {
     savedDiagramsList,
     networkErrorMessage,
     globalSaveStatusMessage,
+    undoStack,
+    redoStack,
     undo,
     redo,
     resetDiagram,
