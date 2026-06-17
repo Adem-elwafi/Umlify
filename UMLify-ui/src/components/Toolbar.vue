@@ -97,8 +97,6 @@ import {
   User, 
   CircleDot, 
   Box, 
-  Pencil, 
-  Link, 
   Download, 
   Upload, 
   Camera, 
@@ -107,7 +105,6 @@ import {
 } from 'lucide-vue-next';
 
 const emit = defineEmits(['local-export', 'local-import', 'local-snapshot']);
-const selectedType = defineModel({ default: 'association' });
 
 const diagramStore = useDiagramStore();
 const authStore = useAuthStore();

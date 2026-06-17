@@ -173,7 +173,6 @@
       :class="isSidebarDrawerOpen ? '-translate-x-24 opacity-0 pointer-events-none' : 'translate-x-0 opacity-100'"
     >
       <Toolbar
-        v-model="selectedType"
         @local-export="exportDiagram"
         @local-import="importDiagram"
         @local-snapshot="exportAsImage"
@@ -265,8 +264,6 @@ const diagramStore = useDiagramStore();
 const { elements, connections, selectedElements, selectedConnectionId, zoomLevel } = storeToRefs(diagramStore);
 const { updateSize, updateLabel, deleteElement, connectElements, undo, redo, saveToHistory } = diagramStore;
 
-const selectedType = ref('association');
-
 const isSelecting = ref(false);
 const selectionBox = ref({ startX: 0, startY: 0, currentX: 0, currentY: 0 });
 const boxLeft = ref(0);
@@ -334,7 +331,7 @@ const handleConnectionMouseUp = (event) => {
         targetElementId,
         activeDraggingLink.value.sourceSide,
         targetSide,
-        selectedType.value
+        'association'
       );
     }
   }
