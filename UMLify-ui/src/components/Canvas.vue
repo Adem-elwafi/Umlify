@@ -413,6 +413,13 @@ const handleElementDragMove = (event) => {
         if (domWrapper) {
           domWrapper.style.transform = `translate3d(${item.currentX}px, ${item.currentY}px, 0)`;
         }
+
+        // REACTIVE PATCH: Synchronize store state for real-time connector re-calculation
+        const el = elements.value.find(e => String(e.id) === String(item.id));
+        if (el) {
+          el.x = item.currentX;
+          el.y = item.currentY;
+        }
       });
       animationFrameId = null;
     });

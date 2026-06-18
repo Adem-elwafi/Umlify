@@ -9,6 +9,7 @@
     />
     
     <text
+      v-if="type !== 'association' && type !== ''"
       :x="labelX"
       :y="labelY"
       font-size="11"
