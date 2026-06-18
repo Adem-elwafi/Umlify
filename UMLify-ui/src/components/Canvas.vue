@@ -121,6 +121,32 @@
           />
         </svg>
 
+        <!-- Smart Alignment Guides -->
+        <svg class="absolute top-0 left-0 w-full h-full pointer-events-none z-[999] overflow-visible">
+          <line 
+            v-if="alignmentGuides.vertical" 
+            :x1="alignmentGuides.vertical" 
+            y1="0" 
+            :x2="alignmentGuides.vertical" 
+            y2="5000" 
+            stroke="var(--color-accent-blue)" 
+            stroke-width="1" 
+            stroke-dasharray="5,5" 
+            class="opacity-60"
+          />
+          <line 
+            v-if="alignmentGuides.horizontal" 
+            x1="0" 
+            :y1="alignmentGuides.horizontal" 
+            x2="5000" 
+            :y2="alignmentGuides.horizontal" 
+            stroke="var(--color-accent-blue)" 
+            stroke-width="1" 
+            stroke-dasharray="5,5" 
+            class="opacity-60"
+          />
+        </svg>
+
         <!-- Relational Connectors -->
         <Connector
           v-for="conn in connections"
@@ -282,6 +308,24 @@ const inspectorElement = computed(() => {
 });
 
 // ==========================================
+// 🎯 SMART ALIGNMENT GUIDES & SNAP SYSTEM
+// ==========================================
+const alignmentGuides = ref({ vertical: null, horizontal: null });
+
+function getElementBounds(el) {
+  const w = el.width || (el.type === 'actor' ? 80 : el.type === 'System' ? 300 : 140);
+  const h = el.height || (el.type === 'actor' ? 120 : el.type === 'System' ? 400 : 80);
+  return {
+    left: el.x,
+    right: el.x + w,
+    top: el.y,
+    bottom: el.y + h,
+    centerX: el.x + w / 2,
+    centerY: el.y + h / 2
+  };
+}
+
+// ==========================================
 // 🔗 INTERACTIVE CONNECTION ENGINE (Task 3)
 // ==========================================
 const activeDraggingLink = ref(null);
@@ -400,10 +444,57 @@ const handleElementDragMove = (event) => {
   const deltaX = (event.clientX - dragStartMouseX) / zoomLevel.value;
   const deltaY = (event.clientY - dragStartMouseY) / zoomLevel.value;
 
+  // Reset alignment guides for this frame
+  alignmentGuides.value = { vertical: null, horizontal: null };
+  const SNAP_THRESHOLD = 8;
+
   activeTrackedElements.value.forEach(item => {
     // Quantize absolute positions to a structured 16px grid matrix
-    item.currentX = Math.round((item.baseX + deltaX) / 16) * 16;
-    item.currentY = Math.round((item.baseY + deltaY) / 16) * 16;
+    let nextX = Math.round((item.baseX + deltaX) / 16) * 16;
+    let nextY = Math.round((item.baseY + deltaY) / 16) * 16;
+
+    // Smart Snapping Logic
+    const staticElements = elements.value.filter(el => !selectedElements.value.includes(String(el.id)));
+    const movingBounds = getElementBounds({ ...item, x: nextX, y: nextY });
+
+    staticElements.forEach(staticEl => {
+      const staticBounds = getElementBounds(staticEl);
+
+      // Vertical Snapping (X-axis)
+      const vSnapPoints = [
+        { moving: movingBounds.left, static: staticBounds.left, offset: 0 },
+        { moving: movingBounds.left, static: staticBounds.right, offset: 0 },
+        { moving: movingBounds.right, static: staticBounds.left, offset: -(movingBounds.right - movingBounds.left) },
+        { moving: movingBounds.right, static: staticBounds.right, offset: -(movingBounds.right - movingBounds.left) },
+        { moving: movingBounds.centerX, static: staticBounds.centerX, offset: -(movingBounds.centerX - movingBounds.left) }
+      ];
+
+      vSnapPoints.forEach(pt => {
+        if (Math.abs(pt.moving - pt.static) < SNAP_THRESHOLD) {
+          nextX = pt.static + pt.offset;
+          alignmentGuides.value.vertical = pt.static;
+        }
+      });
+
+      // Horizontal Snapping (Y-axis)
+      const hSnapPoints = [
+        { moving: movingBounds.top, static: staticBounds.top, offset: 0 },
+        { moving: movingBounds.top, static: staticBounds.bottom, offset: 0 },
+        { moving: movingBounds.bottom, static: staticBounds.top, offset: -(movingBounds.bottom - movingBounds.top) },
+        { moving: movingBounds.bottom, static: staticBounds.bottom, offset: -(movingBounds.bottom - movingBounds.top) },
+        { moving: movingBounds.centerY, static: staticBounds.centerY, offset: -(movingBounds.centerY - movingBounds.top) }
+      ];
+
+      hSnapPoints.forEach(pt => {
+        if (Math.abs(pt.moving - pt.static) < SNAP_THRESHOLD) {
+          nextY = pt.static + pt.offset;
+          alignmentGuides.value.horizontal = pt.static;
+        }
+      });
+    });
+
+    item.currentX = nextX;
+    item.currentY = nextY;
   });
 
   if (!animationFrameId) {
@@ -429,6 +520,9 @@ const handleElementDragMove = (event) => {
 const handleElementDragMouseUp = () => {
   if (!isDraggingElements.value) return;
   isDraggingElements.value = false;
+
+  // Clear alignment guides
+  alignmentGuides.value = { vertical: null, horizontal: null };
 
   window.removeEventListener('mousemove', handleElementDragMove);
   window.removeEventListener('mouseup', handleElementDragMouseUp);
