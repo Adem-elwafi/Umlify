@@ -97,30 +97,54 @@
           </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto px-2 pb-4 space-y-1">
+        <div class="flex-1 overflow-y-auto px-2 pb-4 space-y-1 mt-2">
           <div v-if="diagramStore.savedDiagramsList.length === 0" class="text-center text-zinc-400 text-[11px] p-8 italic font-mono">
             No cloud storage records found.
           </div>
           
-          <!-- Saved Diagram Database Rows -->
+          <!-- Saved Diagram Database Rows (Swipe-to-Reveal-Delete Pattern) -->
           <div 
             v-for="diag in diagramStore.savedDiagramsList" 
             :key="diag.id"
-            @click="handleSelectCloudDiagram(diag.id)"
-            :class="[
-              'p-3 mx-2 rounded-xl transition-all cursor-pointer select-none group flex items-center justify-between border',
-              diagramStore.currentDiagramId === diag.id 
-                ? 'bg-zinc-100 border-zinc-200 text-zinc-900' 
-                : 'bg-transparent border-transparent hover:bg-zinc-50/80 text-zinc-700 hover:text-zinc-900 hover:border-zinc-100'
-            ]"
+            class="relative h-[60px] mx-1 rounded-xl overflow-hidden bg-rose-600 shadow-sm"
           >
-            <div class="truncate mr-2">
-              <p class="text-xs font-semibold truncate">{{ diag.title || 'Untitled Diagram' }}</p>
-              <p class="text-[10px] text-zinc-400 font-mono tracking-normal mt-0.5">
-                {{ new Date(diag.updatedAt || diag.createdAt).toLocaleDateString() }}
-              </p>
+            <!-- Background Layer (Delete Button) -->
+            <div class="absolute inset-0 flex justify-end">
+              <button 
+                @click.stop="promptDelete(diag)"
+                class="w-[80px] h-full flex flex-col items-center justify-center text-white hover:bg-rose-700 transition-colors cursor-pointer"
+                title="Permanently Delete"
+              >
+                <Trash2 class="w-4 h-4 mb-1" />
+                <span class="text-[9px] font-bold uppercase tracking-widest">Delete</span>
+              </button>
             </div>
-            <FileJson class="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
+
+            <!-- Foreground Layer (Project Details) -->
+            <div 
+              @click="handleSelectCloudDiagram(diag.id)"
+              :class="[
+                'absolute inset-0 h-full p-3 transition-transform duration-300 ease-in-out cursor-pointer flex items-center justify-between border rounded-xl',
+                diagramStore.currentDiagramId === diag.id 
+                  ? 'bg-zinc-100 border-zinc-200 text-zinc-900' 
+                  : 'bg-white border-zinc-100 text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900',
+                swipedRowId === diag.id ? '-translate-x-[80px]' : 'translate-x-0'
+              ]"
+            >
+              <div class="truncate mr-2 flex-1">
+                <p class="text-xs font-semibold truncate">{{ diag.title || 'Untitled Diagram' }}</p>
+                <p class="text-[10px] text-zinc-400 font-mono tracking-normal mt-0.5">
+                  {{ new Date(diag.updatedAt || diag.createdAt).toLocaleDateString() }}
+                </p>
+              </div>
+              <button 
+                @click.stop="toggleSwipe(diag.id)"
+                class="p-1.5 text-zinc-300 hover:text-zinc-500 rounded-lg hover:bg-zinc-200 transition-colors cursor-pointer"
+                title="Options"
+              >
+                <MoreVertical class="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -151,6 +175,37 @@
         <TerminalEditor class="w-[32rem]" />
       </div>
     </main>
+
+    <!-- Global Confirmation Modal Wrapper -->
+    <transition name="fade">
+      <div 
+        v-if="diagramStore.globalModalConfig.isOpen" 
+        class="fixed inset-0 z-[100] flex items-center justify-center"
+      >
+        <div 
+          class="absolute inset-0 bg-[#213C51]/80 backdrop-blur-sm"
+          @click="diagramStore.closeGlobalModal()"
+        ></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col p-6 scale-100 transition-transform">
+          <h3 class="text-lg font-semibold text-zinc-900 mb-2">{{ diagramStore.globalModalConfig.title }}</h3>
+          <p class="text-sm text-zinc-500 mb-6">{{ diagramStore.globalModalConfig.message }}</p>
+          <div class="flex justify-end gap-3 mt-auto">
+            <button 
+              @click="diagramStore.closeGlobalModal()"
+              class="px-4 py-2 text-xs font-semibold text-zinc-600 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition-colors cursor-pointer"
+            >
+              {{ diagramStore.globalModalConfig.cancelText }}
+            </button>
+            <button 
+              @click="executeGlobalConfirm"
+              class="px-4 py-2 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition-colors shadow-sm cursor-pointer"
+            >
+              {{ diagramStore.globalModalConfig.confirmText }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -169,7 +224,8 @@ import {
   Undo2,
   Redo2,
   ChevronDown,
-  Type
+  Type,
+  MoreVertical
 } from 'lucide-vue-next';
 
 const diagramStore = useDiagramStore();
@@ -177,6 +233,37 @@ const authStore = useAuthStore();
 
 const isTerminalOpen = ref(true);
 const isSidebarDrawerOpen = ref(false);
+const swipedRowId = ref(null);
+
+const toggleSwipe = (id) => {
+  if (swipedRowId.value === id) {
+    swipedRowId.value = null;
+  } else {
+    swipedRowId.value = id;
+  }
+};
+
+const promptDelete = (diag) => {
+  diagramStore.openGlobalConfirmation({
+    title: 'Delete Cloud Project',
+    message: `Are you sure you want to permanently delete "${diag.title || 'Untitled Diagram'}" from the remote cloud repository? This action is irreversible.`,
+    confirmText: 'Delete Project',
+    cancelText: 'Cancel',
+    onConfirm: async () => {
+      const success = await diagramStore.deleteDiagram(diag.id);
+      if (success) {
+        swipedRowId.value = null;
+      }
+    }
+  });
+};
+
+const executeGlobalConfirm = async () => {
+  if (diagramStore.globalModalConfig.onConfirm) {
+    await diagramStore.globalModalConfig.onConfirm();
+  }
+  diagramStore.closeGlobalModal();
+};
 
 const handleSelectCloudDiagram = async (id) => {
   const loaded = await diagramStore.loadDiagramById(id);

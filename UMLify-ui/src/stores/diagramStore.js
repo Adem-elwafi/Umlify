@@ -18,6 +18,32 @@ export const useDiagramStore = defineStore('diagram', () => {
   const networkErrorMessage = ref(null);
   const globalSaveStatusMessage = ref('');
 
+  // Global Modal Configuration
+  const globalModalConfig = ref({
+    isOpen: false,
+    title: '',
+    message: '',
+    confirmText: 'Confirm',
+    cancelText: 'Cancel',
+    onConfirm: null
+  });
+
+  const openGlobalConfirmation = (config) => {
+    globalModalConfig.value = {
+      isOpen: true,
+      title: config.title || 'Confirmation',
+      message: config.message || 'Are you sure?',
+      confirmText: config.confirmText || 'Confirm',
+      cancelText: config.cancelText || 'Cancel',
+      onConfirm: config.onConfirm || null
+    };
+  };
+
+  const closeGlobalModal = () => {
+    globalModalConfig.value.isOpen = false;
+    globalModalConfig.value.onConfirm = null;
+  };
+
   // Undo/Redo Historical Engine Stacks
   const undoStack = ref([]);
   const redoStack = ref([]);
@@ -188,6 +214,23 @@ export const useDiagramStore = defineStore('diagram', () => {
     return false;
   };
 
+  const deleteDiagram = async (id) => {
+    networkErrorMessage.value = null;
+    try {
+      const response = await axios.delete(`http://localhost:5000/api/diagrams/${id}`, getAuthHeaders());
+      if (response.status === 200 || response.status === 204) {
+        savedDiagramsList.value = savedDiagramsList.value.filter(d => d.id !== id);
+        if (currentDiagramId.value === id) {
+          resetDiagram();
+        }
+        return true;
+      }
+    } catch (err) {
+      networkErrorMessage.value = err.response?.data?.message || 'Failed to delete target diagram.';
+      return false;
+    }
+  };
+
   // Canvas local layout factories
   const addActor = () => {
     saveToHistory();
@@ -267,6 +310,9 @@ export const useDiagramStore = defineStore('diagram', () => {
     savedDiagramsList,
     networkErrorMessage,
     globalSaveStatusMessage,
+    globalModalConfig,
+    openGlobalConfirmation,
+    closeGlobalModal,
     undoStack,
     redoStack,
     undo,
@@ -275,6 +321,7 @@ export const useDiagramStore = defineStore('diagram', () => {
     fetchUserDiagrams,
     saveCurrentDiagram,
     loadDiagramById,
+    deleteDiagram,
     saveToHistory,
     addActor,
     addUseCase,
