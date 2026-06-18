@@ -210,7 +210,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useDiagramStore } from '../stores/diagramStore';
 import { useAuthStore } from '../stores/authStore';
 import Canvas from '../components/Canvas.vue';
@@ -234,6 +234,13 @@ const authStore = useAuthStore();
 const isTerminalOpen = ref(true);
 const isSidebarDrawerOpen = ref(false);
 const swipedRowId = ref(null);
+
+const handleBeforeUnload = (event) => {
+  if (diagramStore.isDirty && diagramStore.elements.length > 0) {
+    event.preventDefault();
+    event.returnValue = ''; // Standard browser prompt
+  }
+};
 
 const toggleSwipe = (id) => {
   if (swipedRowId.value === id) {
@@ -283,7 +290,12 @@ const handleSignOutFlow = () => {
 };
 
 onMounted(async () => {
+  window.addEventListener('beforeunload', handleBeforeUnload);
   await diagramStore.fetchUserDiagrams();
+});
+
+onUnmounted(() => {
+  window.removeEventListener('beforeunload', handleBeforeUnload);
 });
 </script>
 

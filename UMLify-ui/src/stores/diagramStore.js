@@ -10,6 +10,7 @@ export const useDiagramStore = defineStore('diagram', () => {
   const selectedElements = ref([]);
   const selectedConnectionId = ref(null);
   const zoomLevel = ref(1);
+  const isDirty = ref(false);
 
   // Asynchronous Cloud Persistence States
   const currentDiagramId = ref(null);
@@ -64,12 +65,14 @@ export const useDiagramStore = defineStore('diagram', () => {
   };
 
   const saveToHistory = () => {
+    isDirty.value = true;
     undoStack.value.push(createSnapshot());
     redoStack.value = [];
   };
 
   const undo = () => {
     if (undoStack.value.length === 0) return;
+    isDirty.value = true;
     redoStack.value.push(createSnapshot());
     const prev = undoStack.value.pop();
     restoreFromSnapshot(prev);
@@ -77,6 +80,7 @@ export const useDiagramStore = defineStore('diagram', () => {
 
   const redo = () => {
     if (redoStack.value.length === 0) return;
+    isDirty.value = true;
     undoStack.value.push(createSnapshot());
     const nextState = redoStack.value.pop();
     restoreFromSnapshot(nextState);
@@ -109,6 +113,7 @@ export const useDiagramStore = defineStore('diagram', () => {
     currentDiagramTitle.value = 'Untitled Diagram';
     globalSaveStatusMessage.value = '';
     networkErrorMessage.value = null;
+    isDirty.value = false;
   };
 
   // Helper config to fetch auth headers reactively from authStore
@@ -165,6 +170,7 @@ export const useDiagramStore = defineStore('diagram', () => {
       if (response.data && response.data.diagramId) {
         currentDiagramId.value = response.data.diagramId;
         globalSaveStatusMessage.value = 'Saved Successfully!';
+        isDirty.value = false;
         await fetchUserDiagrams(); // Refresh metadata dashboard drawer
         setTimeout(() => { globalSaveStatusMessage.value = '' }, 3000);
         return true;
@@ -206,6 +212,7 @@ export const useDiagramStore = defineStore('diagram', () => {
         selectedConnectionId.value = null;
         undoStack.value = [];
         redoStack.value = [];
+        isDirty.value = false;
         return true;
       }
     } catch (err) {
@@ -265,11 +272,12 @@ export const useDiagramStore = defineStore('diagram', () => {
       el.x = newX;
       el.y = newY;
     }
+    isDirty.value = true;
   };
 
   const updateSize = (id, newWidth, newHeight) => {
     const el = elements.value.find(e => e.id === id);
-    if (el) { el.width = newWidth; el.height = newHeight; }
+    if (el) { el.width = newWidth; el.height = newHeight; isDirty.value = true; }
   };
 
   const updateLabel = (id, newLabel) => {
@@ -286,6 +294,7 @@ export const useDiagramStore = defineStore('diagram', () => {
         id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
         from, to, fromSide: side1, toSide: side2, type
       });
+      isDirty.value = true;
       return true;
     }
     return false;
@@ -297,6 +306,7 @@ export const useDiagramStore = defineStore('diagram', () => {
     elements.value = elements.value.filter(e => String(e.id) !== idStr);
     connections.value = connections.value.filter(c => String(c.from?.id) !== idStr && String(c.to?.id) !== idStr);
     selectedElements.value = selectedElements.value.filter(e => e !== idStr);
+    isDirty.value = true;
   };
 
   return {
@@ -305,6 +315,7 @@ export const useDiagramStore = defineStore('diagram', () => {
     selectedElements,
     selectedConnectionId,
     zoomLevel,
+    isDirty,
     currentDiagramId,
     currentDiagramTitle,
     savedDiagramsList,
