@@ -2,32 +2,42 @@
   <div
     class="actor element absolute cursor-grab active:cursor-grabbing transition-all select-none"
     :class="[
-      selected ? 'z-20' : 'border border-primary-slate/20 shadow-sm rounded-xl bg-white z-10',
+      selected ? 'z-20' : 'z-10',
       { 'scale-[1.02]': selected, 'opacity-80': dragging }
     ]"
     :style="{ 
       left: x + 'px', 
       top: y + 'px',
-      width: width ? width + 'px' : 'auto',
-      height: height ? height + 'px' : 'auto'
+      width: width ? width + 'px' : '80px',
+      height: height ? height + 'px' : '120px'
     }"
     @mousedown="startDrag"
     @mouseup="handleMouseUp"
   >
-    <!-- Vector Asset Container -->
-    <div class="flex flex-col items-center p-3">
-      <div class="w-10 h-10 flex items-center justify-center bg-zinc-50 rounded-lg border border-primary-slate/10 mb-1">
-        <svg viewBox="0 0 24 24" class="w-6 h-6 text-primary-slate" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
-      </div>
+    <!-- Stick-man SVG Container -->
+    <div class="flex flex-col items-center w-full h-full p-2">
+      <svg 
+        viewBox="0 0 100 100" 
+        preserveAspectRatio="xMidYMid meet"
+        class="w-full flex-1 text-primary-slate drop-shadow-sm"
+      >
+        <!-- Head -->
+        <circle cx="50" cy="20" r="15" fill="white" stroke="currentColor" stroke-width="3" />
+        <!-- Body Spine -->
+        <line x1="50" y1="35" x2="50" y2="70" stroke="currentColor" stroke-width="3" />
+        <!-- Arms -->
+        <line x1="20" y1="45" x2="80" y2="45" stroke="currentColor" stroke-width="3" />
+        <!-- Left Leg -->
+        <line x1="50" y1="70" x2="25" y2="95" stroke="currentColor" stroke-width="3" />
+        <!-- Right Leg -->
+        <line x1="50" y1="70" x2="75" y2="95" stroke="currentColor" stroke-width="3" />
+      </svg>
       
       <input 
         type="text" 
         v-model="localLabel" 
         @input="updateLabel"
-        class="text-[11px] font-medium text-zinc-800 tracking-tight text-center truncate w-full bg-transparent border-none outline-none focus:ring-0"
+        class="mt-2 text-[11px] font-bold text-zinc-800 tracking-tight text-center truncate w-full bg-transparent border-none outline-none focus:ring-0"
       >
     </div>
 
