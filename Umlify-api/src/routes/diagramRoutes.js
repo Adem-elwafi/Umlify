@@ -13,7 +13,8 @@ router.use(authenticateToken);
  */
 router.post('/save', async (req, res) => {
   try {
-    const { id, title, payload } = req.body;
+    const diagramId = req.body.diagramId || req.body.id;
+    const { title, payload } = req.body;
     const userId = req.user.id; // Extracted directly from secure JWT verification payload
 
     if (!title || !payload) {
@@ -24,9 +25,9 @@ router.post('/save', async (req, res) => {
     }
 
     // 🔄 Conditional Check: If an explicit ID exists, handle ownership and update
-    if (id) {
+    if (diagramId) {
       const existingDiagram = await prisma.diagram.findUnique({
-        where: { id }
+        where: { id: diagramId }
       });
 
       if (!existingDiagram) {
@@ -43,7 +44,7 @@ router.post('/save', async (req, res) => {
 
       // Safe Update Transaction Execution
       const updatedDiagram = await prisma.diagram.update({
-        where: { id },
+        where: { id: diagramId },
         data: {
           title,
           payload // Automatically mapped as native JSON binary fields inside PostgreSQL
