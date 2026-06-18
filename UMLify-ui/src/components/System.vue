@@ -1,12 +1,7 @@
 <template>
   <div
-    class="System element absolute cursor-grab active:cursor-grabbing transition-all select-none z-0"
-    :style="{ 
-      left: x + 'px', 
-      top: y + 'px',
-      width: width ? width + 'px' : '380px',
-      height: height ? height + 'px' : '560px'
-    }"
+    class="System element relative w-full h-full cursor-grab active:cursor-grabbing transition-all select-none z-0"
+    :style="{}"
     @mousedown="startDrag"
     @mouseup="handleMouseUp"
   >

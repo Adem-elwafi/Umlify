@@ -1,16 +1,11 @@
 <template>
   <div
-    class="actor element absolute cursor-grab active:cursor-grabbing transition-all select-none"
+    class="actor element relative w-full h-full cursor-grab active:cursor-grabbing transition-all select-none"
     :class="[
       selected ? 'z-20' : 'z-10',
       { 'scale-[1.02]': selected, 'opacity-80': dragging }
     ]"
-    :style="{ 
-      left: x + 'px', 
-      top: y + 'px',
-      width: width ? width + 'px' : '80px',
-      height: height ? height + 'px' : '120px'
-    }"
+    :style="{}"
     @mousedown="startDrag"
     @mouseup="handleMouseUp"
   >

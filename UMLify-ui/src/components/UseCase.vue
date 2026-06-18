@@ -1,16 +1,11 @@
 <template>
   <div
-    class="uml-element element absolute cursor-grab active:cursor-grabbing transition-all select-none flex items-center justify-center bg-white border rounded-full px-4 py-2"
+    class="uml-element element relative w-full h-full cursor-grab active:cursor-grabbing transition-all select-none flex items-center justify-center bg-white border rounded-full px-4 py-2"
     :class="[
       selected ? 'z-20 scale-[1.02]' : 'border-primary-slate/20 shadow-xs hover:border-primary-slate/40 z-10',
       { 'opacity-80': dragging }
     ]"
-    :style="{ 
-      left: x + 'px', 
-      top: y + 'px',
-      width: width ? width + 'px' : 'auto',
-      height: height ? height + 'px' : 'auto'
-    }"
+    :style="{}"
     @mousedown="startDrag"
     @mouseup="handleMouseUp"
   >

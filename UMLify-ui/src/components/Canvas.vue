@@ -95,12 +95,12 @@
               v-for="side in ['top', 'right', 'bottom', 'left']" 
               :key="side"
               :data-anchor-side="side"
-              class="absolute w-3 h-3 rounded-full border border-zinc-300 bg-white shadow-xs flex items-center justify-center text-[9px] font-bold text-zinc-400 hover:text-accent-blue hover:border-accent-blue active:scale-75 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-auto cursor-crosshair z-30"
+              class="absolute w-3 h-3 rounded-full border border-zinc-300 bg-white shadow-xs flex items-center justify-center text-[9px] font-bold text-zinc-400 hover:text-accent-blue hover:border-accent-blue active:scale-75 transform opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-auto cursor-crosshair z-30"
               :class="{
-                'top-0 left-1/2': side === 'top',
-                'top-1/2 right-0 translate-x-1/2': side === 'right',
-                'bottom-0 left-1/2 translate-y-1/2': side === 'bottom',
-                'top-1/2 left-0': side === 'left'
+                'top-0 left-1/2 -translate-x-1/2 -translate-y-1/2': side === 'top',
+                'top-1/2 right-0 translate-x-1/2 -translate-y-1/2': side === 'right',
+                'bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2': side === 'bottom',
+                'top-1/2 left-0 -translate-x-1/2 -translate-y-1/2': side === 'left'
               }"
               @mousedown.stop="initiateConnectionDrag($event, element, side)"
             >
@@ -547,7 +547,9 @@ const getElementStyle = (element) => {
     transform: `translate3d(${element.x}px, ${element.y}px, 0)`,
     position: 'absolute',
     top: 0,
-    left: 0
+    left: 0,
+    width: `${element.width}px`,
+    height: `${element.height}px`
   };
 };
 

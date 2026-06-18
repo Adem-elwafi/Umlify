@@ -73,7 +73,13 @@ const labelX = computed(() => {
 
   if (isFromHorizontal && isToHorizontal) return x1 + (x2 - x1) / 2;
   if (!isFromHorizontal && !isToHorizontal) return (x1 + x2) / 2;
-  return x2; // Mixed edge label near the vertical segment
+  
+  // Mixed Edges
+  if (isFromHorizontal) { // H -> V
+    return x2;
+  } else { // V -> H
+    return x1 + (x2 - x1) / 2;
+  }
 });
 
 const labelY = computed(() => {
@@ -87,7 +93,13 @@ const labelY = computed(() => {
 
   if (isFromHorizontal && isToHorizontal) return (y1 + y2) / 2 - 12;
   if (!isFromHorizontal && !isToHorizontal) return y1 + (y2 - y1) / 2 - 12;
-  return y1 - 12; // Mixed edge label near the horizontal segment
+
+  // Mixed Edges
+  if (isFromHorizontal) { // H -> V
+    return y1 + (y2 - y1) / 2;
+  } else { // V -> H
+    return y2 - 12;
+  }
 });
 </script>
 
