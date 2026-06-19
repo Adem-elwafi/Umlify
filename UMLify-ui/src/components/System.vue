@@ -84,7 +84,7 @@ function startDrag(event) {
     const dx = e.clientX - startX
     const dy = e.clientY - startY
     if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved.value = true
-    props.onDrag(initialX + dx, initialY + dy)
+    if (props.onDrag) props.onDrag(initialX + dx, initialY + dy)
   }
 
   const stop = () => {
