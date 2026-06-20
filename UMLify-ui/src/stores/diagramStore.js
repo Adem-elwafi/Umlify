@@ -254,6 +254,16 @@ export const useDiagramStore = defineStore('diagram', () => {
     elements.value.push({ id: `sys_${Date.now()}`, type: 'System', label: 'System', x: 300, y: 100, width: 300, height: 400 });
   };
 
+  const addPackage = () => {
+    saveToHistory();
+    elements.value.push({ id: `pkg_${Date.now()}`, type: 'package', label: 'Package', x: 200, y: 150, width: 200, height: 150 });
+  };
+
+  const addNote = () => {
+    saveToHistory();
+    elements.value.push({ id: `note_${Date.now()}`, type: 'note', label: 'Note', x: 200, y: 150, width: 120, height: 120 });
+  };
+
   const updatePositionWithGroup = (id, newX, newY) => {
     const idStr = String(id);
     const el = elements.value.find(e => String(e.id) === idStr);
@@ -337,6 +347,8 @@ export const useDiagramStore = defineStore('diagram', () => {
     addActor,
     addUseCase,
     addSystem,
+    addPackage,
+    addNote,
     updatePositionWithGroup,
     updateSize,
     updateLabel,

@@ -1,54 +1,175 @@
 <template>
-  <!-- Floating Pill Dock -->
-  <div class="absolute left-6 bottom-10 bg-white/80 backdrop-blur-md border border-zinc-200 shadow-xl shadow-zinc-200/30 rounded-2xl p-2 flex flex-col gap-1.5 z-50 w-13 items-center">
+  <!-- Floating engineered vertical panel -->
+  <div class="absolute left-6 bottom-10 bg-primary-slate border border-secondary-gray/20 shadow-2xl rounded-2xl p-2.5 flex flex-col gap-2 z-50 w-14 items-center text-white">
     
-    <!-- Element Spawners -->
-    <div 
-      draggable="true"
-      @dragstart="handleDragStart($event, 'actor')"
-      class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 transition-all active:scale-95 cursor-grab group"
-      title="Add Actor (Drag to Canvas)"
-    >
-      <User class="w-5 h-5 text-zinc-600 group-hover:text-zinc-900" />
+    <!-- CLUSTER A: UML Structural Entities -->
+    <div class="flex flex-col gap-2 items-center w-full">
+      <!-- Actor -->
+      <div class="relative group/tooltip flex items-center justify-center">
+        <div 
+          draggable="true"
+          @dragstart="handleDragStart($event, 'actor')"
+          class="w-9 h-9 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white/80 hover:text-white transition-all active:scale-95 cursor-grab"
+        >
+          <User class="w-5 h-5" />
+        </div>
+        <div class="absolute left-full ml-3 px-2 py-1 bg-zinc-950/90 border border-zinc-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover/tooltip:opacity-100 transition-all duration-200 whitespace-nowrap z-50 translate-x-1 group-hover/tooltip:translate-x-0">
+          Actor (Drag to Canvas)
+        </div>
+      </div>
+
+      <!-- Use Case -->
+      <div class="relative group/tooltip flex items-center justify-center">
+        <div 
+          draggable="true"
+          @dragstart="handleDragStart($event, 'usecase')"
+          class="w-9 h-9 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white/80 hover:text-white transition-all active:scale-95 cursor-grab"
+        >
+          <CircleDot class="w-5 h-5" />
+        </div>
+        <div class="absolute left-full ml-3 px-2 py-1 bg-zinc-950/90 border border-zinc-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover/tooltip:opacity-100 transition-all duration-200 whitespace-nowrap z-50 translate-x-1 group-hover/tooltip:translate-x-0">
+          Use Case (Drag to Canvas)
+        </div>
+      </div>
+
+      <!-- System Boundary -->
+      <div class="relative group/tooltip flex items-center justify-center">
+        <div 
+          draggable="true"
+          @dragstart="handleDragStart($event, 'System')"
+          class="w-9 h-9 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white/80 hover:text-white transition-all active:scale-95 cursor-grab"
+        >
+          <Box class="w-5 h-5" />
+        </div>
+        <div class="absolute left-full ml-3 px-2 py-1 bg-zinc-950/90 border border-zinc-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover/tooltip:opacity-100 transition-all duration-200 whitespace-nowrap z-50 translate-x-1 group-hover/tooltip:translate-x-0">
+          System Boundary (Drag to Canvas)
+        </div>
+      </div>
+
+      <!-- Package Container -->
+      <div class="relative group/tooltip flex items-center justify-center">
+        <div 
+          draggable="true"
+          @dragstart="handleDragStart($event, 'package')"
+          class="w-9 h-9 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white/80 hover:text-white transition-all active:scale-95 cursor-grab"
+        >
+          <FolderArchive class="w-5 h-5" />
+        </div>
+        <div class="absolute left-full ml-3 px-2 py-1 bg-zinc-950/90 border border-zinc-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover/tooltip:opacity-100 transition-all duration-200 whitespace-nowrap z-50 translate-x-1 group-hover/tooltip:translate-x-0">
+          Package Container (Drag to Canvas)
+        </div>
+      </div>
+
+      <!-- Note Node -->
+      <div class="relative group/tooltip flex items-center justify-center">
+        <div 
+          draggable="true"
+          @dragstart="handleDragStart($event, 'note')"
+          class="w-9 h-9 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white/80 hover:text-white transition-all active:scale-95 cursor-grab"
+        >
+          <StickyNote class="w-5 h-5" />
+        </div>
+        <div class="absolute left-full ml-3 px-2 py-1 bg-zinc-950/90 border border-zinc-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover/tooltip:opacity-100 transition-all duration-200 whitespace-nowrap z-50 translate-x-1 group-hover/tooltip:translate-x-0">
+          Note Node (Drag to Canvas)
+        </div>
+      </div>
     </div>
-    
-    <div 
-      draggable="true"
-      @dragstart="handleDragStart($event, 'usecase')"
-      class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 transition-all active:scale-95 cursor-grab group"
-      title="Add Use Case (Drag to Canvas)"
-    >
-      <CircleDot class="w-5 h-5 text-zinc-600 group-hover:text-zinc-900" />
+
+    <!-- Crisp Separator line bounded by secondary-gray token -->
+    <div class="w-8 h-px bg-secondary-gray/20 my-1" />
+
+    <!-- CLUSTER B: Active Canvas Utilities -->
+    <div class="flex flex-col gap-2 items-center w-full">
+      <!-- Link Vector Spawner -->
+      <div class="relative group/tooltip flex items-center justify-center">
+        <button 
+          @click="handleLinkSpawnerClick"
+          class="w-9 h-9 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white/80 hover:text-white cursor-pointer transition-all active:scale-95"
+        >
+          <ArrowUpRight class="w-5 h-5" />
+        </button>
+        <div class="absolute left-full ml-3 px-2 py-1 bg-zinc-950/90 border border-zinc-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover/tooltip:opacity-100 transition-all duration-200 whitespace-nowrap z-50 translate-x-1 group-hover/tooltip:translate-x-0">
+          Quick Link (Select 2 elements to connect)
+        </div>
+      </div>
+
+      <!-- Standalone Text Annotation Tool -->
+      <div class="relative group/tooltip flex items-center justify-center">
+        <button 
+          @click="handleTextAnnotationClick"
+          class="w-9 h-9 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white/80 hover:text-white cursor-pointer transition-all active:scale-95"
+        >
+          <Type class="w-5 h-5" />
+        </button>
+        <div class="absolute left-full ml-3 px-2 py-1 bg-zinc-950/90 border border-zinc-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover/tooltip:opacity-100 transition-all duration-200 whitespace-nowrap z-50 translate-x-1 group-hover/tooltip:translate-x-0">
+          Add Standalone Note
+        </div>
+      </div>
+
+      <!-- Instantaneous Clear Canvas -->
+      <div class="relative group/tooltip flex items-center justify-center">
+        <button 
+          @click="handleClearCanvas"
+          class="w-9 h-9 flex items-center justify-center rounded-xl bg-rose-950/50 hover:bg-rose-900 border border-rose-900/50 text-rose-200 hover:text-white cursor-pointer transition-all active:scale-95"
+        >
+          <Trash2 class="w-5 h-5" />
+        </button>
+        <div class="absolute left-full ml-3 px-2 py-1 bg-zinc-950/90 border border-zinc-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover/tooltip:opacity-100 transition-all duration-200 whitespace-nowrap z-50 translate-x-1 group-hover/tooltip:translate-x-0">
+          Clear Canvas
+        </div>
+      </div>
     </div>
 
-    <div 
-      draggable="true"
-      @dragstart="handleDragStart($event, 'System')"
-      class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 transition-all active:scale-95 cursor-grab group"
-      title="Add System Boundary (Drag to Canvas)"
-    >
-      <Box class="w-5 h-5 text-zinc-600 group-hover:text-zinc-900" />
+    <!-- Crisp Separator line -->
+    <div class="w-8 h-px bg-secondary-gray/20 my-1" />
+
+    <!-- CLUSTER C: Local File Actions -->
+    <div class="flex flex-col gap-2 items-center w-full">
+      <!-- Export JSON -->
+      <div class="relative group/tooltip flex items-center justify-center">
+        <button @click="emitLocalExport" class="w-9 h-9 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white/80 hover:text-white cursor-pointer transition-all active:scale-95">
+          <Download class="w-4 h-4" />
+        </button>
+        <div class="absolute left-full ml-3 px-2 py-1 bg-zinc-950/90 border border-zinc-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover/tooltip:opacity-100 transition-all duration-200 whitespace-nowrap z-50 translate-x-1 group-hover/tooltip:translate-x-0">
+          Export JSON
+        </div>
+      </div>
+
+      <!-- Import JSON -->
+      <div class="relative group/tooltip flex items-center justify-center">
+        <button @click="triggerFileInput" class="w-9 h-9 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white/80 hover:text-white cursor-pointer transition-all active:scale-95">
+          <Upload class="w-4 h-4" />
+        </button>
+        <div class="absolute left-full ml-3 px-2 py-1 bg-zinc-950/90 border border-zinc-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover/tooltip:opacity-100 transition-all duration-200 whitespace-nowrap z-50 translate-x-1 group-hover/tooltip:translate-x-0">
+          Import JSON
+        </div>
+      </div>
+
+      <!-- PNG Snapshot -->
+      <div class="relative group/tooltip flex items-center justify-center">
+        <button @click="emitLocalSnapshot" class="w-9 h-9 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white/80 hover:text-white cursor-pointer transition-all active:scale-95">
+          <Camera class="w-4 h-4" />
+        </button>
+        <div class="absolute left-full ml-3 px-2 py-1 bg-zinc-950/90 border border-zinc-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover/tooltip:opacity-100 transition-all duration-200 whitespace-nowrap z-50 translate-x-1 group-hover/tooltip:translate-x-0">
+          PNG Snapshot
+        </div>
+      </div>
     </div>
 
-    <div class="w-6 h-px bg-zinc-200 my-0.5" />
+    <!-- Crisp Separator line -->
+    <div class="w-8 h-px bg-secondary-gray/20 my-1" />
 
-    <!-- Local File Actions -->
-    <button @click="emitLocalExport" class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-zinc-600 cursor-pointer transition-all group" title="Export JSON">
-      <Download class="w-4 h-4 group-hover:text-zinc-900" />
-    </button>
-    <button @click="triggerFileInput" class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-zinc-600 cursor-pointer transition-all group" title="Import JSON">
-      <Upload class="w-4 h-4 group-hover:text-zinc-900" />
-    </button>
-    <button @click="emitLocalSnapshot" class="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 text-zinc-600 cursor-pointer transition-all group" title="PNG Snapshot">
-      <Camera class="w-4 h-4 group-hover:text-zinc-900" />
-    </button>
-    
-    <div class="w-6 h-px bg-zinc-200 my-0.5" />
-
-    <!-- Sign Out -->
-    <button @click="handleLogOutFlow" class="w-9 h-9 flex items-center justify-center rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200/60 text-rose-600 cursor-pointer transition-all group" title="Sign Out">
-      <LogOut class="w-4 h-4 group-hover:text-rose-700" />
-    </button>
+    <!-- CLUSTER D: Sign Out -->
+    <div class="flex flex-col gap-2 items-center w-full">
+      <div class="relative group/tooltip flex items-center justify-center">
+        <button @click="handleLogOutFlow" class="w-9 h-9 flex items-center justify-center rounded-xl bg-rose-950/40 hover:bg-rose-900 border border-rose-900/40 text-rose-300 hover:text-white cursor-pointer transition-all active:scale-95">
+          <LogOut class="w-4 h-4" />
+        </button>
+        <div class="absolute left-full ml-3 px-2 py-1 bg-zinc-950/90 border border-zinc-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover/tooltip:opacity-100 transition-all duration-200 whitespace-nowrap z-50 translate-x-1 group-hover/tooltip:translate-x-0">
+          Sign Out
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Project Controls Panel (Floating next to the element dock) -->
@@ -97,6 +218,11 @@ import {
   User, 
   CircleDot, 
   Box, 
+  FolderArchive,
+  StickyNote,
+  ArrowUpRight,
+  Type,
+  Trash2,
   Download, 
   Upload, 
   Camera, 
@@ -142,6 +268,28 @@ const emitLocalSnapshot = () => emit('local-snapshot');
 const handleLogOutFlow = () => {
   diagramStore.resetDiagram();
   authStore.logout();
+};
+
+const handleLinkSpawnerClick = () => {
+  if (diagramStore.selectedElements.length >= 2) {
+    diagramStore.connectElements(
+      diagramStore.selectedElements[0],
+      diagramStore.selectedElements[1],
+      'right',
+      'left',
+      'association'
+    );
+  } else {
+    alert("Please select at least two elements on the canvas to link them.");
+  }
+};
+
+const handleTextAnnotationClick = () => {
+  diagramStore.addNote();
+};
+
+const handleClearCanvas = () => {
+  diagramStore.resetDiagram();
 };
 </script>
 

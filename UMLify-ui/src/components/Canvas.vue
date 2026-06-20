@@ -61,7 +61,7 @@
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
           />
           <Actor
-            v-if="element.type === 'actor'"
+            v-else-if="element.type === 'actor'"
             :label="element.label"
             :x="0"
             :y="0"
@@ -81,6 +81,34 @@
             :y="0"
             :width="element.width || 140"
             :height="element.height || 80"
+            :onDrag="null"
+            :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
+            :selected="selectedElements.includes(String(element.id))"
+            @click.stop="selectElement(element.id)"
+            @update:label="(newLabel) => updateLabel(element.id, newLabel)"
+            @delete="deleteElement(element.id)"
+          />
+          <Package
+            v-else-if="element.type === 'package'"
+            :label="element.label"
+            :x="0"
+            :y="0"
+            :width="element.width || 200"
+            :height="element.height || 150"
+            :onDrag="null"
+            :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
+            :selected="selectedElements.includes(String(element.id))"
+            @click.stop="selectElement(element.id)"
+            @update:label="(newLabel) => updateLabel(element.id, newLabel)"
+            @delete="deleteElement(element.id)"
+          />
+          <Note
+            v-else-if="element.type === 'note'"
+            :label="element.label"
+            :x="0"
+            :y="0"
+            :width="element.width || 120"
+            :height="element.height || 120"
             :onDrag="null"
             :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
@@ -279,6 +307,8 @@ import Connector from './connector.vue';
 import UseCase from './UseCase.vue';
 import Toolbar from './Toolbar.vue';
 import System from './System.vue'; 
+import Package from './Package.vue';
+import Note from './Note.vue';
 import html2canvas from 'html2canvas'; 
 
 const props = defineProps({ 
@@ -312,9 +342,22 @@ const inspectorElement = computed(() => {
 // ==========================================
 const alignmentGuides = ref({ vertical: null, horizontal: null });
 
+function getElementDimensions(el) {
+  if (!el) return { width: 0, height: 0 };
+  let defaultW = 140;
+  let defaultH = 80;
+  if (el.type === 'actor') { defaultW = 80; defaultH = 120; }
+  else if (el.type === 'System') { defaultW = 300; defaultH = 400; }
+  else if (el.type === 'package') { defaultW = 200; defaultH = 150; }
+  else if (el.type === 'note') { defaultW = 120; defaultH = 120; }
+  return {
+    width: el.width || defaultW,
+    height: el.height || defaultH
+  };
+}
+
 function getElementBounds(el) {
-  const w = el.width || (el.type === 'actor' ? 80 : el.type === 'System' ? 300 : 140);
-  const h = el.height || (el.type === 'actor' ? 120 : el.type === 'System' ? 400 : 80);
+  const { width: w, height: h } = getElementDimensions(el);
   return {
     left: el.x,
     right: el.x + w,
@@ -610,8 +653,7 @@ function updateSelectionFromBox() {
   const newSelection = [];
   
   elements.value.forEach(el => {
-    const w = el.width || (el.type === 'actor' ? 80 : el.type === 'System' ? 300 : 140);
-    const h = el.height || (el.type === 'actor' ? 120 : el.type === 'System' ? 400 : 80);
+    const { width: w, height: h } = getElementDimensions(el);
     
     if (el.x < maxX && el.x + w > minX && el.y < maxY && el.y + h > minY) {
       newSelection.push(String(el.id));
@@ -627,7 +669,7 @@ const handleDragOver = (event) => {
 
 const handleDrop = (event) => {
   const elementType = event.dataTransfer.getData('text/plain');
-  if (!['actor', 'usecase', 'System'].includes(elementType)) return;
+  if (!['actor', 'usecase', 'System', 'package', 'note'].includes(elementType)) return;
 
   const canvasArea = document.querySelector('#uml-canvas div[class*="overflow-auto"]');
   if (!canvasArea) return;
@@ -642,14 +684,16 @@ const handleDrop = (event) => {
   }
   
   const generatedId = `${elementType.toLowerCase()}_${Date.now()}`;
+  const { width: defaultWidth, height: defaultHeight } = getElementDimensions({ type: elementType });
+  
   const elementPayload = {
     id: generatedId,
     type: elementType,
-    label: elementType === 'System' ? 'System Boundary' : `New ${elementType}`,
-    x: droppedX - (elementType === 'actor' ? 40 : elementType === 'System' ? 150 : 70),
-    y: droppedY - (elementType === 'actor' ? 60 : elementType === 'System' ? 200 : 40),
-    width: elementType === 'actor' ? 80 : elementType === 'System' ? 300 : 140,
-    height: elementType === 'actor' ? 120 : elementType === 'System' ? 400 : 80
+    label: elementType === 'System' ? 'System Boundary' : elementType === 'package' ? 'New Package' : elementType === 'note' ? 'New Note' : `New ${elementType}`,
+    x: droppedX - (defaultWidth / 2),
+    y: droppedY - (defaultHeight / 2),
+    width: defaultWidth,
+    height: defaultHeight
   };
 
   elements.value.push(elementPayload);
@@ -667,8 +711,7 @@ function changeSelectedConnectionType(newType) {
 
 function getConnectionPoint(element, side = 'right') {
   if (!element) return { x: 0, y: 0 };
-  const width = element.width || (element.type === 'actor' ? 80 : element.type === 'usecase' ? 140 : 300);
-  const height = element.height || (element.type === 'actor' ? 120 : element.type === 'usecase' ? 80 : 400);
+  const { width, height } = getElementDimensions(element);
   const positions = {
     top: { x: element.x + width / 2, y: element.y, side: 'top' },
     bottom: { x: element.x + width / 2, y: element.y + height, side: 'bottom' },
