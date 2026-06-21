@@ -101,8 +101,8 @@ function startResize(event) {
   resizing.value = true
   const startX = event.clientX
   const startY = event.clientY
-  const initialWidth = props.width || 160
-  const initialHeight = props.height || 60
+  const initialWidth = props.width || 140
+  const initialHeight = props.height || 80
 
   const resize = (e) => {
     const dx = e.clientX - startX

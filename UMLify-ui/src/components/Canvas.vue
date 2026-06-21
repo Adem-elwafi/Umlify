@@ -179,8 +179,11 @@
         <Connector
           v-for="conn in connections"
           :key="conn.id || `${conn.from?.id}-${conn.to?.id}`"
+          :id="conn.id"
           :from="getConnectionPoint(conn.from, conn.fromSide)"
           :to="getConnectionPoint(conn.to, conn.toSide)"
+          :from-element="conn.from"
+          :to-element="conn.to"
           :type="conn.type"
         />
 
@@ -374,12 +377,9 @@ function getElementBounds(el) {
 const activeDraggingLink = ref(null);
 
 const initiateConnectionDrag = (event, element, side) => {
-  const rect = event.currentTarget.getBoundingClientRect();
-  const canvasArea = document.querySelector('#uml-canvas div[class*="overflow-auto"]');
-  const canvasRect = canvasArea.getBoundingClientRect();
-  
-  const startX = (rect.left - canvasRect.left + rect.width / 2 + canvasArea.scrollLeft) / zoomLevel.value;
-  const startY = (rect.top - canvasRect.top + rect.height / 2 + canvasArea.scrollTop) / zoomLevel.value;
+  const fromPt = getConnectionPoint(element, side);
+  const startX = fromPt.x;
+  const startY = fromPt.y;
 
   activeDraggingLink.value = {
     sourceId: element.id,
@@ -387,7 +387,9 @@ const initiateConnectionDrag = (event, element, side) => {
     startX,
     startY,
     currentX: startX,
-    currentY: startY
+    currentY: startY,
+    targetId: null,
+    targetSide: null
   };
 
   window.addEventListener('mousemove', handleConnectionMouseMove);
@@ -401,12 +403,32 @@ const handleConnectionMouseMove = (event) => {
   
   activeDraggingLink.value.currentX = (event.clientX - rect.left + canvasArea.scrollLeft) / zoomLevel.value;
   activeDraggingLink.value.currentY = (event.clientY - rect.top + canvasArea.scrollTop) / zoomLevel.value;
+
+  const elementUnderCursor = document.elementFromPoint(event.clientX, event.clientY);
+  const target = elementUnderCursor ? elementUnderCursor.closest('[data-anchor-side]') : null;
+  if (target) {
+    const targetWrapper = target.closest('[data-element-id]');
+    const targetElementId = targetWrapper ? targetWrapper.dataset.elementId : null;
+    const targetSide = target.dataset.anchorSide;
+    
+    if (targetElementId && targetElementId !== String(activeDraggingLink.value.sourceId)) {
+      activeDraggingLink.value.targetId = targetElementId;
+      activeDraggingLink.value.targetSide = targetSide;
+    } else {
+      activeDraggingLink.value.targetId = null;
+      activeDraggingLink.value.targetSide = null;
+    }
+  } else {
+    activeDraggingLink.value.targetId = null;
+    activeDraggingLink.value.targetSide = null;
+  }
 };
 
 const handleConnectionMouseUp = (event) => {
   if (!activeDraggingLink.value) return;
 
-  const target = event.target.closest('[data-anchor-side]');
+  const elementUnderCursor = document.elementFromPoint(event.clientX, event.clientY);
+  const target = elementUnderCursor ? elementUnderCursor.closest('[data-anchor-side]') : null;
   if (target) {
     const targetWrapper = target.closest('[data-element-id]');
     const targetElementId = targetWrapper ? targetWrapper.dataset.elementId : null;
@@ -430,15 +452,137 @@ const handleConnectionMouseUp = (event) => {
 
 const draggingPath = computed(() => {
   if (!activeDraggingLink.value) return '';
-  const { startX, startY, currentX, currentY, sourceSide } = activeDraggingLink.value;
+  const { sourceId, sourceSide, startX, startY, currentX, currentY, targetId, targetSide } = activeDraggingLink.value;
   
-  // Real-time Orthogonal Path Tracking
-  if (sourceSide === 'left' || sourceSide === 'right') {
-    const midX = startX + (currentX - startX) / 2;
-    return `M ${startX} ${startY} H ${midX} V ${currentY} H ${currentX}`;
+  const sourceEl = elements.value.find(e => String(e.id) === String(sourceId));
+  const targetEl = targetId ? elements.value.find(e => String(e.id) === String(targetId)) : null;
+
+  if (sourceEl && targetEl && targetSide) {
+    const fromPt = getConnectionPoint(sourceEl, sourceSide);
+    const toPt = getConnectionPoint(targetEl, targetSide);
+    
+    const x1 = fromPt.x;
+    const y1 = fromPt.y;
+    const x2 = toPt.x;
+    const y2 = toPt.y;
+    
+    const fromBounds = getElementBounds(sourceEl);
+    const toBounds = getElementBounds(targetEl);
+
+    let px1 = x1;
+    let py1 = y1;
+    if (sourceSide === 'right') px1 = fromBounds.right + 24;
+    else if (sourceSide === 'left') px1 = fromBounds.left - 24;
+    else if (sourceSide === 'top') py1 = fromBounds.top - 24;
+    else if (sourceSide === 'bottom') py1 = fromBounds.bottom + 24;
+
+    let px2 = x2;
+    let py2 = y2;
+    if (targetSide === 'right') px2 = toBounds.right + 24;
+    else if (targetSide === 'left') px2 = toBounds.left - 24;
+    else if (targetSide === 'top') py2 = toBounds.top - 24;
+    else if (targetSide === 'bottom') py2 = toBounds.bottom + 24;
+
+    const isFromHorizontal = ['left', 'right'].includes(sourceSide);
+    const isToHorizontal = ['left', 'right'].includes(targetSide);
+
+    // Case A: Horizontal Exit -> Horizontal Entry
+    if (isFromHorizontal && isToHorizontal) {
+      if (sourceSide === 'right' && targetSide === 'left') {
+        if (x2 >= x1) {
+          const midX = px1 + (px2 - px1) / 2;
+          return `M ${x1} ${y1} L ${px1} ${py1} L ${midX} ${py1} L ${midX} ${py2} L ${px2} ${py2} L ${x2} ${y2}`;
+        } else {
+          const midY = py1 + (y2 - y1) / 2;
+          return `M ${x1} ${y1} L ${px1} ${py1} L ${px1} ${midY} L ${px2} ${midY} L ${px2} ${py2} L ${x2} ${y2}`;
+        }
+      }
+      if (sourceSide === 'left' && targetSide === 'right') {
+        if (x2 <= x1) {
+          const midX = px1 + (px2 - px1) / 2;
+          return `M ${x1} ${y1} L ${px1} ${py1} L ${midX} ${py1} L ${midX} ${py2} L ${px2} ${py2} L ${x2} ${y2}`;
+        } else {
+          const midY = py1 + (y2 - y1) / 2;
+          return `M ${x1} ${y1} L ${px1} ${py1} L ${px1} ${midY} L ${px2} ${midY} L ${px2} ${py2} L ${x2} ${y2}`;
+        }
+      }
+      const escapeY = y2 >= y1 
+        ? Math.max(fromBounds.bottom, toBounds.bottom) + 24 
+        : Math.min(fromBounds.top, toBounds.top) - 24;
+      return `M ${x1} ${y1} L ${px1} ${py1} L ${px1} ${escapeY} L ${px2} ${escapeY} L ${px2} ${py2} L ${x2} ${y2}`;
+    }
+
+    // Case B: Vertical Exit -> Vertical Entry
+    if (!isFromHorizontal && !isToHorizontal) {
+      if (sourceSide === 'bottom' && targetSide === 'top') {
+        if (y2 >= y1) {
+          const midY = py1 + (py2 - py1) / 2;
+          return `M ${x1} ${y1} L ${px1} ${py1} L ${px1} ${midY} L ${px2} ${midY} L ${px2} ${py2} L ${x2} ${y2}`;
+        } else {
+          const midX = px1 + (x2 - x1) / 2;
+          return `M ${x1} ${y1} L ${px1} ${py1} L ${midX} ${py1} L ${midX} ${py2} L ${px2} ${py2} L ${x2} ${y2}`;
+        }
+      }
+      if (sourceSide === 'top' && targetSide === 'bottom') {
+        if (y2 <= y1) {
+          const midY = py1 + (py2 - py1) / 2;
+          return `M ${x1} ${y1} L ${px1} ${py1} L ${px1} ${midY} L ${px2} ${midY} L ${px2} ${py2} L ${x2} ${y2}`;
+        } else {
+          const midX = px1 + (x2 - x1) / 2;
+          return `M ${x1} ${y1} L ${px1} ${py1} L ${midX} ${py1} L ${midX} ${py2} L ${px2} ${py2} L ${x2} ${y2}`;
+        }
+      }
+      const escapeX = x2 >= x1 
+        ? Math.max(fromBounds.right, toBounds.right) + 24 
+        : Math.min(fromBounds.left, toBounds.left) - 24;
+      return `M ${x1} ${y1} L ${px1} ${py1} L ${escapeX} ${py1} L ${escapeX} ${py2} L ${px2} ${py2} L ${x2} ${y2}`;
+    }
+
+    // Case C: Horizontal Exit -> Vertical Entry
+    if (isFromHorizontal && !isToHorizontal) {
+      if ((sourceSide === 'right' && px2 < px1) || 
+          (sourceSide === 'left' && px2 > px1) ||
+          (targetSide === 'bottom' && py1 < py2) ||
+          (targetSide === 'top' && py1 > py2)) {
+        return `M ${x1} ${y1} L ${px1} ${py1} L ${px1} ${py2} L ${px2} ${py2} L ${x2} ${y2}`;
+      }
+      return `M ${x1} ${y1} L ${px1} ${py1} L ${px2} ${py1} L ${px2} ${py2} L ${x2} ${y2}`;
+    }
+
+    // Case D: Vertical Exit -> Horizontal Entry
+    if (!isFromHorizontal && isToHorizontal) {
+      if ((sourceSide === 'bottom' && py2 < py1) || 
+          (sourceSide === 'top' && py2 > py1) ||
+          (targetSide === 'left' && px1 > px2) ||
+          (targetSide === 'right' && px1 < px2)) {
+        return `M ${x1} ${y1} L ${px1} ${py1} L ${px2} ${py1} L ${px2} ${py2} L ${x2} ${y2}`;
+      }
+      return `M ${x1} ${y1} L ${px1} ${py1} L ${px1} ${py2} L ${px2} ${py2} L ${x2} ${y2}`;
+    }
+  }
+
+  // 2. Fallback: Dragging in empty space
+  let px1 = startX;
+  let py1 = startY;
+  if (sourceSide === 'right') px1 = startX + 24;
+  else if (sourceSide === 'left') px1 = startX - 24;
+  else if (sourceSide === 'top') py1 = startY - 24;
+  else if (sourceSide === 'bottom') py1 = startY + 24;
+
+  const isHorizontal = ['left', 'right'].includes(sourceSide);
+
+  if (isHorizontal) {
+    if ((sourceSide === 'right' && currentX < px1) || (sourceSide === 'left' && currentX > px1)) {
+      return `M ${startX} ${startY} L ${px1} ${startY} L ${px1} ${currentY} L ${currentX} ${currentY}`;
+    }
+    const midX = px1 + (currentX - px1) / 2;
+    return `M ${startX} ${startY} L ${px1} ${startY} L ${midX} ${startY} L ${midX} ${currentY} L ${currentX} ${currentY}`;
   } else {
-    const midY = startY + (currentY - startY) / 2;
-    return `M ${startX} ${startY} V ${midY} H ${currentX} V ${currentY}`;
+    if ((sourceSide === 'bottom' && currentY < py1) || (sourceSide === 'top' && currentY > py1)) {
+      return `M ${startX} ${startY} L ${startX} ${py1} L ${currentX} ${py1} L ${currentX} ${currentY}`;
+    }
+    const midY = py1 + (currentY - py1) / 2;
+    return `M ${startX} ${startY} L ${startX} ${py1} L ${startX} ${midY} L ${currentX} ${midY} L ${currentX} ${currentY}`;
   }
 });
 
@@ -586,13 +730,14 @@ const handleElementDragMouseUp = () => {
 };
 
 const getElementStyle = (element) => {
+  const { width, height } = getElementDimensions(element);
   return {
     transform: `translate3d(${element.x}px, ${element.y}px, 0)`,
     position: 'absolute',
     top: 0,
     left: 0,
-    width: `${element.width}px`,
-    height: `${element.height}px`
+    width: `${width}px`,
+    height: `${height}px`
   };
 };
 
@@ -775,6 +920,9 @@ function handleKeydown(e) {
     if (selectedElements.value.length > 0) {
       [...selectedElements.value].forEach(id => diagramStore.deleteElement(id));
       selectedElements.value = [];
+    } else if (selectedConnectionId.value) {
+      diagramStore.deleteConnection(selectedConnectionId.value);
+      selectedConnectionId.value = null;
     }
   }
 }

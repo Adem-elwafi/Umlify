@@ -44,13 +44,26 @@
       </marker>
     </defs>
     
+    <!-- Path A: Interaction Target hitbox overlay -->
     <path 
       :d="pathString" 
       fill="none" 
-      stroke="var(--color-primary-slate)" 
+      stroke="transparent" 
+      stroke-width="12" 
+      class="interaction-target cursor-pointer"
+      @click.stop="diagramStore.selectedConnectionId = props.id"
+    />
+    
+    <!-- Path B: Visual relationship line vector -->
+    <path 
+      :d="pathString" 
+      fill="none" 
+      :stroke="isSelected ? 'var(--color-accent-violet)' : 'var(--color-primary-slate)'" 
       stroke-width="2.5" 
       :stroke-dasharray="isDash ? '6,4' : 'none'"
       :marker-end="computedMarker"
+      class="pointer-events-none transition-colors duration-150"
+      :class="{ 'selected-glow': isSelected }"
     />
     
     <text
@@ -70,14 +83,22 @@
 
 <script setup>
 import { computed } from 'vue';
+import { useDiagramStore } from '../stores/diagramStore';
 
 const props = defineProps({
+  id: String,
   from: Object,
   to: Object,
+  fromElement: Object,
+  toElement: Object,
   type: String
-})
+});
+
+const diagramStore = useDiagramStore();
 
 const isDash = computed(() => ['include', 'extend', 'dependency'].includes(props.type));
+
+const isSelected = computed(() => String(diagramStore.selectedConnectionId) === String(props.id));
 
 const computedMarker = computed(() => {
   if (props.type === 'association') {
@@ -92,6 +113,42 @@ const computedMarker = computed(() => {
   return null;
 });
 
+function getElementDimensions(el) {
+  if (!el) return { width: 0, height: 0 };
+  let defaultW = 140;
+  let defaultH = 80;
+  if (el.type === 'actor') { defaultW = 80; defaultH = 120; }
+  else if (el.type === 'System') { defaultW = 300; defaultH = 400; }
+  else if (el.type === 'package') { defaultW = 200; defaultH = 150; }
+  else if (el.type === 'note') { defaultW = 120; defaultH = 120; }
+  return {
+    width: el.width || defaultW,
+    height: el.height || defaultH
+  };
+}
+
+const fromBounds = computed(() => {
+  if (!props.fromElement) return null;
+  const { width, height } = getElementDimensions(props.fromElement);
+  return {
+    left: props.fromElement.x,
+    right: props.fromElement.x + width,
+    top: props.fromElement.y,
+    bottom: props.fromElement.y + height
+  };
+});
+
+const toBounds = computed(() => {
+  if (!props.toElement) return null;
+  const { width, height } = getElementDimensions(props.toElement);
+  return {
+    left: props.toElement.x,
+    right: props.toElement.x + width,
+    top: props.toElement.y,
+    bottom: props.toElement.y + height
+  };
+});
+
 const pathString = computed(() => {
   const x1 = props.from?.x || 0;
   const y1 = props.from?.y || 0;
@@ -100,24 +157,128 @@ const pathString = computed(() => {
   const fromSide = props.from?.side || 'right';
   const toSide = props.to?.side || 'left';
 
+  // 1. Calculate clearance projection points using boundary edges
+  let px1 = x1;
+  let py1 = y1;
+  if (props.fromElement && fromBounds.value) {
+    const bounds = fromBounds.value;
+    if (fromSide === 'right') px1 = bounds.right + 24;
+    else if (fromSide === 'left') px1 = bounds.left - 24;
+    else if (fromSide === 'top') py1 = bounds.top - 24;
+    else if (fromSide === 'bottom') py1 = bounds.bottom + 24;
+  } else {
+    if (fromSide === 'right') px1 = x1 + 24;
+    else if (fromSide === 'left') px1 = x1 - 24;
+    else if (fromSide === 'top') py1 = y1 - 24;
+    else if (fromSide === 'bottom') py1 = y1 + 24;
+  }
+
+  let px2 = x2;
+  let py2 = y2;
+  if (props.toElement && toBounds.value) {
+    const bounds = toBounds.value;
+    if (toSide === 'right') px2 = bounds.right + 24;
+    else if (toSide === 'left') px2 = bounds.left - 24;
+    else if (toSide === 'top') py2 = bounds.top - 24;
+    else if (toSide === 'bottom') py2 = bounds.bottom + 24;
+  } else {
+    if (toSide === 'right') px2 = x2 + 24;
+    else if (toSide === 'left') px2 = x2 - 24;
+    else if (toSide === 'top') py2 = y2 - 24;
+    else if (toSide === 'bottom') py2 = y2 + 24;
+  }
+
   const isFromHorizontal = ['left', 'right'].includes(fromSide);
   const isToHorizontal = ['left', 'right'].includes(toSide);
 
-  // 1. Horizontal Exit/Entry Configuration (Left/Right to Left/Right)
+  // Case A: Horizontal Exit -> Horizontal Entry
   if (isFromHorizontal && isToHorizontal) {
-    const midX = x1 + (x2 - x1) / 2;
-    return `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
+    // A1: Right to Left
+    if (fromSide === 'right' && toSide === 'left') {
+      if (x2 >= x1) {
+        const midX = px1 + (px2 - px1) / 2;
+        return `M ${x1} ${y1} L ${px1} ${py1} L ${midX} ${py1} L ${midX} ${py2} L ${px2} ${py2} L ${x2} ${y2}`;
+      } else {
+        const midY = py1 + (y2 - y1) / 2;
+        return `M ${x1} ${y1} L ${px1} ${py1} L ${px1} ${midY} L ${px2} ${midY} L ${px2} ${py2} L ${x2} ${y2}`;
+      }
+    }
+    // A2: Left to Right
+    if (fromSide === 'left' && toSide === 'right') {
+      if (x2 <= x1) {
+        const midX = px1 + (px2 - px1) / 2;
+        return `M ${x1} ${y1} L ${px1} ${py1} L ${midX} ${py1} L ${midX} ${py2} L ${px2} ${py2} L ${x2} ${y2}`;
+      } else {
+        const midY = py1 + (y2 - y1) / 2;
+        return `M ${x1} ${y1} L ${px1} ${py1} L ${px1} ${midY} L ${px2} ${midY} L ${px2} ${py2} L ${x2} ${y2}`;
+      }
+    }
+    // A3: Same-Side (Right-to-Right or Left-to-Left)
+    const fromB = fromBounds.value;
+    const toB = toBounds.value;
+    let escapeY;
+    if (y2 >= y1) {
+      const maxY = Math.max(fromB ? fromB.bottom : y1, toB ? toB.bottom : y2);
+      escapeY = maxY + 24;
+    } else {
+      const minY = Math.min(fromB ? fromB.top : y1, toB ? toB.top : y2);
+      escapeY = minY - 24;
+    }
+    return `M ${x1} ${y1} L ${px1} ${py1} L ${px1} ${escapeY} L ${px2} ${escapeY} L ${px2} ${py2} L ${x2} ${y2}`;
   }
 
-  // 2. Vertical Exit/Entry Configuration (Top/Bottom to Top/Bottom)
+  // Case B: Vertical Exit -> Vertical Entry
   if (!isFromHorizontal && !isToHorizontal) {
-    const midY = y1 + (y2 - y1) / 2;
-    return `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
+    // B1: Bottom to Top
+    if (fromSide === 'bottom' && toSide === 'top') {
+      if (y2 >= y1) {
+        const midY = py1 + (py2 - py1) / 2;
+        return `M ${x1} ${y1} L ${px1} ${py1} L ${px1} ${midY} L ${px2} ${midY} L ${px2} ${py2} L ${x2} ${y2}`;
+      } else {
+        const midX = px1 + (x2 - x1) / 2;
+        return `M ${x1} ${y1} L ${px1} ${py1} L ${midX} ${py1} L ${midX} ${py2} L ${px2} ${py2} L ${x2} ${y2}`;
+      }
+    }
+    // B2: Top to Bottom
+    if (fromSide === 'top' && toSide === 'bottom') {
+      if (y2 <= y1) {
+        const midY = py1 + (py2 - py1) / 2;
+        return `M ${x1} ${y1} L ${px1} ${py1} L ${px1} ${midY} L ${px2} ${midY} L ${px2} ${py2} L ${x2} ${y2}`;
+      } else {
+        const midX = px1 + (x2 - x1) / 2;
+        return `M ${x1} ${y1} L ${px1} ${py1} L ${midX} ${py1} L ${midX} ${py2} L ${px2} ${py2} L ${x2} ${y2}`;
+      }
+    }
+    // B3: Same-Side (Top-to-Top or Bottom-to-Bottom)
+    const escapeX = x2 >= x1 
+      ? Math.max(fromB ? fromB.right : x1, toB ? toB.right : x2) + 24 
+      : Math.min(fromB ? fromB.left : x1, toB ? toB.left : x2) - 24;
+    return `M ${x1} ${y1} L ${px1} ${py1} L ${escapeX} ${py1} L ${escapeX} ${py2} L ${px2} ${py2} L ${x2} ${y2}`;
   }
 
-  // 3. Mixed Edge Config (Horizontal to Vertical)
-  // Logic: M x1 y1 L x2 y1 L x2 y2
-  return `M ${x1} ${y1} L ${x2} ${y1} L ${x2} ${y2}`;
+  // Case C: Horizontal Exit -> Vertical Entry
+  if (isFromHorizontal && !isToHorizontal) {
+    if ((fromSide === 'right' && px2 < px1) || 
+        (fromSide === 'left' && px2 > px1) ||
+        (toSide === 'bottom' && py1 < py2) ||
+        (toSide === 'top' && py1 > py2)) {
+      return `M ${x1} ${y1} L ${px1} ${py1} L ${px1} ${py2} L ${px2} ${py2} L ${x2} ${y2}`;
+    }
+    return `M ${x1} ${y1} L ${px1} ${py1} L ${px2} ${py1} L ${px2} ${py2} L ${x2} ${y2}`;
+  }
+
+  // Case D: Vertical Exit -> Horizontal Entry
+  if (!isFromHorizontal && isToHorizontal) {
+    if ((fromSide === 'bottom' && py2 < py1) || 
+        (fromSide === 'top' && py2 > py1) ||
+        (toSide === 'left' && px1 > px2) ||
+        (toSide === 'right' && px1 < px2)) {
+      return `M ${x1} ${y1} L ${px1} ${py1} L ${px2} ${py1} L ${px2} ${py2} L ${x2} ${y2}`;
+    }
+    return `M ${x1} ${y1} L ${px1} ${py1} L ${px1} ${py2} L ${px2} ${py2} L ${x2} ${y2}`;
+  }
+
+  return `M ${x1} ${y1} L ${x2} ${y2}`;
 });
 
 const labelX = computed(() => {
@@ -169,6 +330,14 @@ const labelY = computed(() => {
   width: 100%;
   height: 100%;
   pointer-events: none;
+}
+
+.connector .interaction-target {
+  pointer-events: stroke;
+}
+
+.selected-glow {
+  filter: drop-shadow(0 0 3px rgba(221, 174, 211, 0.6));
 }
 
 .connector-label {

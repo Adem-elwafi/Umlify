@@ -319,6 +319,16 @@ export const useDiagramStore = defineStore('diagram', () => {
     isDirty.value = true;
   };
 
+  const deleteConnection = (id) => {
+    saveToHistory();
+    const idStr = String(id);
+    connections.value = connections.value.filter(c => String(c.id) !== idStr);
+    if (String(selectedConnectionId.value) === idStr) {
+      selectedConnectionId.value = null;
+    }
+    isDirty.value = true;
+  };
+
   return {
     elements,
     connections,
@@ -353,6 +363,7 @@ export const useDiagramStore = defineStore('diagram', () => {
     updateSize,
     updateLabel,
     connectElements,
-    deleteElement
+    deleteElement,
+    deleteConnection
   };
 });
