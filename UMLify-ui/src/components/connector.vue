@@ -1,11 +1,56 @@
 <template>
   <svg class="connector">
+    <defs>
+      <!-- Sharp solid triangle for associations -->
+      <marker 
+        id="marker-association" 
+        viewBox="0 0 10 10" 
+        refX="7" 
+        refY="5" 
+        markerWidth="6" 
+        markerHeight="6" 
+        orient="auto-start-reverse" 
+        markerUnits="strokeWidth"
+      >
+        <path d="M 0 2 L 8 5 L 0 8 z" fill="var(--color-primary-slate)" />
+      </marker>
+      
+      <!-- Open chevron for dependencies, includes, and extends -->
+      <marker 
+        id="marker-dependency" 
+        viewBox="0 0 10 10" 
+        refX="7" 
+        refY="5" 
+        markerWidth="6" 
+        markerHeight="6" 
+        orient="auto-start-reverse" 
+        markerUnits="strokeWidth"
+      >
+        <path d="M 1 2 L 7 5 L 1 8" fill="none" stroke="var(--color-primary-slate)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </marker>
+      
+      <!-- Hollow triangle for generalizations -->
+      <marker 
+        id="marker-generalisation" 
+        viewBox="0 0 10 10" 
+        refX="7" 
+        refY="5" 
+        markerWidth="6" 
+        markerHeight="6" 
+        orient="auto-start-reverse" 
+        markerUnits="strokeWidth"
+      >
+        <path d="M 1 2 L 7 5 L 1 8 z" fill="white" stroke="var(--color-primary-slate)" stroke-width="1.5" stroke-linejoin="round" />
+      </marker>
+    </defs>
+    
     <path 
       :d="pathString" 
       fill="none" 
       stroke="var(--color-primary-slate)" 
       stroke-width="2.5" 
       :stroke-dasharray="isDash ? '6,4' : 'none'"
+      :marker-end="computedMarker"
     />
     
     <text
@@ -33,6 +78,19 @@ const props = defineProps({
 })
 
 const isDash = computed(() => ['include', 'extend', 'dependency'].includes(props.type));
+
+const computedMarker = computed(() => {
+  if (props.type === 'association') {
+    return 'url(#marker-association)';
+  }
+  if (['include', 'extend', 'dependency'].includes(props.type)) {
+    return 'url(#marker-dependency)';
+  }
+  if (props.type === 'generalization') {
+    return 'url(#marker-generalisation)';
+  }
+  return null;
+});
 
 const pathString = computed(() => {
   const x1 = props.from?.x || 0;
