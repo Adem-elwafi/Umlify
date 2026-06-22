@@ -6,10 +6,10 @@
         <button 
           @click="isSidebarDrawerOpen = !isSidebarDrawerOpen"
           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/10 text-zinc-100 text-xs font-medium transition-all active:scale-95 cursor-pointer shadow-xs select-none group"
-          title="Toggle Cloud Directory Drawer"
+          title="Toggle Sidebar Drawer"
         >
           <Folder class="w-3.5 h-3.5 text-zinc-300 group-hover:text-white" />
-          <span>Cloud Files</span>
+          <span>{{ isSidebarDrawerOpen ? 'Close Drawer' : 'Open Drawer' }}</span>
         </button>
 
         <div class="flex items-center gap-2">
@@ -62,97 +62,120 @@
     </header>
 
     <main class="flex-1 w-full flex min-h-0 relative">
-      <!-- Cloud File Drawer Backdrop -->
-      <transition name="fade">
-        <div 
-          v-if="isSidebarDrawerOpen" 
-          @click="isSidebarDrawerOpen = false" 
-          class="absolute inset-0 bg-zinc-950/20 z-40 transition-opacity duration-200 backdrop-blur-xs" 
-        />
-      </transition>
-      
       <!-- Collapsible Cloud File Slider Drawer -->
       <div 
         :class="[
-          'absolute left-0 top-0 bottom-0 w-80 bg-white border-r border-zinc-200 z-50 transition-transform duration-300 ease-in-out flex flex-col shadow-2xl',
-          isSidebarDrawerOpen ? 'translate-x-0' : '-translate-x-full'
+          'h-full bg-white border-r border-zinc-200 transition-all duration-300 ease-in-out flex flex-col shrink-0 overflow-hidden',
+          isSidebarDrawerOpen ? 'w-80' : 'w-0'
         ]"
       >
-        <div class="p-4 border-b border-zinc-100 flex justify-between items-center bg-zinc-50/50 text-[11px] font-bold uppercase tracking-wider text-zinc-400 select-none">
-          <div class="flex items-center gap-2">
-            <Folder class="w-3.5 h-3.5" />
-            <span>Cloud Projects Directory</span>
-          </div>
-          <button @click="isSidebarDrawerOpen = false" class="text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer">
-            <X class="w-4 h-4" />
-          </button>
-        </div>
-
-        <div class="p-4">
-          <button 
-            @click="createNewCanvasAction" 
-            class="w-full py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold rounded-lg shadow-sm transition-all active:scale-98 cursor-pointer text-center"
-          >
-            New Clean Canvas
-          </button>
-        </div>
-
-        <div class="flex-1 overflow-y-auto px-2 pb-4 space-y-1 mt-2">
-          <div v-if="diagramStore.savedDiagramsList.length === 0" class="text-center text-zinc-400 text-[11px] p-8 italic font-mono">
-            No cloud storage records found.
-          </div>
-          
-          <!-- Saved Diagram Database Rows (Swipe-to-Reveal-Delete Pattern) -->
-          <div 
-            v-for="diag in diagramStore.savedDiagramsList" 
-            :key="diag.id"
-            class="relative h-[60px] mx-1 rounded-xl overflow-hidden bg-rose-600 shadow-sm"
-          >
-            <!-- Background Layer (Delete Button) -->
-            <div class="absolute inset-0 flex justify-end">
+        <div class="w-80 flex-1 flex flex-col min-h-0">
+          <!-- Dual-tab Header Bar -->
+          <div class="flex items-center justify-between bg-[#213C51] text-white select-none px-3 py-2 shrink-0 border-b border-[#1a3041]">
+            <div class="flex items-center gap-1.5 flex-1 mr-2">
+              <!-- Toolbench Tab Button -->
               <button 
-                @click.stop="promptDelete(diag)"
-                class="w-[80px] h-full flex flex-col items-center justify-center text-white hover:bg-rose-700 transition-colors cursor-pointer"
-                title="Permanently Delete"
+                @click="activeSidebarTab = 'tools'"
+                :class="[
+                  'flex-1 text-center py-1.5 text-[11px] font-bold rounded-lg transition-all cursor-pointer',
+                  activeSidebarTab === 'tools' 
+                    ? 'bg-white/20 text-white shadow-xs' 
+                    : 'text-zinc-300 hover:text-white hover:bg-white/5'
+                ]"
               >
-                <Trash2 class="w-4 h-4 mb-1" />
-                <span class="text-[9px] font-bold uppercase tracking-widest">Delete</span>
+                Toolbench
+              </button>
+              <!-- Cloud Files Tab Button -->
+              <button 
+                @click="activeSidebarTab = 'cloud'"
+                :class="[
+                  'flex-1 text-center py-1.5 text-[11px] font-bold rounded-lg transition-all cursor-pointer',
+                  activeSidebarTab === 'cloud' 
+                    ? 'bg-white/20 text-white shadow-xs' 
+                    : 'text-zinc-300 hover:text-white hover:bg-white/5'
+                ]"
+              >
+                Cloud Files
+              </button>
+            </div>
+            <!-- Close button -->
+            <button @click="isSidebarDrawerOpen = false" class="p-1 text-zinc-300 hover:text-white transition-colors cursor-pointer rounded-lg hover:bg-white/10" title="Close Drawer">
+              <X class="w-4 h-4" />
+            </button>
+          </div>
+
+          <!-- Conditional Tab Content Rendering -->
+          <div v-if="activeSidebarTab === 'tools'" class="flex-1 flex flex-col min-h-0 overflow-y-auto">
+            <Toolbar />
+          </div>
+          <div v-else class="flex-1 flex flex-col min-h-0 overflow-y-auto">
+            <div class="p-4 border-b border-zinc-100 flex-shrink-0">
+              <button 
+                @click="createNewCanvasAction" 
+                class="w-full py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold rounded-lg shadow-sm transition-all active:scale-98 cursor-pointer text-center"
+              >
+                New Clean Canvas
               </button>
             </div>
 
-            <!-- Foreground Layer (Project Details) -->
-            <div 
-              @click="handleSelectCloudDiagram(diag.id)"
-              :class="[
-                'absolute inset-0 h-full p-3 transition-transform duration-300 ease-in-out cursor-pointer flex items-center justify-between border rounded-xl',
-                diagramStore.currentDiagramId === diag.id 
-                  ? 'bg-zinc-100 border-zinc-200 text-zinc-900' 
-                  : 'bg-white border-zinc-100 text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900',
-                swipedRowId === diag.id ? '-translate-x-[80px]' : 'translate-x-0'
-              ]"
-            >
-              <div class="truncate mr-2 flex-1">
-                <p class="text-xs font-semibold truncate">{{ diag.title || 'Untitled Diagram' }}</p>
-                <p class="text-[10px] text-zinc-400 font-mono tracking-normal mt-0.5">
-                  {{ new Date(diag.updatedAt || diag.createdAt).toLocaleDateString() }}
-                </p>
+            <div class="flex-1 overflow-y-auto px-2 pb-4 space-y-1 mt-2">
+              <div v-if="diagramStore.savedDiagramsList.length === 0" class="text-center text-zinc-400 text-[11px] p-8 italic font-mono">
+                No cloud storage records found.
               </div>
-              <button 
-                @click.stop="toggleSwipe(diag.id)"
-                class="p-1.5 text-zinc-300 hover:text-zinc-500 rounded-lg hover:bg-zinc-200 transition-colors cursor-pointer"
-                title="Options"
+              
+              <!-- Saved Diagram Database Rows (Swipe-to-Reveal-Delete Pattern) -->
+              <div 
+                v-for="diag in diagramStore.savedDiagramsList" 
+                :key="diag.id"
+                class="relative h-[60px] mx-1 rounded-xl overflow-hidden bg-rose-600 shadow-sm"
               >
-                <MoreVertical class="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
+                <!-- Background Layer (Delete Button) -->
+                <div class="absolute inset-0 flex justify-end">
+                  <button 
+                    @click.stop="promptDelete(diag)"
+                    class="w-[80px] h-full flex flex-col items-center justify-center text-white hover:bg-rose-700 transition-colors cursor-pointer"
+                    title="Permanently Delete"
+                  >
+                    <Trash2 class="w-4 h-4 mb-1" />
+                    <span class="text-[9px] font-bold uppercase tracking-widest">Delete</span>
+                  </button>
+                </div>
 
-        <!-- Trash/Delete Zone Placeholder -->
-        <div class="p-4 border-t border-zinc-100 mt-auto">
-          <div class="w-full py-3 border border-dashed border-zinc-200 rounded-xl flex flex-col items-center justify-center gap-1.5 text-zinc-400 group hover:border-rose-200 hover:bg-rose-50/30 transition-all">
-            <Trash2 class="w-4 h-4 group-hover:text-rose-500" />
-            <span class="text-[9px] uppercase font-bold tracking-widest group-hover:text-rose-600">Drop to Delete</span>
+                <!-- Foreground Layer (Project Details) -->
+                <div 
+                  @click="handleSelectCloudDiagram(diag.id)"
+                  :class="[
+                    'absolute inset-0 h-full p-3 transition-transform duration-300 ease-in-out cursor-pointer flex items-center justify-between border rounded-xl',
+                    diagramStore.currentDiagramId === diag.id 
+                      ? 'bg-zinc-100 border-zinc-200 text-zinc-900' 
+                      : 'bg-white border-zinc-100 text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900',
+                    swipedRowId === diag.id ? '-translate-x-[80px]' : 'translate-x-0'
+                  ]"
+                >
+                  <div class="truncate mr-2 flex-1">
+                    <p class="text-xs font-semibold truncate">{{ diag.title || 'Untitled Diagram' }}</p>
+                    <p class="text-[10px] text-zinc-400 font-mono tracking-normal mt-0.5">
+                      {{ new Date(diag.updatedAt || diag.createdAt).toLocaleDateString() }}
+                    </p>
+                  </div>
+                  <button 
+                    @click.stop="toggleSwipe(diag.id)"
+                    class="p-1.5 text-zinc-300 hover:text-zinc-500 rounded-lg hover:bg-zinc-200 transition-colors cursor-pointer"
+                    title="Options"
+                  >
+                    <MoreVertical class="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Trash/Delete Zone Placeholder -->
+            <div class="p-4 border-t border-zinc-100 mt-auto flex-shrink-0">
+              <div class="w-full py-3 border border-dashed border-zinc-200 rounded-xl flex flex-col items-center justify-center gap-1.5 text-zinc-400 group hover:border-rose-200 hover:bg-rose-50/30 transition-all">
+                <Trash2 class="w-4 h-4 group-hover:text-rose-500" />
+                <span class="text-[9px] uppercase font-bold tracking-widest group-hover:text-rose-600">Drop to Delete</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -161,7 +184,6 @@
       <div class="flex-1 h-full relative bg-[radial-gradient(#e4e4e7_1px,transparent_1px)] [background-size:16px_16px] bg-zinc-50 transition-all duration-300 overflow-hidden">
         <Canvas 
           :onLogout="handleSignOutFlow" 
-          :isSidebarDrawerOpen="isSidebarDrawerOpen"
         />
       </div>
 
@@ -214,6 +236,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { useDiagramStore } from '../stores/diagramStore';
 import { useAuthStore } from '../stores/authStore';
 import Canvas from '../components/Canvas.vue';
+import Toolbar from '../components/Toolbar.vue';
 import TerminalEditor from '../components/TerminalEditor.vue';
 import { 
   Folder, 
@@ -232,7 +255,8 @@ const diagramStore = useDiagramStore();
 const authStore = useAuthStore();
 
 const isTerminalOpen = ref(true);
-const isSidebarDrawerOpen = ref(false);
+const isSidebarDrawerOpen = ref(true);
+const activeSidebarTab = ref('tools');
 const swipedRowId = ref(null);
 
 const handleBeforeUnload = (event) => {

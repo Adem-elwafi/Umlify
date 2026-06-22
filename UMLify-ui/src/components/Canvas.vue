@@ -224,18 +224,6 @@
       </div>
     </div>
 
-    <!-- Toolbar Entry Point -->
-    <div 
-      class="transition-all duration-300 ease-in-out"
-      :class="isSidebarDrawerOpen ? '-translate-x-24 opacity-0 pointer-events-none' : 'translate-x-0 opacity-100'"
-    >
-      <Toolbar
-        @local-export="exportDiagram"
-        @local-import="importDiagram"
-        @local-snapshot="exportAsImage"
-      />
-    </div>
-
     <!-- Element Property Inspector Sidebar -->
     <transition name="fade">
       <div v-if="inspectorElement" class="absolute right-6 top-24 w-64 bg-white/95 backdrop-blur-md border border-zinc-200/80 shadow-xl shadow-zinc-200/30 rounded-2xl p-4 flex flex-col gap-4 z-40" @mousedown.stop>
@@ -277,13 +265,13 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-2 text-[11px] mt-1">
+          <div class="grid grid-cols-3 gap-2 text-[11px] mt-1">
             <div class="flex flex-col gap-1">
               <span class="text-zinc-400 text-[9px] uppercase font-bold">Width</span>
               <input 
                 v-model.number="inspectorElement.width"
                 type="number"
-                class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-400 transition-all"
+                class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-400 transition-all"
               />
             </div>
             <div class="flex flex-col gap-1">
@@ -291,7 +279,16 @@
               <input 
                 v-model.number="inspectorElement.height"
                 type="number"
-                class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-400 transition-all"
+                class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-400 transition-all"
+              />
+            </div>
+            <div class="flex flex-col gap-1">
+              <span class="text-zinc-400 text-[9px] uppercase font-bold">Layer (Z)</span>
+              <input 
+                v-model.number="inspectorElement.zIndex"
+                type="number"
+                class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-400 transition-all"
+                placeholder="Auto"
               />
             </div>
           </div>
@@ -308,15 +305,12 @@ import { useDiagramStore } from '../stores/diagramStore';
 import Actor from './Actor.vue';
 import Connector from './connector.vue';
 import UseCase from './UseCase.vue';
-import Toolbar from './Toolbar.vue';
 import System from './System.vue'; 
 import Package from './Package.vue';
 import Note from './Note.vue';
-import html2canvas from 'html2canvas'; 
 
 const props = defineProps({ 
-  onLogout: Function,
-  isSidebarDrawerOpen: Boolean
+  onLogout: Function
 });
 
 const diagramStore = useDiagramStore();
@@ -731,13 +725,29 @@ const handleElementDragMouseUp = () => {
 
 const getElementStyle = (element) => {
   const { width, height } = getElementDimensions(element);
+  
+  let baseZIndex = 10;
+  if (element.type === 'System' || element.type === 'package') {
+    baseZIndex = 5;
+  } else if (element.type === 'actor' || element.type === 'usecase' || element.type === 'note') {
+    baseZIndex = 10;
+  }
+
+  // Support manual z-index overrides from inspector
+  let zIndex = typeof element.zIndex === 'number' ? element.zIndex : baseZIndex;
+
+  if (selectedElements.value.includes(String(element.id))) {
+    zIndex = Math.max(zIndex, 20);
+  }
+
   return {
     transform: `translate3d(${element.x}px, ${element.y}px, 0)`,
     position: 'absolute',
     top: 0,
     left: 0,
     width: `${width}px`,
-    height: `${height}px`
+    height: `${height}px`,
+    'z-index': zIndex
   };
 };
 
@@ -938,43 +948,6 @@ onBeforeUnmount(() => {
   window.removeEventListener('mouseup', handleCanvasMouseUp);
 });
 
-function exportDiagram() {
-  const data = {
-    elements: elements.value.map(e => ({ id: e.id, type: e.type, label: e.label, x: e.x, y: e.y, width: e.width, height: e.height })),
-    connections: connections.value.map(c => ({ id: c.id, from: c.from?.id, to: c.to?.id, fromSide: c.fromSide, toSide: c.toSide, type: c.type }))
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'uml-diagram.json';
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
-function importDiagram(data) {
-  if (typeof diagramStore.saveToHistory === 'function') diagramStore.saveToHistory();
-  elements.value = data.elements.map(e => ({ id: e.id, type: e.type, label: e.label, x: e.x, y: e.y, width: e.width, height: e.height }));
-  connections.value = data.connections.map(c => ({
-    id: c.id,
-    from: elements.value.find(e => String(e.id) === String(c.from)),
-    to: elements.value.find(e => String(e.id) === String(c.to)),
-    fromSide: c.fromSide,
-    toSide: c.toSide,
-    type: c.type
-  })).filter(c => c.from && c.to);
-}
-
-function exportAsImage() {
-  const canvasElement = document.getElementById('uml-canvas');
-  if (!canvasElement) return;
-  html2canvas(canvasElement).then(canvas => {
-    const link = document.createElement('a');
-    link.download = 'uml-diagram.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  });
-}
 </script>
 
 <style scoped>

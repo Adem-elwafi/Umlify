@@ -1,6 +1,6 @@
 <template>
   <div
-    class="System element relative w-full h-full cursor-grab active:cursor-grabbing transition-all select-none z-0"
+    class="System element relative w-full h-full cursor-grab active:cursor-grabbing transition-all select-none"
     :style="{}"
     @mousedown="startDrag"
     @mouseup="handleMouseUp"

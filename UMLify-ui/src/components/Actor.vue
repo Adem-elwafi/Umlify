@@ -2,7 +2,6 @@
   <div
     class="actor element relative w-full h-full cursor-grab active:cursor-grabbing transition-all select-none"
     :class="[
-      selected ? 'z-20' : 'z-10',
       { 'scale-[1.02]': selected, 'opacity-80': dragging }
     ]"
     :style="{}"

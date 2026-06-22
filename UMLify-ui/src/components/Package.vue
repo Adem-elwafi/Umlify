@@ -1,6 +1,6 @@
 <template>
   <div
-    class="package element relative w-full h-full cursor-grab active:cursor-grabbing transition-all select-none z-0"
+    class="package element relative w-full h-full cursor-grab active:cursor-grabbing transition-all select-none"
     @mousedown="startDrag"
     @mouseup="handleMouseUp"
   >

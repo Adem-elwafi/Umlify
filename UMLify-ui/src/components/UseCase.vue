@@ -2,7 +2,7 @@
   <div
     class="uml-element element relative w-full h-full cursor-grab active:cursor-grabbing transition-all select-none flex items-center justify-center bg-white border rounded-full px-4 py-2"
     :class="[
-      selected ? 'z-20 scale-[1.02]' : 'border-primary-slate/20 shadow-xs hover:border-primary-slate/40 z-10',
+      selected ? 'scale-[1.02]' : 'border-primary-slate/20 shadow-xs hover:border-primary-slate/40',
       { 'opacity-80': dragging }
     ]"
     :style="{}"

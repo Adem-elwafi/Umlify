@@ -1,6 +1,6 @@
 <template>
   <div
-    class="note element relative w-full h-full cursor-grab active:cursor-grabbing transition-all select-none z-0"
+    class="note element relative w-full h-full cursor-grab active:cursor-grabbing transition-all select-none"
     @mousedown="startDrag"
     @mouseup="handleMouseUp"
   >
