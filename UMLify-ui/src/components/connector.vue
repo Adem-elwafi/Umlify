@@ -156,6 +156,8 @@ const pathString = computed(() => {
   const y2 = props.to?.y || 0;
   const fromSide = props.from?.side || 'right';
   const toSide = props.to?.side || 'left';
+  const fromB = fromBounds.value;
+  const toB = toBounds.value;
 
   // 1. Calculate clearance projection points using boundary edges
   let px1 = x1;
@@ -214,8 +216,6 @@ const pathString = computed(() => {
       }
     }
     // A3: Same-Side (Right-to-Right or Left-to-Left)
-    const fromB = fromBounds.value;
-    const toB = toBounds.value;
     let escapeY;
     if (y2 >= y1) {
       const maxY = Math.max(fromB ? fromB.bottom : y1, toB ? toB.bottom : y2);
@@ -330,6 +330,7 @@ const labelY = computed(() => {
   width: 100%;
   height: 100%;
   pointer-events: none;
+  z-index: 15;
 }
 
 .connector .interaction-target {

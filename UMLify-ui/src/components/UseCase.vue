@@ -17,7 +17,13 @@
     >
 
     <!-- Resize handles (only show when selected) -->
-    <div v-if="selected" class="w-2.5 h-2.5 bg-white border border-accent-blue rounded-md shadow-sm cursor-nwse-resize hover:bg-accent-blue/10 transition-all select-none z-30 active:scale-90 absolute -bottom-1 -right-1" @mousedown.stop="startResize"></div>
+    <div 
+      v-if="selected" 
+      class="absolute -bottom-2.5 -right-2.5 w-6 h-6 flex items-center justify-center cursor-nwse-resize z-30 select-none"
+      @mousedown.stop="startResize"
+    >
+      <div class="w-2.5 h-2.5 bg-white border border-accent-blue rounded-md shadow-sm hover:bg-accent-blue/10 transition-all active:scale-90"></div>
+    </div>
 
     <!-- Delete button (shows when selected) -->
     <button
@@ -62,9 +68,9 @@ const dragging = ref(false)
 const resizing = ref(false)
 const moved = ref(false)
 
-function handleMouseUp() {
+function handleMouseUp(event) {
   if (!moved.value) {
-    emit('click')
+    emit('click', event)
   }
   moved.value = false
 }
@@ -97,7 +103,9 @@ function startDrag(event) {
 }
 
 function startResize(event) {
-  event.stopPropagation()
+  if (event && typeof event.stopPropagation === 'function') {
+    event.stopPropagation()
+  }
   resizing.value = true
   const startX = event.clientX
   const startY = event.clientY

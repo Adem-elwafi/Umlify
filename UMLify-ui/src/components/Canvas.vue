@@ -56,7 +56,7 @@
             :onDrag="null"
             :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
-            @click.stop="selectElement(element.id)"
+            @click="selectElement(element.id)"
             @delete="deleteElement(element.id)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
           />
@@ -70,7 +70,7 @@
             :onDrag="null"
             :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
-            @click.stop="selectElement(element.id)"
+            @click="selectElement(element.id)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
             @delete="deleteElement(element.id)"
           />
@@ -84,7 +84,7 @@
             :onDrag="null"
             :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
-            @click.stop="selectElement(element.id)"
+            @click="selectElement(element.id)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
             @delete="deleteElement(element.id)"
           />
@@ -98,7 +98,7 @@
             :onDrag="null"
             :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
-            @click.stop="selectElement(element.id)"
+            @click="selectElement(element.id)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
             @delete="deleteElement(element.id)"
           />
@@ -112,7 +112,7 @@
             :onDrag="null"
             :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
-            @click.stop="selectElement(element.id)"
+            @click="selectElement(element.id)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
             @delete="deleteElement(element.id)"
           />
