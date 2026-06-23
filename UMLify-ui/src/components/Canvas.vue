@@ -292,6 +292,26 @@
               />
             </div>
           </div>
+
+          <!-- Stacking Buttons Row -->
+          <div class="flex gap-2 mt-2">
+            <button 
+              @click="adjustLayer(1)"
+              class="flex-1 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold rounded-lg transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1 border border-zinc-200"
+              title="Bring Forward"
+            >
+              <ChevronUp class="w-3 h-3 text-zinc-500" />
+              <span>Forward</span>
+            </button>
+            <button 
+              @click="adjustLayer(-1)"
+              class="flex-1 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold rounded-lg transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1 border border-zinc-200"
+              title="Send Backward"
+            >
+              <ChevronDown class="w-3 h-3 text-zinc-500" />
+              <span>Backward</span>
+            </button>
+          </div>
         </div>
       </div>
     </transition>
@@ -301,6 +321,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { storeToRefs } from 'pinia';
+import { ChevronUp, ChevronDown } from 'lucide-vue-next';
 import { useDiagramStore } from '../stores/diagramStore';
 import Actor from './Actor.vue';
 import Connector from './connector.vue';
@@ -736,8 +757,10 @@ const getElementStyle = (element) => {
   // Support manual z-index overrides from inspector
   let zIndex = typeof element.zIndex === 'number' ? element.zIndex : baseZIndex;
 
-  if (selectedElements.value.includes(String(element.id))) {
-    zIndex = Math.max(zIndex, 20);
+  // Only elevate default elements to z-index 20 when selected.
+  // If user sets a custom z-index, keep it so they see the change immediately.
+  if (selectedElements.value.includes(String(element.id)) && typeof element.zIndex !== 'number') {
+    zIndex = 20;
   }
 
   return {
@@ -918,6 +941,24 @@ function selectElement(id) {
   } else {
     selectedElements.value = [idStr];
   }
+}
+
+function adjustLayer(delta) {
+  if (!inspectorElement.value) return;
+  if (typeof diagramStore.saveToHistory === 'function') {
+    diagramStore.saveToHistory();
+  }
+  let currentZ = inspectorElement.value.zIndex;
+  if (typeof currentZ !== 'number') {
+    let baseZIndex = 10;
+    if (inspectorElement.value.type === 'System' || inspectorElement.value.type === 'package') {
+      baseZIndex = 5;
+    } else if (inspectorElement.value.type === 'actor' || inspectorElement.value.type === 'usecase' || inspectorElement.value.type === 'note') {
+      baseZIndex = 10;
+    }
+    currentZ = baseZIndex;
+  }
+  inspectorElement.value.zIndex = currentZ + delta;
 }
 
 function handleKeydown(e) {
