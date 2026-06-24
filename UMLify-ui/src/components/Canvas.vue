@@ -5,13 +5,7 @@
     @dragover.prevent="handleDragOver"
     @drop="handleDrop"
   >
-    <!-- Zoom Controls -->
-    <div class="absolute top-6 right-6 flex items-center gap-2 bg-white/80 backdrop-blur-md border border-zinc-200/80 p-1.5 rounded-xl shadow-sm z-30">
-      <button @click="zoomIn" class="w-8 h-8 flex items-center justify-center bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 rounded-lg text-zinc-600 transition-all active:scale-95 cursor-pointer text-sm font-bold" title="Zoom In"><span>+</span></button>
-      <span class="min-w-[48px] text-center text-[11px] font-bold text-zinc-500 font-mono">{{ Math.round(zoomLevel * 100) }}%</span>
-      <button @click="zoomOut" class="w-8 h-8 flex items-center justify-center bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 rounded-lg text-zinc-600 transition-all active:scale-95 cursor-pointer text-sm font-bold" title="Zoom Out"><span>−</span></button>
-      <button @click="resetZoom" class="w-8 h-8 flex items-center justify-center bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 rounded-lg text-zinc-400 transition-all active:scale-95 cursor-pointer text-xs" title="Reset Zoom"><span>⟲</span></button>
-    </div>
+
     
     <div 
       class="flex-1 w-full relative overflow-auto bg-transparent" 
@@ -224,104 +218,13 @@
       </div>
     </div>
 
-    <!-- Element Property Inspector Sidebar -->
-    <transition name="fade">
-      <div v-if="inspectorElement" class="absolute right-6 top-24 w-64 bg-white/95 backdrop-blur-md border border-zinc-200/80 shadow-xl shadow-zinc-200/30 rounded-2xl p-4 flex flex-col gap-4 z-40" @mousedown.stop>
-        <div class="flex flex-col gap-1">
-          <label class="text-[10px] font-bold tracking-wider uppercase text-zinc-400 font-mono select-none">Element Label</label>
-          <input 
-            v-model="inspectorElement.label"
-            type="text"
-            class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs font-medium text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 transition-all shadow-xs"
-            placeholder="Node Name"
-          />
-          <div class="text-[11px] font-mono font-medium text-zinc-400 mt-1 select-none flex items-center gap-1">
-            <span>ID:</span>
-            <span class="truncate uppercase">{{ inspectorElement.id.split('_')[1] || inspectorElement.id.slice(-6) }}</span>
-          </div>
-        </div>
 
-        <div class="h-px bg-zinc-100 w-full" />
-
-        <div class="flex flex-col gap-2">
-          <label class="text-[10px] font-bold tracking-wider uppercase text-zinc-400 font-mono select-none">Geometric Parameters</label>
-          
-          <div class="grid grid-cols-2 gap-2 text-[11px]">
-            <div class="flex flex-col gap-1">
-              <span class="text-zinc-400 text-[9px] uppercase font-bold">Position X</span>
-              <input 
-                v-model.number="inspectorElement.x"
-                type="number"
-                class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-400 transition-all"
-              />
-            </div>
-            <div class="flex flex-col gap-1">
-              <span class="text-zinc-400 text-[9px] uppercase font-bold">Position Y</span>
-              <input 
-                v-model.number="inspectorElement.y"
-                type="number"
-                class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-400 transition-all"
-              />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-3 gap-2 text-[11px] mt-1">
-            <div class="flex flex-col gap-1">
-              <span class="text-zinc-400 text-[9px] uppercase font-bold">Width</span>
-              <input 
-                v-model.number="inspectorElement.width"
-                type="number"
-                class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-400 transition-all"
-              />
-            </div>
-            <div class="flex flex-col gap-1">
-              <span class="text-zinc-400 text-[9px] uppercase font-bold">Height</span>
-              <input 
-                v-model.number="inspectorElement.height"
-                type="number"
-                class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-400 transition-all"
-              />
-            </div>
-            <div class="flex flex-col gap-1">
-              <span class="text-zinc-400 text-[9px] uppercase font-bold">Layer (Z)</span>
-              <input 
-                v-model.number="inspectorElement.zIndex"
-                type="number"
-                class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-400 transition-all"
-                placeholder="Auto"
-              />
-            </div>
-          </div>
-
-          <!-- Stacking Buttons Row -->
-          <div class="flex gap-2 mt-2">
-            <button 
-              @click="adjustLayer(1)"
-              class="flex-1 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold rounded-lg transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1 border border-zinc-200"
-              title="Bring Forward"
-            >
-              <ChevronUp class="w-3 h-3 text-zinc-500" />
-              <span>Forward</span>
-            </button>
-            <button 
-              @click="adjustLayer(-1)"
-              class="flex-1 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold rounded-lg transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1 border border-zinc-200"
-              title="Send Backward"
-            >
-              <ChevronDown class="w-3 h-3 text-zinc-500" />
-              <span>Backward</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </transition>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ChevronUp, ChevronDown } from 'lucide-vue-next';
 import { useDiagramStore } from '../stores/diagramStore';
 import Actor from './Actor.vue';
 import Connector from './connector.vue';
@@ -348,12 +251,7 @@ const boxHeight = ref(0);
 const connectionTypes = ['association', 'include', 'extend', 'generalization', 'dependency'];
 const selectedConnection = computed(() => connections.value.find(c => c.id === selectedConnectionId.value) || null);
 
-const inspectorElement = computed(() => {
-  if (selectedElements.value.length === 1) {
-    return elements.value.find(e => String(e.id) === String(selectedElements.value[0])) || null;
-  }
-  return null;
-});
+
 
 // ==========================================
 // 🎯 SMART ALIGNMENT GUIDES & SNAP SYSTEM
@@ -879,9 +777,7 @@ const handleDrop = (event) => {
 
 function selectConnection(id) { selectedConnectionId.value = id; }
 function clearSelectedConnection() { selectedConnectionId.value = null; }
-function zoomIn() { if (zoomLevel.value < 2) zoomLevel.value = Math.min(2, zoomLevel.value + 0.1); }
-function zoomOut() { if (zoomLevel.value > 0.5) zoomLevel.value = Math.max(0.5, zoomLevel.value - 0.1); }
-function resetZoom() { zoomLevel.value = 1; }
+
 
 function changeSelectedConnectionType(newType) {
   if (selectedConnection.value) selectedConnection.value.type = newType;
@@ -943,23 +839,7 @@ function selectElement(id) {
   }
 }
 
-function adjustLayer(delta) {
-  if (!inspectorElement.value) return;
-  if (typeof diagramStore.saveToHistory === 'function') {
-    diagramStore.saveToHistory();
-  }
-  let currentZ = inspectorElement.value.zIndex;
-  if (typeof currentZ !== 'number') {
-    let baseZIndex = 10;
-    if (inspectorElement.value.type === 'System' || inspectorElement.value.type === 'package') {
-      baseZIndex = 5;
-    } else if (inspectorElement.value.type === 'actor' || inspectorElement.value.type === 'usecase' || inspectorElement.value.type === 'note') {
-      baseZIndex = 10;
-    }
-    currentZ = baseZIndex;
-  }
-  inspectorElement.value.zIndex = currentZ + delta;
-}
+
 
 function handleKeydown(e) {
   const active = document.activeElement;

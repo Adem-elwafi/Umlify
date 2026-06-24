@@ -61,6 +61,134 @@
       </div>
     </header>
 
+    <!-- Horizontal Engineering Telemetry & Property Control Strip -->
+    <section class="h-11 w-full bg-white border-b border-zinc-200 px-6 flex items-center justify-between shrink-0 z-20 shadow-xs">
+      <!-- Left side: Telemetry parameters or placeholder -->
+      <div class="flex-1 flex items-center">
+        <div v-if="inspectorElement" class="flex items-center gap-6 text-xs text-zinc-700">
+          <!-- GROUP A: Identity -->
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-[10px] text-zinc-400 uppercase font-mono tracking-wider">Name:</span>
+            <input 
+              v-model="inspectorElement.label" 
+              type="text" 
+              class="bg-zinc-50 border border-zinc-200 rounded-lg px-2.5 py-1 text-xs font-semibold text-zinc-900 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 transition-all w-48 shadow-xs"
+              placeholder="Element Name"
+            />
+            <span class="text-[10px] font-mono text-zinc-400 uppercase ml-1">ID: {{ inspectorElement.id.split('_')[1] || inspectorElement.id.slice(-6) }}</span>
+          </div>
+
+          <div class="w-px h-4 bg-zinc-200" />
+
+          <!-- GROUP B: Coordinates -->
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1.5">
+              <span class="font-bold text-[10px] text-zinc-400 uppercase font-mono tracking-wider">X:</span>
+              <input 
+                v-model.number="inspectorElement.x" 
+                type="number" 
+                class="w-16 bg-zinc-50 border border-zinc-200 rounded-lg px-2 py-1 text-xs font-semibold text-zinc-900 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 transition-all shadow-xs"
+              />
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="font-bold text-[10px] text-zinc-400 uppercase font-mono tracking-wider">Y:</span>
+              <input 
+                v-model.number="inspectorElement.y" 
+                type="number" 
+                class="w-16 bg-zinc-50 border border-zinc-200 rounded-lg px-2 py-1 text-xs font-semibold text-zinc-900 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 transition-all shadow-xs"
+              />
+            </div>
+          </div>
+
+          <div class="w-px h-4 bg-zinc-200" />
+
+          <!-- GROUP C: Dimensions -->
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1.5">
+              <span class="font-bold text-[10px] text-zinc-400 uppercase font-mono tracking-wider">W:</span>
+              <input 
+                v-model.number="inspectorElement.width" 
+                type="number" 
+                class="w-16 bg-zinc-50 border border-zinc-200 rounded-lg px-2 py-1 text-xs font-semibold text-zinc-900 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 transition-all shadow-xs"
+                placeholder="Auto"
+              />
+           </div>
+           <div class="flex items-center gap-1.5">
+             <span class="font-bold text-[10px] text-zinc-400 uppercase font-mono tracking-wider">H:</span>
+             <input 
+               v-model.number="inspectorElement.height" 
+               type="number" 
+               class="w-16 bg-zinc-50 border border-zinc-200 rounded-lg px-2 py-1 text-xs font-semibold text-zinc-900 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 transition-all shadow-xs"
+               placeholder="Auto"
+             />
+           </div>
+         </div>
+
+         <div class="w-px h-4 bg-zinc-200" />
+
+         <!-- GROUP D: Layering Bench -->
+         <div class="flex items-center gap-3">
+           <div class="flex items-center gap-1.5">
+             <span class="font-bold text-[10px] text-zinc-400 uppercase font-mono tracking-wider">Layer (Z):</span>
+             <input 
+               v-model.number="inspectorElement.zIndex" 
+               type="number" 
+               class="w-16 bg-zinc-50 border border-zinc-200 rounded-lg px-2 py-1 text-xs font-semibold text-zinc-900 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 transition-all shadow-xs"
+               placeholder="Auto"
+             />
+           </div>
+           <div class="flex items-center gap-1 bg-zinc-100 border border-zinc-200 rounded-lg p-0.5 shadow-xs">
+             <button 
+               @click="adjustLayer(1)"
+               class="p-1 hover:bg-zinc-200 text-zinc-600 rounded transition-all active:scale-90 cursor-pointer flex items-center justify-center"
+               title="Bring Forward"
+             >
+               <ChevronUp class="w-3.5 h-3.5" />
+             </button>
+             <button 
+               @click="adjustLayer(-1)"
+               class="p-1 hover:bg-zinc-200 text-zinc-600 rounded transition-all active:scale-90 cursor-pointer flex items-center justify-center"
+               title="Send Backward"
+             >
+               <ChevronDown class="w-3.5 h-3.5" />
+             </button>
+           </div>
+         </div>
+        </div>
+        <div v-else class="text-xs text-zinc-400 font-mono italic select-none">
+          Select an asset to view engineering telemetry...
+        </div>
+      </div>
+
+      <!-- Right side: Zoom Controls -->
+      <div class="flex items-center gap-2 bg-zinc-50 border border-zinc-200 rounded-lg p-0.5 shadow-xs ml-4">
+        <button 
+          @click="zoomIn" 
+          class="w-6 h-6 flex items-center justify-center hover:bg-zinc-200 text-zinc-600 rounded transition-all active:scale-95 cursor-pointer text-sm font-bold" 
+          title="Zoom In"
+        >
+          <span>+</span>
+        </button>
+        <span class="min-w-[36px] text-center text-[10px] font-bold text-zinc-500 font-mono select-none">
+          {{ Math.round(diagramStore.zoomLevel * 100) }}%
+        </span>
+        <button 
+          @click="zoomOut" 
+          class="w-6 h-6 flex items-center justify-center hover:bg-zinc-200 text-zinc-600 rounded transition-all active:scale-95 cursor-pointer text-sm font-bold" 
+          title="Zoom Out"
+        >
+          <span>−</span>
+        </button>
+        <button 
+          @click="resetZoom" 
+          class="w-6 h-6 flex items-center justify-center hover:bg-zinc-200 text-zinc-400 rounded transition-all active:scale-95 cursor-pointer text-xs" 
+          title="Reset Zoom"
+        >
+          <span>⟲</span>
+        </button>
+      </div>
+    </section>
+
     <main class="flex-1 w-full flex min-h-0 relative">
       <!-- Collapsible Cloud File Slider Drawer -->
       <div 
@@ -232,7 +360,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useDiagramStore } from '../stores/diagramStore';
 import { useAuthStore } from '../stores/authStore';
 import Canvas from '../components/Canvas.vue';
@@ -247,6 +375,7 @@ import {
   Undo2,
   Redo2,
   ChevronDown,
+  ChevronUp,
   Type,
   MoreVertical
 } from 'lucide-vue-next';
@@ -258,6 +387,47 @@ const isTerminalOpen = ref(true);
 const isSidebarDrawerOpen = ref(true);
 const activeSidebarTab = ref('tools');
 const swipedRowId = ref(null);
+
+const inspectorElement = computed(() => {
+  if (diagramStore.selectedElements.length === 1) {
+    return diagramStore.elements.find(e => String(e.id) === String(diagramStore.selectedElements[0])) || null;
+  }
+  return null;
+});
+
+function adjustLayer(delta) {
+  if (!inspectorElement.value) return;
+  if (typeof diagramStore.saveToHistory === 'function') {
+    diagramStore.saveToHistory();
+  }
+  let currentZ = inspectorElement.value.zIndex;
+  if (typeof currentZ !== 'number') {
+    let baseZIndex = 10;
+    if (inspectorElement.value.type === 'System' || inspectorElement.value.type === 'package') {
+      baseZIndex = 5;
+    } else {
+      baseZIndex = 10;
+    }
+    currentZ = baseZIndex;
+  }
+  inspectorElement.value.zIndex = currentZ + delta;
+}
+
+function zoomIn() {
+  if (diagramStore.zoomLevel < 2) {
+    diagramStore.zoomLevel = Math.min(2, diagramStore.zoomLevel + 0.1);
+  }
+}
+
+function zoomOut() {
+  if (diagramStore.zoomLevel > 0.5) {
+    diagramStore.zoomLevel = Math.max(0.5, diagramStore.zoomLevel - 0.1);
+  }
+}
+
+function resetZoom() {
+  diagramStore.zoomLevel = 1;
+}
 
 const handleBeforeUnload = (event) => {
   if (diagramStore.isDirty && diagramStore.elements.length > 0) {
