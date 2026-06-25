@@ -5,6 +5,21 @@
   --color-accent-blue: #6594B1;
   --color-accent-violet: #DDAED3;
   --color-secondary-gray: #EEEEEE;
+
+  /* Custom premium UI color references */
+  --accent-violet: #ddaed3;
+  --accent-violet-glow: rgba(221, 174, 211, 0.3);
+}
+
+/* Custom Blueprint Sheet Grid Engine overrides */
+.sheet-grid {
+  background-size: 24px 24px;
+  background-image: radial-gradient(circle, rgba(148, 163, 184, 0.15) 1px, transparent 1px);
+  transition: background-color 0.2s ease, background-image 0.2s ease;
+}
+
+.dark .sheet-grid {
+  background-image: radial-gradient(circle, rgba(51, 65, 85, 0.4) 1px, transparent 1px);
 }
 
 /* 

@@ -1,7 +1,7 @@
 <template>
   <div 
     id="uml-canvas" 
-    class="w-full h-full relative overflow-hidden bg-[#fafafa] flex flex-col select-none" 
+    class="w-full h-full relative overflow-hidden bg-[#f8fafc] dark:bg-[#070a13] transition-colors duration-200 flex flex-col select-none" 
     @dragover.prevent="handleDragOver"
     @drop="handleDrop"
   >
@@ -38,7 +38,7 @@
           @mousedown.stop="initiateElementsDrag($event, element)"
         >
           <!-- Task 1: Premium Hairline Selection Highlight -->
-          <div v-if="selectedElements.includes(String(element.id))" class="absolute inset-0 pointer-events-none border border-accent-blue rounded-xl ring-1 ring-accent-blue/20 z-20"></div>
+          <div v-if="selectedElements.includes(String(element.id))" class="absolute inset-0 pointer-events-none border border-[var(--accent-violet)] shadow-[0_0_12px_var(--accent-violet-glow)] rounded-xl z-20"></div>
 
           <System
             v-if="element.type === 'System'"
