@@ -1,11 +1,11 @@
 <template>
   <div class="h-full w-full flex flex-col bg-zinc-50 select-none overflow-hidden font-sans">
     <!-- Master Workspace Header -->
-    <header class="h-14 w-full bg-primary-slate border-b border-primary-slate/50 px-6 flex justify-between items-center shrink-0 z-30 shadow-xs">
+    <header class="h-14 w-full bg-[#213C51] text-white border-b border-white/10 dark:bg-[#0f172a] dark:text-slate-100 dark:border-b dark:border-zinc-800/80 transition-colors duration-200 px-6 flex justify-between items-center shrink-0 z-30 shadow-xs">
       <div class="flex items-center gap-4">
         <button 
           @click="isSidebarDrawerOpen = !isSidebarDrawerOpen"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/10 text-zinc-100 text-xs font-medium transition-all active:scale-95 cursor-pointer shadow-xs select-none group"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 dark:hover:bg-slate-800/60 border border-white/10 text-zinc-100 text-xs font-medium transition-all duration-200 active:scale-95 cursor-pointer shadow-xs select-none group"
           title="Toggle Sidebar Drawer"
         >
           <Folder class="w-3.5 h-3.5 text-zinc-300 group-hover:text-white" />
@@ -48,12 +48,20 @@
         ⚠️ {{ diagramStore.networkErrorMessage }}
       </div>
       
-      <div class="flex items-center">
+      <div class="flex items-center gap-2">
+        <button 
+          @click="toggleDarkMode" 
+          class="p-2 rounded-xl transition-all duration-200 hover:bg-white/15 dark:hover:bg-slate-800/60 focus:outline-none focus:ring-2 focus:ring-blue-400/40"
+          title="Toggle Visual Theme"
+        >
+          <Sun v-if="isDarkMode" class="w-5 h-5 text-amber-400" />
+          <Moon v-else class="w-5 h-5 text-slate-200" />
+        </button>
         <button 
           @click="isTerminalOpen = !isTerminalOpen"
           :class="isTerminalOpen 
-            ? 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent-blue text-white text-xs font-medium transition-all cursor-pointer shadow-sm select-none' 
-            : 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/10 text-zinc-100 text-xs font-medium transition-all active:scale-95 cursor-pointer shadow-xs select-none'"
+            ? 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-accent-blue hover:bg-accent-blue/90 text-white text-xs font-medium transition-all duration-200 cursor-pointer shadow-sm select-none' 
+            : 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 dark:hover:bg-slate-800/60 border border-white/10 text-zinc-100 text-xs font-medium transition-all duration-200 active:scale-95 cursor-pointer shadow-xs select-none'"
         >
           <Terminal class="w-3.5 h-3.5" />
           <span>{{ isTerminalOpen ? 'Hide Terminal' : 'AI Terminal' }}</span>
@@ -377,7 +385,9 @@ import {
   ChevronDown,
   ChevronUp,
   Type,
-  MoreVertical
+  MoreVertical,
+  Sun,
+  Moon
 } from 'lucide-vue-next';
 
 const diagramStore = useDiagramStore();
@@ -387,6 +397,18 @@ const isTerminalOpen = ref(true);
 const isSidebarDrawerOpen = ref(true);
 const activeSidebarTab = ref('tools');
 const swipedRowId = ref(null);
+
+const isDarkMode = ref(false);
+const toggleDarkMode = () => {
+  isDarkMode.value = !isDarkMode.value;
+  if (isDarkMode.value) {
+    document.documentElement.classList.add('dark');
+    localStorage.setItem('theme', 'dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+    localStorage.setItem('theme', 'light');
+  }
+};
 
 const inspectorElement = computed(() => {
   if (diagramStore.selectedElements.length === 1) {
@@ -484,6 +506,14 @@ const handleSignOutFlow = () => {
 };
 
 onMounted(async () => {
+  if (localStorage.getItem('theme') === 'dark' || 
+     (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    isDarkMode.value = true;
+    document.documentElement.classList.add('dark');
+  } else {
+    isDarkMode.value = false;
+    document.documentElement.classList.remove('dark');
+  }
   window.addEventListener('beforeunload', handleBeforeUnload);
   await diagramStore.fetchUserDiagrams();
 });
