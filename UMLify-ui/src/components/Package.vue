@@ -1,27 +1,27 @@
 <template>
   <div
-    class="package element relative w-full h-full cursor-grab active:cursor-grabbing transition-all select-none"
+    class="package element relative w-full h-full cursor-grab active:cursor-grabbing transition-all duration-200 ease-in-out select-none"
     @mousedown="startDrag"
     @mouseup="handleMouseUp"
   >
     <div class="w-full h-full flex flex-col relative">
       <!-- Folder Tab -->
       <div 
-        class="h-6 w-28 bg-white border-t border-x border-primary-slate/30 rounded-t-lg px-2 flex items-center z-10 shadow-xs"
+        class="h-6 w-28 px-2 flex items-center z-10 transition-colors duration-200 bg-zinc-50/40 text-zinc-900 border-t border-x border-zinc-200/80 dark:bg-zinc-900/20 dark:text-zinc-100 dark:border-t dark:border-x dark:border-zinc-800/50 rounded-t-lg shadow-xs"
         @mousedown.stop
       >
         <input
           type="text"
           v-model="localLabel"
-          class="bg-transparent border-none outline-none focus:ring-0 text-[10px] font-bold uppercase tracking-wider text-primary-slate w-full"
+          class="text-inherit bg-transparent border-none outline-none focus:ring-0 text-[10px] font-bold uppercase tracking-wider w-full"
           placeholder="PACKAGE"
         />
       </div>
 
       <!-- Main Boundary Box -->
       <div 
-        class="flex-1 border rounded-b-2xl rounded-tr-2xl relative transition-all -mt-px"
-        :class="selected ? 'border-primary-slate/40 bg-secondary-gray/20' : 'border-primary-slate/20 bg-secondary-gray/5'"
+        class="flex-1 border rounded-xl rounded-tl-none relative transition-all duration-200 ease-in-out -mt-px bg-zinc-50/40 text-zinc-900 border border-zinc-200/80 dark:bg-zinc-900/20 dark:text-zinc-100 dark:border dark:border-zinc-800/50"
+        :class="selected ? 'border-zinc-450 dark:border-zinc-650 shadow-sm' : ''"
       >
         <!-- Resize handles (only show when selected) -->
         <div 

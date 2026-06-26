@@ -1,21 +1,21 @@
 <template>
   <div
-    class="System element relative w-full h-full cursor-grab active:cursor-grabbing transition-all select-none"
+    class="System element relative w-full h-full cursor-grab active:cursor-grabbing transition-all duration-200 ease-in-out select-none"
     :style="{}"
     @mousedown="startDrag"
     @mouseup="handleMouseUp"
   >
     <!-- Main Boundary Box -->
     <div 
-      class="w-full h-full border border-dashed rounded-2xl relative transition-all"
-      :class="selected ? 'border-primary-slate/40 bg-secondary-gray/20' : 'border-primary-slate/20 bg-secondary-gray/5'"
+      class="w-full h-full border border-dashed rounded-2xl relative transition-all duration-200 bg-zinc-500/5 text-zinc-900 border-zinc-300/80 dark:bg-zinc-400/5 dark:text-zinc-100 dark:border dark:border-zinc-800/60"
+      :class="selected ? 'border-zinc-450 dark:border-zinc-600 shadow-sm' : 'border-zinc-300/80 dark:border-zinc-800/60'"
     >
       <!-- Namespace Label Badge -->
-      <div class="absolute -top-2.5 left-4 bg-white border border-primary-slate/20 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider text-primary-slate select-none shadow-xs" @mousedown.stop>
+      <div class="absolute -top-2.5 left-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-2 py-0.5 rounded-md text-[10px] font-semibold tracking-wide text-zinc-500 dark:text-zinc-400 select-none shadow-xs" @mousedown.stop>
         <input
           type="text"
           v-model="localLabel"
-          class="bg-transparent border-none outline-none focus:ring-0 text-center w-full min-w-[60px]"
+          class="bg-transparent border-none outline-none focus:ring-0 text-inherit font-semibold text-center w-full min-w-[60px]"
           placeholder="SYSTEM"
         />
       </div>
