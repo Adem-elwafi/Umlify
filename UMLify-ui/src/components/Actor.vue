@@ -1,6 +1,6 @@
 <template>
   <div
-    class="actor element relative w-full h-full cursor-grab active:cursor-grabbing transition-all select-none"
+    class="actor element relative w-full h-full cursor-grab active:cursor-grabbing transition-colors duration-200 select-none"
     :class="[
       { 'scale-[1.02]': selected, 'opacity-80': dragging }
     ]"
@@ -13,18 +13,18 @@
       <svg 
         viewBox="0 0 100 100" 
         preserveAspectRatio="xMidYMid meet"
-        class="w-full flex-1 text-primary-slate drop-shadow-sm"
+        class="w-full flex-1 text-zinc-800 dark:text-zinc-200 drop-shadow-sm"
       >
         <!-- Head -->
-        <circle cx="50" cy="20" r="15" fill="white" stroke="currentColor" stroke-width="3" />
+        <circle cx="50" cy="20" r="15" class="fill-white dark:fill-[#111827] stroke-zinc-800 dark:stroke-zinc-200" stroke-width="3" />
         <!-- Body Spine -->
-        <line x1="50" y1="35" x2="50" y2="70" stroke="currentColor" stroke-width="3" />
+        <line x1="50" y1="35" x2="50" y2="70" class="stroke-zinc-800 dark:stroke-zinc-200" stroke-width="3" />
         <!-- Arms -->
-        <line x1="20" y1="45" x2="80" y2="45" stroke="currentColor" stroke-width="3" />
+        <line x1="20" y1="45" x2="80" y2="45" class="stroke-zinc-800 dark:stroke-zinc-200" stroke-width="3" />
         <!-- Left Leg -->
-        <line x1="50" y1="70" x2="25" y2="95" stroke="currentColor" stroke-width="3" />
+        <line x1="50" y1="70" x2="25" y2="95" class="stroke-zinc-800 dark:stroke-zinc-200" stroke-width="3" />
         <!-- Right Leg -->
-        <line x1="50" y1="70" x2="75" y2="95" stroke="currentColor" stroke-width="3" />
+        <line x1="50" y1="70" x2="75" y2="95" class="stroke-zinc-800 dark:stroke-zinc-200" stroke-width="3" />
       </svg>
       
       <textarea 
@@ -32,7 +32,7 @@
         @input="updateLabel"
         @mousedown.stop
         rows="2"
-        class="mt-2 text-[11px] font-bold text-zinc-800 tracking-tight text-center w-full bg-transparent border-none outline-none focus:ring-0 resize-none overflow-hidden whitespace-normal text-wrap break-words h-9"
+        class="text-zinc-700 dark:text-zinc-300 text-xs mt-2 font-medium px-2 py-1 rounded-lg bg-white/60 dark:bg-zinc-900/60 border border-zinc-200/50 dark:border-zinc-800/50 text-center w-full outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/60 resize-none overflow-hidden whitespace-normal text-wrap break-words h-9"
       ></textarea>
     </div>
 

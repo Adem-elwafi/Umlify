@@ -1,8 +1,8 @@
 <template>
   <div
-    class="uml-element element relative w-full h-full cursor-grab active:cursor-grabbing transition-all select-none flex items-center justify-center bg-white border rounded-full px-4 py-2"
+    class="uml-element element relative w-full h-full cursor-grab active:cursor-grabbing transition-colors duration-200 select-none flex items-center justify-center bg-white text-zinc-900 border border-zinc-200/80 shadow-sm shadow-zinc-200/40 dark:bg-[#111827] dark:text-zinc-100 dark:border dark:border-zinc-800/80 dark:shadow-none rounded-full px-4 py-2"
     :class="[
-      selected ? 'scale-[1.02]' : 'border-primary-slate/20 shadow-xs hover:border-primary-slate/40',
+      selected ? 'scale-[1.02]' : 'hover:border-zinc-400/80 dark:hover:border-zinc-700/80',
       { 'opacity-80': dragging }
     ]"
     :style="{}"
@@ -13,7 +13,7 @@
       type="text" 
       v-model="localLabel" 
       @input="updateLabel"
-      class="text-xs font-medium tracking-tight text-zinc-800 text-center w-full bg-transparent border-none outline-none focus:ring-0"
+      class="text-xs font-medium tracking-tight text-inherit text-center w-full bg-transparent border-none outline-none focus:ring-0"
     >
 
     <!-- Resize handles (only show when selected) -->

@@ -1,21 +1,21 @@
 <template>
   <div
-    class="note element relative w-full h-full cursor-grab active:cursor-grabbing transition-all select-none"
+    class="note element relative w-full h-full cursor-grab active:cursor-grabbing transition-colors duration-200 select-none"
     @mousedown="startDrag"
     @mouseup="handleMouseUp"
   >
     <!-- Note Body with folded corner styling -->
     <div 
-      class="w-full h-full bg-[#fefad4]/80 border relative transition-all shadow-xs rounded-sm p-3 flex flex-col justify-between"
-      :class="selected ? 'border-amber-400 ring-1 ring-amber-400/20' : 'border-amber-200/60 hover:border-amber-300'"
+      class="w-full h-full bg-amber-50/90 text-amber-900 border border-amber-200/60 dark:bg-amber-950/20 dark:text-amber-200 dark:border dark:border-amber-900/40 relative transition-colors duration-200 shadow-xs rounded-sm p-3 flex flex-col justify-between"
+      :class="selected ? 'border-amber-400/80 ring-1 ring-amber-400/20' : 'hover:border-amber-300'"
     >
       <!-- Folded top-right corner -->
-      <div class="absolute top-0 right-0 w-3 h-3 bg-[#fdf6b2] border-l border-b border-amber-200/60 rounded-bl-sm"></div>
+      <div class="absolute top-0 right-0 w-3 h-3 bg-amber-100 dark:bg-amber-900/40 border-l border-b border-amber-200/60 dark:border-amber-900/40 rounded-bl-sm"></div>
 
       <textarea
         v-model="localLabel"
         @mousedown.stop
-        class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-[11px] text-zinc-700 leading-normal resize-none overflow-hidden text-center py-1"
+        class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-[11px] text-inherit leading-normal resize-none overflow-hidden text-center py-1"
         placeholder="Note Text"
       ></textarea>
 
