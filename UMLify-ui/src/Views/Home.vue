@@ -201,7 +201,7 @@
       <!-- Collapsible Cloud File Slider Drawer -->
       <div 
         :class="[
-          'h-full bg-white border-r border-zinc-200 transition-all duration-300 ease-in-out flex flex-col shrink-0 overflow-hidden',
+          'h-full flex flex-col shrink-0 overflow-hidden bg-white/80 backdrop-blur-md text-zinc-800 border-r border-zinc-200/50 dark:bg-[#111827]/75 dark:backdrop-blur-md dark:text-zinc-100 dark:border-r dark:border-zinc-800/40 transition-all duration-300 ease-in-out',
           isSidebarDrawerOpen ? 'w-80' : 'w-0'
         ]"
       >

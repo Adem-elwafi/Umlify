@@ -1,125 +1,125 @@
 <template>
-  <div class="w-full flex-1 flex flex-col bg-white overflow-y-auto px-4 py-3 gap-5 text-zinc-700 select-none">
+  <div class="w-full flex-1 flex flex-col bg-transparent overflow-y-auto px-4 py-3 gap-5 text-zinc-700 dark:text-zinc-300 select-none">
     
     <!-- SECTION A: Core Structural Entities -->
     <div class="flex flex-col gap-2">
-      <h3 class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 select-none font-mono">Core Entities</h3>
+      <h3 class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 select-none font-mono">Core Entities</h3>
       <div class="grid grid-cols-2 gap-2">
         <!-- Actor Card -->
         <div 
           draggable="true"
           @dragstart="handleDragStart($event, 'actor')"
-          class="flex flex-col items-center justify-center p-3 border border-zinc-200 rounded-xl hover:bg-zinc-50 cursor-grab transition-colors active:scale-98 select-none group"
+          class="flex flex-col items-center justify-center p-3 border rounded-xl cursor-grab active:scale-98 select-none group transition-all duration-200 bg-zinc-50/50 border-zinc-200/60 hover:bg-white hover:border-zinc-300 hover:shadow-sm dark:bg-zinc-900/40 dark:border-zinc-800/60 dark:hover:bg-zinc-800/50 dark:hover:border-zinc-700/60 dark:hover:shadow-none"
         >
-          <User class="w-6 h-6 text-zinc-500 group-hover:text-zinc-950 transition-colors mb-1.5" />
-          <span class="text-[11px] font-semibold text-zinc-600 group-hover:text-zinc-950">Actor</span>
+          <User class="w-6 h-6 text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200 mb-1.5" />
+          <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200">Actor</span>
         </div>
 
         <!-- Use Case Card -->
         <div 
           draggable="true"
           @dragstart="handleDragStart($event, 'usecase')"
-          class="flex flex-col items-center justify-center p-3 border border-zinc-200 rounded-xl hover:bg-zinc-50 cursor-grab transition-colors active:scale-98 select-none group"
+          class="flex flex-col items-center justify-center p-3 border rounded-xl cursor-grab active:scale-98 select-none group transition-all duration-200 bg-zinc-50/50 border-zinc-200/60 hover:bg-white hover:border-zinc-300 hover:shadow-sm dark:bg-zinc-900/40 dark:border-zinc-800/60 dark:hover:bg-zinc-800/50 dark:hover:border-zinc-700/60 dark:hover:shadow-none"
         >
-          <CircleDot class="w-6 h-6 text-zinc-500 group-hover:text-zinc-950 transition-colors mb-1.5" />
-          <span class="text-[11px] font-semibold text-zinc-600 group-hover:text-zinc-950">Use Case</span>
+          <CircleDot class="w-6 h-6 text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200 mb-1.5" />
+          <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200">Use Case</span>
         </div>
 
         <!-- System Boundary Card (Full span) -->
         <div 
           draggable="true"
           @dragstart="handleDragStart($event, 'System')"
-          class="col-span-2 flex flex-col items-center justify-center p-3 border border-zinc-200 rounded-xl hover:bg-zinc-50 cursor-grab transition-colors active:scale-98 select-none group"
+          class="col-span-2 flex flex-col items-center justify-center p-3 border rounded-xl cursor-grab active:scale-98 select-none group transition-all duration-200 bg-zinc-50/50 border-zinc-200/60 hover:bg-white hover:border-zinc-300 hover:shadow-sm dark:bg-zinc-900/40 dark:border-zinc-800/60 dark:hover:bg-zinc-800/50 dark:hover:border-zinc-700/60 dark:hover:shadow-none"
         >
-          <Box class="w-6 h-6 text-zinc-500 group-hover:text-zinc-950 transition-colors mb-1.5" />
-          <span class="text-[11px] font-semibold text-zinc-600 group-hover:text-zinc-950">System Boundary</span>
+          <Box class="w-6 h-6 text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200 mb-1.5" />
+          <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200">System Boundary</span>
         </div>
       </div>
     </div>
 
     <!-- Section Separator Line -->
-    <div class="border-t border-zinc-100" />
+    <div class="border-t border-zinc-100 dark:border-zinc-800/60" />
 
     <!-- SECTION B: Extended Canvas Shapes -->
     <div class="flex flex-col gap-2">
-      <h3 class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 select-none font-mono">Extended Shapes</h3>
+      <h3 class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 select-none font-mono">Extended Shapes</h3>
       <div class="grid grid-cols-2 gap-2">
         <!-- Package Card -->
         <div 
           draggable="true"
           @dragstart="handleDragStart($event, 'package')"
-          class="flex flex-col items-center justify-center p-3 border border-zinc-200 rounded-xl hover:bg-zinc-50 cursor-grab transition-colors active:scale-98 select-none group"
+          class="flex flex-col items-center justify-center p-3 border rounded-xl cursor-grab active:scale-98 select-none group transition-all duration-200 bg-zinc-50/50 border-zinc-200/60 hover:bg-white hover:border-zinc-300 hover:shadow-sm dark:bg-zinc-900/40 dark:border-zinc-800/60 dark:hover:bg-zinc-800/50 dark:hover:border-zinc-700/60 dark:hover:shadow-none"
         >
-          <FolderArchive class="w-6 h-6 text-zinc-500 group-hover:text-zinc-950 transition-colors mb-1.5" />
-          <span class="text-[11px] font-semibold text-zinc-600 group-hover:text-zinc-950">Package</span>
+          <FolderArchive class="w-6 h-6 text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200 mb-1.5" />
+          <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200">Package</span>
         </div>
 
         <!-- Note Card -->
         <div 
           draggable="true"
           @dragstart="handleDragStart($event, 'note')"
-          class="flex flex-col items-center justify-center p-3 border border-zinc-200 rounded-xl hover:bg-zinc-50 cursor-grab transition-colors active:scale-98 select-none group"
+          class="flex flex-col items-center justify-center p-3 border rounded-xl cursor-grab active:scale-98 select-none group transition-all duration-200 bg-zinc-50/50 border-zinc-200/60 hover:bg-white hover:border-zinc-300 hover:shadow-sm dark:bg-zinc-900/40 dark:border-zinc-800/60 dark:hover:bg-zinc-800/50 dark:hover:border-zinc-700/60 dark:hover:shadow-none"
         >
-          <StickyNote class="w-6 h-6 text-zinc-500 group-hover:text-zinc-950 transition-colors mb-1.5" />
-          <span class="text-[11px] font-semibold text-zinc-600 group-hover:text-zinc-950">Note</span>
+          <StickyNote class="w-6 h-6 text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200 mb-1.5" />
+          <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200">Note</span>
         </div>
       </div>
     </div>
 
     <!-- Section Separator Line -->
-    <div class="border-t border-zinc-100" />
+    <div class="border-t border-zinc-100 dark:border-zinc-800/60" />
 
     <!-- SECTION C: Canvas Utilities -->
     <div class="flex flex-col gap-2">
-      <h3 class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 select-none font-mono">Canvas Utilities</h3>
+      <h3 class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 select-none font-mono">Canvas Utilities</h3>
       <div class="grid grid-cols-2 gap-2">
         <!-- Quick Link -->
         <button 
           @click="handleLinkSpawnerClick"
-          class="flex flex-col items-center justify-center p-3 border border-zinc-200 rounded-xl hover:bg-zinc-50 transition-colors active:scale-98 cursor-pointer group"
+          class="flex flex-col items-center justify-center p-3 border rounded-xl active:scale-98 cursor-pointer group transition-all duration-200 bg-zinc-50/50 border-zinc-200/60 hover:bg-white hover:border-zinc-300 hover:shadow-sm dark:bg-zinc-900/40 dark:border-zinc-800/60 dark:hover:bg-zinc-800/50 dark:hover:border-zinc-700/60 dark:hover:shadow-none"
         >
-          <ArrowUpRight class="w-6 h-6 text-zinc-500 group-hover:text-zinc-950 transition-colors mb-1.5" />
-          <span class="text-[11px] font-semibold text-zinc-600 group-hover:text-zinc-950">Quick Link</span>
+          <ArrowUpRight class="w-6 h-6 text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200 mb-1.5" />
+          <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200">Quick Link</span>
         </button>
 
         <!-- Standalone Note / Text label -->
         <button 
           @click="handleTextAnnotationClick"
-          class="flex flex-col items-center justify-center p-3 border border-zinc-200 rounded-xl hover:bg-zinc-50 transition-colors active:scale-98 cursor-pointer group"
+          class="flex flex-col items-center justify-center p-3 border rounded-xl active:scale-98 cursor-pointer group transition-all duration-200 bg-zinc-50/50 border-zinc-200/60 hover:bg-white hover:border-zinc-300 hover:shadow-sm dark:bg-zinc-900/40 dark:border-zinc-800/60 dark:hover:bg-zinc-800/50 dark:hover:border-zinc-700/60 dark:hover:shadow-none"
         >
-          <Type class="w-6 h-6 text-zinc-500 group-hover:text-zinc-950 transition-colors mb-1.5" />
-          <span class="text-[11px] font-semibold text-zinc-600 group-hover:text-zinc-950">Add Text</span>
+          <Type class="w-6 h-6 text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200 mb-1.5" />
+          <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200">Add Text</span>
         </button>
 
         <!-- Clear Canvas (Full span) -->
         <button 
           @click="handleClearCanvas"
-          class="col-span-2 flex flex-col items-center justify-center p-3 border border-rose-200 rounded-xl bg-rose-50/50 hover:bg-rose-50 transition-colors active:scale-98 cursor-pointer group"
+          class="col-span-2 flex flex-col items-center justify-center p-3 border border-rose-200 dark:border-rose-950/30 rounded-xl bg-rose-50/50 hover:bg-rose-50 dark:bg-rose-950/10 dark:hover:bg-rose-950/20 transition-all duration-200 active:scale-98 cursor-pointer group"
         >
-          <Trash2 class="w-6 h-6 text-rose-600 group-hover:text-rose-700 transition-colors mb-1.5" />
-          <span class="text-[11px] font-bold text-rose-600 group-hover:text-rose-700">Clear Viewport</span>
+          <Trash2 class="w-6 h-6 text-rose-600 dark:text-rose-400 group-hover:text-rose-700 dark:group-hover:text-rose-300 transition-colors duration-200 mb-1.5" />
+          <span class="text-[11px] font-bold text-rose-600 dark:text-rose-400 group-hover:text-rose-700 dark:group-hover:text-rose-300 transition-colors duration-200">Clear Viewport</span>
         </button>
       </div>
     </div>
 
     <!-- Section Separator Line -->
-    <div class="border-t border-zinc-100" />
+    <div class="border-t border-zinc-100 dark:border-zinc-800/60" />
 
     <!-- SECTION D: Project Controls & Save -->
-    <div class="flex flex-col gap-2.5 p-3 bg-zinc-50 border border-zinc-200/80 rounded-2xl">
+    <div class="flex flex-col gap-2.5 p-3 bg-zinc-50/50 border border-zinc-200/80 dark:bg-zinc-900/40 dark:border-zinc-800/80 rounded-2xl">
       <div class="flex flex-col gap-1 px-1">
-        <label class="text-[9px] uppercase tracking-wider text-zinc-400 font-bold font-mono select-none">Diagram Title</label>
+        <label class="text-[9px] uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-bold font-mono select-none">Diagram Title</label>
         <input 
           v-model="diagramStore.currentDiagramTitle"
           type="text"
           placeholder="Untitled Diagram"
-          class="bg-transparent border-none text-[11px] text-zinc-900 font-semibold focus:outline-none placeholder-zinc-300 w-full"
+          class="bg-transparent border-none text-[11px] text-zinc-900 dark:text-zinc-100 font-semibold focus:outline-none placeholder-zinc-300 dark:placeholder-zinc-600 w-full"
         />
       </div>
-      <div class="h-px bg-zinc-200 w-full" />
+      <div class="h-px bg-zinc-200 dark:bg-zinc-800 w-full" />
       <button 
         @click="handleCloudSave"
-        class="bg-[#213C51] hover:bg-[#1a3041] text-white text-[11px] font-bold py-2 rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+        class="bg-[#213C51] dark:bg-[#2563eb] dark:hover:bg-[#1d4ed8] hover:bg-[#1a3041] text-white text-[11px] font-bold py-2 rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
       >
         <Save class="w-3.5 h-3.5" /> Save to Cloud
       </button>
@@ -128,7 +128,7 @@
         <div 
           v-if="diagramStore.globalSaveStatusMessage" 
           class="text-[10px] font-medium px-2 py-1.5 rounded-lg flex items-center gap-1.5 mt-1"
-          :class="diagramStore.globalSaveStatusMessage.includes('Successful') ? 'text-emerald-600 bg-emerald-50 border border-emerald-100' : 'text-amber-600 bg-amber-50 border border-amber-100'"
+          :class="diagramStore.globalSaveStatusMessage.includes('Successful') ? 'text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30' : 'text-amber-650 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30'"
         >
           <span class="text-xs">{{ diagramStore.globalSaveStatusMessage.includes('Successful') ? '✓' : '⚠️' }}</span>
           {{ diagramStore.globalSaveStatusMessage }}
@@ -137,36 +137,48 @@
     </div>
 
     <!-- Section Separator Line -->
-    <div class="border-t border-zinc-100" />
+    <div class="border-t border-zinc-100 dark:border-zinc-800/60" />
 
     <!-- SECTION E: Import/Export Operations -->
     <div class="flex flex-col gap-2">
-      <h3 class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 select-none font-mono">Local Operations</h3>
+      <h3 class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 select-none font-mono">Local Operations</h3>
       <div class="grid grid-cols-3 gap-1.5">
         <!-- Export -->
-        <button @click="emitLocalExport" class="flex flex-col items-center justify-center py-2 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors cursor-pointer group" title="Export JSON">
-          <Download class="w-4 h-4 text-zinc-500 group-hover:text-zinc-900 mb-1" />
-          <span class="text-[9px] text-zinc-500 font-semibold group-hover:text-zinc-900">Export</span>
+        <button 
+          @click="emitLocalExport" 
+          class="flex flex-col items-center justify-center py-2 border rounded-xl cursor-pointer group transition-all duration-200 bg-zinc-50/50 border-zinc-200/60 hover:bg-white hover:border-zinc-300 hover:shadow-sm dark:bg-zinc-900/40 dark:border-zinc-800/60 dark:hover:bg-zinc-800/50 dark:hover:border-zinc-700/60" 
+          title="Export JSON"
+        >
+          <Download class="w-4 h-4 text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200 mb-1" />
+          <span class="text-[9px] text-zinc-500 dark:text-zinc-400 font-semibold group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200">Export</span>
         </button>
         <!-- Import -->
-        <button @click="triggerFileInput" class="flex flex-col items-center justify-center py-2 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors cursor-pointer group" title="Import JSON">
-          <Upload class="w-4 h-4 text-zinc-500 group-hover:text-zinc-900 mb-1" />
-          <span class="text-[9px] text-zinc-500 font-semibold group-hover:text-zinc-900">Import</span>
+        <button 
+          @click="triggerFileInput" 
+          class="flex flex-col items-center justify-center py-2 border rounded-xl cursor-pointer group transition-all duration-200 bg-zinc-50/50 border-zinc-200/60 hover:bg-white hover:border-zinc-300 hover:shadow-sm dark:bg-zinc-900/40 dark:border-zinc-800/60 dark:hover:bg-zinc-800/50 dark:hover:border-zinc-700/60" 
+          title="Import JSON"
+        >
+          <Upload class="w-4 h-4 text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200 mb-1" />
+          <span class="text-[9px] text-zinc-500 dark:text-zinc-400 font-semibold group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200">Import</span>
         </button>
         <!-- Snapshot -->
-        <button @click="emitLocalSnapshot" class="flex flex-col items-center justify-center py-2 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors cursor-pointer group" title="Save PNG">
-          <Camera class="w-4 h-4 text-zinc-500 group-hover:text-zinc-900 mb-1" />
-          <span class="text-[9px] text-zinc-500 font-semibold group-hover:text-zinc-900">Snapshot</span>
+        <button 
+          @click="emitLocalSnapshot" 
+          class="flex flex-col items-center justify-center py-2 border rounded-xl cursor-pointer group transition-all duration-200 bg-zinc-50/50 border-zinc-200/60 hover:bg-white hover:border-zinc-300 hover:shadow-sm dark:bg-zinc-900/40 dark:border-zinc-800/60 dark:hover:bg-zinc-800/50 dark:hover:border-zinc-700/60" 
+          title="Save PNG"
+        >
+          <Camera class="w-4 h-4 text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200 mb-1" />
+          <span class="text-[9px] text-zinc-500 dark:text-zinc-400 font-semibold group-hover:text-zinc-900 dark:group-hover:text-white transition-colors duration-200">Snapshot</span>
         </button>
       </div>
     </div>
 
     <!-- Section Separator Line -->
-    <div class="border-t border-zinc-100" />
+    <div class="border-t border-zinc-100 dark:border-zinc-800/60" />
 
     <!-- SECTION F: Account Controls -->
     <div class="flex flex-col gap-2">
-      <button @click="handleLogOutFlow" class="w-full flex items-center justify-center gap-2 py-2 border border-rose-200 rounded-xl bg-rose-50/20 text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer font-bold text-[11px]">
+      <button @click="handleLogOutFlow" class="w-full flex items-center justify-center gap-2 py-2 border border-rose-200 dark:border-rose-900/30 rounded-xl bg-rose-50/20 dark:bg-rose-950/10 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all duration-200 cursor-pointer font-bold text-[11px]">
         <LogOut class="w-4 h-4" /> Sign Out
       </button>
     </div>
