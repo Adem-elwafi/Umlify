@@ -1,54 +1,31 @@
 <template>
-  <div class="h-full w-full flex flex-col bg-zinc-50 select-none overflow-hidden font-sans">
+  <div class="min-h-screen h-screen w-full flex flex-col bg-[#f8fafc] dark:bg-[#070a13] text-zinc-900 dark:text-zinc-100 transition-colors duration-200 select-none overflow-hidden font-sans">
     <!-- Master Workspace Header -->
     <header class="h-14 w-full bg-[#213C51] text-white border-b border-white/10 dark:bg-[#0f172a] dark:text-slate-100 dark:border-b dark:border-zinc-800/80 transition-colors duration-200 px-6 flex justify-between items-center shrink-0 z-30 shadow-xs">
-      <div class="flex items-center gap-4">
-        <button 
-          @click="isSidebarDrawerOpen = !isSidebarDrawerOpen"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 dark:hover:bg-slate-800/60 border border-white/10 text-zinc-100 text-xs font-medium transition-all duration-200 active:scale-95 cursor-pointer shadow-xs select-none group"
-          title="Toggle Sidebar Drawer"
-        >
-          <Folder class="w-3.5 h-3.5 text-zinc-300 group-hover:text-white" />
-          <span>{{ isSidebarDrawerOpen ? 'Close Drawer' : 'Open Drawer' }}</span>
-        </button>
-
+      <!-- Left Branding -->
+      <div class="flex items-center gap-3">
         <div class="flex items-center gap-2">
-          <div class="w-6 h-6 rounded bg-white/10 flex items-center justify-center font-bold text-white text-xs select-none">U</div>
-          <h1 class="text-sm font-semibold tracking-tight text-white select-none font-sans">UMLify Workspace</h1>
-          
-          <!-- Typography Modifier Hook -->
-          <div class="ml-2 flex items-center gap-1 px-2 py-1 bg-white/10 border border-white/10 rounded-lg text-[10px] font-medium text-zinc-300 cursor-default">
-            <Type class="w-3 h-3" />
-            <span>Inter</span>
-            <ChevronDown class="w-2.5 h-2.5" />
-          </div>
+          <div class="w-6 h-6 rounded-lg bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center font-bold text-white text-xs select-none shadow-sm">U</div>
+          <span class="text-sm font-bold tracking-tight text-white dark:text-zinc-100 font-sans">UMLify</span>
         </div>
+        <span class="text-[9px] font-semibold text-zinc-400 bg-white/10 px-1.5 py-0.5 rounded-md border border-white/5">v1.1</span>
       </div>
 
-      <!-- Operational Telemetry Controls -->
-      <div class="flex items-center bg-white/10 border border-white/10 rounded-xl p-1 gap-1 shadow-xs">
-        <button 
-          @click="diagramStore.undo()"
-          :class="['w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 hover:shadow-sm text-zinc-100 transition-all active:scale-90', diagramStore.undoStack.length === 0 ? 'opacity-40 pointer-events-none' : '']"
-          title="Undo (Ctrl+Z)"
-        >
-          <Undo2 class="w-4 h-4" />
-        </button>
-        <div class="w-px h-4 bg-white/10 mx-0.5" />
-        <button 
-          @click="diagramStore.redo()"
-          :class="['w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 hover:shadow-sm text-zinc-100 transition-all active:scale-90', diagramStore.redoStack.length === 0 ? 'opacity-40 pointer-events-none' : '']"
-          title="Redo (Ctrl+Y)"
-        >
-          <Redo2 class="w-4 h-4" />
-        </button>
+      <!-- Center Enterprise Menu -->
+      <div class="hidden lg:flex items-center gap-4 text-[11px] font-medium text-zinc-300/80">
+        <button class="hover:text-white transition-colors cursor-pointer">Workspace Settings</button>
+        <div class="w-1 h-1 rounded-full bg-white/20"></div>
+        <button class="hover:text-white transition-colors cursor-pointer">Collaboration Engine</button>
+        <div class="w-1 h-1 rounded-full bg-white/20"></div>
+        <button class="hover:text-white transition-colors cursor-pointer">Analytics Profile</button>
       </div>
 
-      <div v-if="diagramStore.networkErrorMessage" class="px-4 py-1.5 bg-rose-500/10 border border-rose-500/20 rounded-lg text-rose-300 text-[10px] font-mono max-w-xl truncate">
-        ⚠️ {{ diagramStore.networkErrorMessage }}
-      </div>
-      
-      <div class="flex items-center gap-2">
+      <!-- Right Controls -->
+      <div class="flex items-center gap-3">
+        <div v-if="diagramStore.networkErrorMessage" class="px-3 py-1 bg-rose-500/20 border border-rose-500/35 rounded-lg text-rose-200 text-[10px] font-mono max-w-xs truncate">
+          ⚠️ {{ diagramStore.networkErrorMessage }}
+        </div>
+        
         <button 
           @click="toggleDarkMode" 
           class="p-2 rounded-xl transition-all duration-200 hover:bg-white/15 dark:hover:bg-slate-800/60 focus:outline-none focus:ring-2 focus:ring-blue-400/40"
@@ -57,22 +34,45 @@
           <Sun v-if="isDarkMode" class="w-5 h-5 text-amber-400" />
           <Moon v-else class="w-5 h-5 text-slate-200" />
         </button>
-        <button 
-          @click="isTerminalOpen = !isTerminalOpen"
-          :class="isTerminalOpen 
-            ? 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-accent-blue hover:bg-accent-blue/90 text-white text-xs font-medium transition-all duration-200 cursor-pointer shadow-sm select-none' 
-            : 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 dark:hover:bg-slate-800/60 border border-white/10 text-zinc-100 text-xs font-medium transition-all duration-200 active:scale-95 cursor-pointer shadow-xs select-none'"
-        >
-          <Terminal class="w-3.5 h-3.5" />
-          <span>{{ isTerminalOpen ? 'Hide Terminal' : 'AI Terminal' }}</span>
-        </button>
       </div>
     </header>
 
     <!-- Horizontal Engineering Telemetry & Property Control Strip -->
     <section class="h-11 w-full bg-white border-b border-zinc-200/80 text-zinc-800 dark:bg-[#111827] dark:border-b dark:border-zinc-800/60 dark:text-zinc-100 transition-colors duration-200 px-6 flex items-center justify-between shrink-0 z-20 shadow-xs">
-      <!-- Left side: Telemetry parameters or placeholder -->
-      <div class="flex-1 flex items-center">
+      <!-- Left side: Spawner toggle and Undo/Redo -->
+      <div class="flex items-center gap-3">
+        <!-- Spawner Toggle Button -->
+        <button 
+          @click="isSidebarDrawerOpen = !isSidebarDrawerOpen"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/50 hover:bg-zinc-100 dark:bg-zinc-900/50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium transition-all active:scale-95 cursor-pointer shadow-xs select-none group"
+          title="Toggle Shapes Drawer"
+        >
+          <Folder class="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-white" />
+          <span>{{ isSidebarDrawerOpen ? 'Close Spawner' : 'Open Spawner' }}</span>
+        </button>
+
+        <!-- Undo/Redo Controls -->
+        <div class="flex items-center bg-zinc-50/50 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg p-0.5 shadow-xs gap-0.5">
+          <button 
+            @click="diagramStore.undo()"
+            :class="['w-7 h-7 flex items-center justify-center rounded hover:bg-zinc-200/60 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-all active:scale-90', diagramStore.undoStack.length === 0 ? 'opacity-40 pointer-events-none' : '']"
+            title="Undo (Ctrl+Z)"
+          >
+            <Undo2 class="w-3.5 h-3.5" />
+          </button>
+          <div class="w-px h-3 bg-zinc-200 dark:bg-zinc-800 mx-0.5" />
+          <button 
+            @click="diagramStore.redo()"
+            :class="['w-7 h-7 flex items-center justify-center rounded hover:bg-zinc-200/60 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-all active:scale-90', diagramStore.redoStack.length === 0 ? 'opacity-40 pointer-events-none' : '']"
+            title="Redo (Ctrl+Y)"
+          >
+            <Redo2 class="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+
+      <!-- Center side: Telemetry parameters or placeholder -->
+      <div class="flex-1 flex justify-center px-4">
         <div v-if="inspectorElement" class="flex items-center gap-6 text-xs text-zinc-700 dark:text-zinc-300">
           <!-- GROUP A: Identity -->
           <div class="flex items-center gap-2">
@@ -168,44 +168,59 @@
         </div>
       </div>
 
-      <!-- Right side: Zoom Controls -->
-      <div class="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-0.5 shadow-xs ml-4">
+      <!-- Right side: Zoom and AI Terminal Controls -->
+      <div class="flex items-center gap-3">
+        <!-- Zoom Controls -->
+        <div class="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-0.5 shadow-xs">
+          <button 
+            @click="zoomIn" 
+            class="w-6 h-6 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded transition-all active:scale-95 cursor-pointer text-sm font-bold" 
+            title="Zoom In"
+          >
+            <span>+</span>
+          </button>
+          <span class="min-w-[36px] text-center text-[10px] font-bold text-zinc-500 dark:text-zinc-400 font-mono select-none">
+            {{ Math.round(diagramStore.zoomLevel * 100) }}%
+          </span>
+          <button 
+            @click="zoomOut" 
+            class="w-6 h-6 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded transition-all active:scale-95 cursor-pointer text-sm font-bold" 
+            title="Zoom Out"
+          >
+            <span>−</span>
+          </button>
+          <button 
+            @click="resetZoom" 
+            class="w-6 h-6 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-400 dark:text-zinc-500 rounded transition-all active:scale-95 cursor-pointer text-xs" 
+            title="Reset Zoom"
+          >
+            <span>⟲</span>
+          </button>
+        </div>
+
+        <!-- AI Terminal Toggle Switch -->
         <button 
-          @click="zoomIn" 
-          class="w-6 h-6 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded transition-all active:scale-95 cursor-pointer text-sm font-bold" 
-          title="Zoom In"
+          @click="isTerminalOpen = !isTerminalOpen"
+          :class="isTerminalOpen 
+            ? 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-accent-blue hover:bg-accent-blue/90 text-white text-xs font-medium transition-all duration-200 cursor-pointer shadow-sm select-none' 
+            : 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-700 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800 transition-all duration-200 active:scale-95 cursor-pointer shadow-xs select-none'"
         >
-          <span>+</span>
-        </button>
-        <span class="min-w-[36px] text-center text-[10px] font-bold text-zinc-500 dark:text-zinc-400 font-mono select-none">
-          {{ Math.round(diagramStore.zoomLevel * 100) }}%
-        </span>
-        <button 
-          @click="zoomOut" 
-          class="w-6 h-6 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded transition-all active:scale-95 cursor-pointer text-sm font-bold" 
-          title="Zoom Out"
-        >
-          <span>−</span>
-        </button>
-        <button 
-          @click="resetZoom" 
-          class="w-6 h-6 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-400 dark:text-zinc-500 rounded transition-all active:scale-95 cursor-pointer text-xs" 
-          title="Reset Zoom"
-        >
-          <span>⟲</span>
+          <Terminal class="w-3.5 h-3.5" />
+          <span>{{ isTerminalOpen ? 'Hide Terminal' : 'AI Terminal' }}</span>
         </button>
       </div>
     </section>
 
-    <main class="flex-1 w-full flex min-h-0 relative">
+    <main class="flex-1 w-full flex min-h-0 relative bg-transparent">
       <!-- Collapsible Cloud File Slider Drawer -->
       <div 
         :class="[
-          'h-full flex flex-col shrink-0 overflow-hidden bg-white/80 backdrop-blur-md text-zinc-800 border-r border-zinc-200/50 dark:bg-[#111827]/75 dark:backdrop-blur-md dark:text-zinc-100 dark:border-r dark:border-zinc-800/40 transition-all duration-300 ease-in-out',
-          isSidebarDrawerOpen ? 'w-80' : 'w-0'
+          'h-full flex flex-col shrink-0 overflow-hidden bg-white/80 backdrop-blur-md text-zinc-800 border-r border-zinc-200/50 dark:bg-[#111827]/75 dark:backdrop-blur-md dark:text-zinc-100 dark:border-r dark:border-zinc-800/40',
+          isResizing ? '' : 'transition-all duration-300 ease-in-out'
         ]"
+        :style="{ width: isSidebarDrawerOpen ? sidebarWidth + 'px' : '0px' }"
       >
-        <div class="w-80 flex-1 flex flex-col min-h-0">
+        <div class="w-full flex-1 flex flex-col min-h-0">
           <!-- Dual-tab Header Bar -->
           <div class="flex items-center justify-between bg-[#213C51] text-white select-none px-3 py-2 shrink-0 border-b border-[#1a3041]">
             <div class="flex items-center gap-1.5 flex-1 mr-2">
@@ -316,8 +331,15 @@
         </div>
       </div>
 
+      <!-- Resizable Sidebar Drag Handle -->
+      <div 
+        v-if="isSidebarDrawerOpen"
+        @mousedown="startResize"
+        class="w-1 cursor-col-resize hover:bg-blue-500/40 active:bg-blue-500 transition-colors h-full relative z-30 select-none bg-zinc-200/40 dark:bg-zinc-800/40"
+      ></div>
+
       <!-- Main Drawing Area Container -->
-      <div class="flex-1 h-full relative bg-[radial-gradient(#e4e4e7_1px,transparent_1px)] [background-size:16px_16px] bg-zinc-50 transition-all duration-300 overflow-hidden">
+      <div class="flex-1 h-full relative bg-[radial-gradient(#e4e4e7_1px,transparent_1px)] [background-size:16px_16px] bg-zinc-50 dark:bg-[#070a13] transition-all duration-300 overflow-hidden">
         <Canvas 
           :onLogout="handleSignOutFlow" 
         />
@@ -326,7 +348,7 @@
       <!-- AI Terminal Pane Layout Wrapper -->
       <div 
         :class="[
-          'h-full border-l border-zinc-200 transition-all duration-300 ease-in-out z-20 shrink-0 overflow-hidden',
+          'h-full border-l border-zinc-200 dark:border-zinc-800/60 transition-all duration-300 ease-in-out z-20 shrink-0 overflow-hidden',
           isTerminalOpen ? 'w-[32rem]' : 'w-0'
         ]"
       >
@@ -384,7 +406,6 @@ import {
   Redo2,
   ChevronDown,
   ChevronUp,
-  Type,
   MoreVertical,
   Sun,
   Moon
@@ -397,6 +418,30 @@ const isTerminalOpen = ref(true);
 const isSidebarDrawerOpen = ref(true);
 const activeSidebarTab = ref('tools');
 const swipedRowId = ref(null);
+
+// Resizable Sidebar Engine
+const sidebarWidth = ref(260);
+const isResizing = ref(false);
+
+const startResize = (e) => {
+  isResizing.value = true;
+  document.addEventListener('mousemove', handleResize);
+  document.addEventListener('mouseup', stopResize);
+};
+
+const handleResize = (e) => {
+  if (!isResizing.value) return;
+  // Constrain resizing between 200px and 450px
+  if (e.clientX >= 200 && e.clientX <= 450) {
+    sidebarWidth.value = e.clientX;
+  }
+};
+
+const stopResize = () => {
+  isResizing.value = false;
+  document.removeEventListener('mousemove', handleResize);
+  document.removeEventListener('mouseup', stopResize);
+};
 
 const isDarkMode = ref(false);
 const toggleDarkMode = () => {
