@@ -3,25 +3,25 @@
 @variant dark (.dark &);
 
 @theme {
-  --color-primary-slate: #213C51;
-  --color-accent-blue: #6594B1;
-  --color-accent-violet: #DDAED3;
-  --color-secondary-gray: #EEEEEE;
+  /* Redefined monochromatic SaaS colors */
+  --color-primary-slate: #111827;
+  --color-accent-blue: #6b7280;
+  --color-accent-violet: #9ca3af;
+  --color-secondary-gray: #f1f5f9;
 
-  /* Custom premium UI color references */
-  --accent-violet: #ddaed3;
-  --accent-violet-glow: rgba(221, 174, 211, 0.3);
+  --accent-violet: #9ca3af;
+  --accent-violet-glow: rgba(156, 163, 175, 0.2);
 }
 
 /* Custom Blueprint Sheet Grid Engine overrides */
 .sheet-grid {
   background-size: 24px 24px;
-  background-image: radial-gradient(circle, rgba(148, 163, 184, 0.15) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(148, 163, 184, 0.12) 1.5px, transparent 1.5px);
   transition: background-color 0.2s ease, background-image 0.2s ease;
 }
 
 .dark .sheet-grid {
-  background-image: radial-gradient(circle, rgba(51, 65, 85, 0.4) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(75, 85, 99, 0.2) 1.5px, transparent 1.5px);
 }
 
 /* 
@@ -37,7 +37,7 @@ html, body, #app {
 }
 
 html.dark, html.dark body, html.dark #app {
-  background-color: #070a13;
+  background-color: #0b0f19;
   color: #f1f5f9;
 }
 

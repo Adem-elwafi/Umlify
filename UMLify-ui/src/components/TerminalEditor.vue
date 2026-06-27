@@ -1,40 +1,47 @@
 <template>
-  <div class="w-full h-full bg-zinc-950 border-l border-zinc-900 flex flex-col p-4 font-sans text-zinc-300">
+  <div class="w-full h-full bg-[#f1f5f9] text-[#0f172a] border-l border-slate-200/80 dark:bg-[#0b0f19] dark:text-zinc-300 dark:border-zinc-800/50 flex flex-col p-4 font-sans transition-colors duration-200">
     <!-- Panel Header -->
     <div class="flex items-center justify-between mb-4 shrink-0">
       <div class="flex items-center space-x-3">
         <div class="flex space-x-1.5">
-          <span class="w-2.5 h-2.5 rounded-full bg-zinc-800"></span>
-          <span class="w-2.5 h-2.5 rounded-full bg-zinc-800"></span>
-          <span class="w-2.5 h-2.5 rounded-full bg-zinc-800"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80 dark:bg-rose-500/60"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80 dark:bg-amber-500/60"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80 dark:bg-emerald-500/60"></span>
         </div>
-        <h2 class="text-[10px] font-bold tracking-wider uppercase text-zinc-500 select-none font-mono">
+        <h2 class="text-[10px] font-bold tracking-wider uppercase text-zinc-600 dark:text-zinc-400 select-none font-mono">
           AI Architecture Compiler
         </h2>
       </div>
       <div class="flex items-center space-x-2">
+        <!-- Success State -->
         <div v-if="successMessage" class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] animate-pulse"></div>
-        <div v-else class="w-2 h-2 rounded-full bg-zinc-800"></div>
-        <span class="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">{{ successMessage ? 'Active' : 'Standby' }}</span>
+        <!-- Generating / Compiling State -->
+        <div v-else-if="isGenerating" class="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)] animate-pulse"></div>
+        <!-- Standby State -->
+        <div v-else class="w-2 h-2 rounded-full bg-zinc-400 dark:bg-zinc-800"></div>
+        
+        <span class="text-[9px] font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
+          {{ isGenerating ? 'Compiling' : successMessage ? 'Active' : 'Standby' }}
+        </span>
       </div>
     </div>
 
     <!-- AI Configuration Accordion Overlay -->
-    <div class="mb-4 bg-[#213C51]/10 border border-[#213C51]/30 rounded-xl overflow-hidden shrink-0 transition-all">
+    <div class="mb-4 bg-zinc-200/20 border border-zinc-300/40 dark:bg-zinc-800/10 dark:border-zinc-700/30 rounded-xl overflow-hidden shrink-0 transition-all">
       <!-- Accordion Toggle Header -->
       <button 
         @click="isConfigOpen = !isConfigOpen"
-        class="w-full px-4 py-3 flex items-center justify-between bg-[#213C51]/20 hover:bg-[#213C51]/30 transition-colors text-left"
+        class="w-full px-4 py-3 flex items-center justify-between bg-zinc-200/35 hover:bg-zinc-200/50 dark:bg-zinc-800/20 dark:hover:bg-zinc-800/30 transition-colors text-left"
       >
         <div class="flex items-center space-x-2">
-          <svg class="w-4 h-4 text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 text-zinc-650 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          <span class="text-xs font-bold uppercase tracking-wider text-zinc-200">AI Configuration</span>
+          <span class="text-xs font-bold uppercase tracking-wider text-zinc-750 dark:text-zinc-200">AI Configuration</span>
         </div>
         <div class="flex items-center space-x-2">
-          <span class="text-[9px] px-2 py-0.5 bg-[#213C51]/40 border border-[#213C51]/30 rounded-md text-zinc-300 uppercase tracking-wider font-mono">
+          <span class="text-[9px] px-2 py-0.5 bg-zinc-200 border border-zinc-300/40 text-zinc-650 dark:bg-zinc-800/40 dark:border-zinc-700/30 dark:text-zinc-300 rounded-md uppercase tracking-wider font-mono">
             {{ activeVendor === 'gemini' ? 'Gemini' : 'OpenAI' }}
           </span>
           <svg 
@@ -49,14 +56,14 @@
 
       <!-- Accordion Content -->
       <transition name="expand">
-        <div v-show="isConfigOpen" class="p-4 border-t border-[#213C51]/20 bg-zinc-900/40 space-y-4">
+        <div v-show="isConfigOpen" class="p-4 border-t border-zinc-200 dark:border-zinc-800/40 bg-zinc-100/30 dark:bg-zinc-900/40 space-y-4">
           <!-- Vendor Selection Menu -->
           <div class="flex flex-col space-y-1.5">
-            <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Endpoint Provider</label>
+            <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Endpoint Provider</label>
             <div class="relative">
               <select 
                 v-model="activeVendor"
-                class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-[#213C51] focus:ring-1 focus:ring-[#213C51] transition-all appearance-none cursor-pointer"
+                class="w-full bg-white border border-zinc-200 dark:bg-zinc-950 dark:border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 dark:focus:border-zinc-650 dark:focus:ring-zinc-650 transition-all appearance-none cursor-pointer"
               >
                 <option value="gemini">Google Gemini API</option>
                 <option value="openai">OpenAI Completion API</option>
@@ -73,13 +80,13 @@
           </div>
 
           <!-- API Key Input Field -->
-          <div class="flex flex-col space-y-1.5">
-            <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">API Access Token</label>
+          <div v-if="activeVendor !== 'demo'" class="flex flex-col space-y-1.5">
+            <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">API Access Token</label>
             <input 
               type="password" 
               v-model="aiApiKey"
               placeholder="Enter your API key..."
-              class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-200 placeholder-zinc-700 focus:outline-none focus:border-[#213C51] focus:ring-1 focus:ring-[#213C51] transition-all"
+              class="w-full bg-white border border-zinc-200 dark:bg-zinc-950 dark:border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-700 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 dark:focus:border-zinc-650 dark:focus:ring-zinc-650 transition-all"
             />
           </div>
         </div>
@@ -87,14 +94,14 @@
     </div>
 
     <!-- Tab Navigation Bar -->
-    <div class="flex border-b border-zinc-900 mb-4 shrink-0">
+    <div class="flex border-b border-zinc-200 dark:border-zinc-850 mb-4 shrink-0">
       <button 
         @click="activeTab = 'prompt'"
         :class="[
           'flex-1 pb-2.5 text-xs font-bold uppercase tracking-wider transition-all border-b-2 text-center cursor-pointer select-none',
           activeTab === 'prompt' 
-            ? 'text-zinc-200 border-[#213C51]' 
-            : 'text-zinc-600 border-transparent hover:text-zinc-400'
+            ? 'text-zinc-850 border-zinc-800 dark:text-zinc-200 dark:border-zinc-300' 
+            : 'text-zinc-400 border-transparent hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-350'
         ]"
       >
         AI Blueprint
@@ -104,8 +111,8 @@
         :class="[
           'flex-1 pb-2.5 text-xs font-bold uppercase tracking-wider transition-all border-b-2 text-center cursor-pointer select-none',
           activeTab === 'json' 
-            ? 'text-zinc-200 border-[#213C51]' 
-            : 'text-zinc-600 border-transparent hover:text-zinc-400'
+            ? 'text-zinc-850 border-zinc-800 dark:text-zinc-200 dark:border-zinc-300' 
+            : 'text-zinc-400 border-transparent hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-350'
         ]"
       >
         Raw JSON Sandbox
@@ -117,22 +124,25 @@
       <!-- Mode: AI Prompt Blueprint Generator -->
       <div v-if="activeTab === 'prompt'" class="flex-1 min-h-0 flex flex-col">
         <!-- Prompt Requirement Header Info -->
-        <div class="mb-4 p-3 bg-zinc-900/30 border border-zinc-800/50 rounded-xl shrink-0">
-          <p class="text-[10px] text-zinc-500 leading-relaxed">
-            <span class="text-zinc-300 font-bold uppercase mr-1.5">Prompt Engine:</span>
+        <div class="mb-4 p-3 bg-zinc-200/40 border border-zinc-350/40 dark:bg-zinc-900/30 dark:border-zinc-800/50 rounded-xl shrink-0">
+          <p class="text-[10px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            <span class="text-zinc-800 dark:text-zinc-200 font-bold uppercase mr-1.5">Prompt Engine:</span>
             Describe your system architecture requirements in plain text. The model will securely compile layout blocks and grid connections.
           </p>
         </div>
 
         <!-- Requirement Prompt Buffer Textarea -->
         <div class="flex-1 min-h-0 mb-4 relative group">
-          <div class="absolute inset-0 bg-gradient-to-b from-zinc-900/20 to-transparent pointer-events-none rounded-lg"></div>
           <textarea
             v-model="userRequirement"
             placeholder="e.g. Create a banking system with a Customer actor and a Teller actor. The Customer can deposit money and check balance, and the Teller can process transactions, all placed inside a Core Banking system container..."
-            class="w-full h-full bg-zinc-900/50 border border-zinc-800/80 rounded-lg p-4 text-xs font-sans text-zinc-100 placeholder-zinc-700 focus:outline-none focus:border-zinc-700 focus:ring-1 focus:ring-zinc-800 transition-all shadow-inner resize-none overflow-y-auto leading-relaxed"
+            class="w-full h-full bg-white border border-zinc-200 rounded-lg p-4 pb-10 text-xs font-sans text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 dark:bg-zinc-900/50 dark:border-zinc-800/80 dark:text-zinc-100 dark:placeholder-zinc-700 dark:focus:border-zinc-700 dark:focus:ring-zinc-800 transition-all shadow-sm resize-none overflow-y-auto leading-relaxed"
             spellcheck="true"
+            maxlength="2000"
           ></textarea>
+          <div class="absolute bottom-3 right-3 text-[10px] font-mono text-zinc-400 dark:text-zinc-500 bg-zinc-100/80 dark:bg-zinc-950/80 px-1.5 py-0.5 rounded border border-zinc-200/50 dark:border-zinc-800/50 select-none">
+            {{ userRequirement.length }} / 2000
+          </div>
         </div>
 
         <!-- Inline Warning Alert Badge -->
@@ -174,11 +184,11 @@
         <button 
           @click="generateDiagramWithAI" 
           :disabled="isGenerating || !userRequirement.trim()"
-          class="w-full py-2.5 bg-zinc-100 hover:bg-zinc-200 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none text-zinc-950 font-semibold text-xs rounded-lg shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer group"
+          class="w-full py-2.5 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-zinc-200 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none font-semibold text-xs rounded-lg shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer group"
         >
           <svg 
             v-if="isGenerating" 
-            class="animate-spin -ml-1 mr-3 h-4 w-4 text-zinc-950" 
+            class="animate-spin -ml-1 mr-3 h-4 w-4 text-white dark:text-zinc-950" 
             xmlns="http://www.w3.org/2000/svg" 
             fill="none" 
             viewBox="0 0 24 24"
@@ -196,20 +206,19 @@
       <!-- Mode: Raw JSON Sandbox -->
       <div v-else class="flex-1 min-h-0 flex flex-col">
         <!-- Blueprint Protocol Info -->
-        <div class="mb-4 p-3 bg-zinc-900/30 border border-zinc-800/50 rounded-xl shrink-0">
-          <p class="text-[10px] text-zinc-500 leading-relaxed">
-            <span class="text-zinc-300 font-bold uppercase mr-1.5">Blueprint Protocol:</span>
-            Input a valid JSON payload containing <code class="text-zinc-300 font-mono">elements</code> and <code class="text-zinc-300 font-mono">connections</code> arrays to instantiate the vector architecture.
+        <div class="mb-4 p-3 bg-zinc-200/40 border border-zinc-350/40 dark:bg-zinc-900/30 dark:border-zinc-800/50 rounded-xl shrink-0">
+          <p class="text-[10px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            <span class="text-zinc-800 dark:text-zinc-200 font-bold uppercase mr-1.5">Blueprint Protocol:</span>
+            Input a valid JSON payload containing <code class="text-zinc-800 dark:text-zinc-200 font-mono font-bold">elements</code> and <code class="text-zinc-800 dark:text-zinc-200 font-mono font-bold">connections</code> arrays to instantiate the vector architecture.
           </p>
         </div>
 
         <!-- Main Input Area Textarea -->
         <div class="flex-1 min-h-0 mb-4 relative group">
-          <div class="absolute inset-0 bg-gradient-to-b from-zinc-900/20 to-transparent pointer-events-none rounded-lg"></div>
           <textarea
             v-model="jsonInput"
             placeholder='{&#10;  "elements": [...],&#10;  "connections": [...]&#10;}'
-            class="w-full h-full bg-zinc-900/50 border border-zinc-800/80 rounded-lg p-4 text-xs font-mono text-zinc-100 placeholder-zinc-700 focus:outline-none focus:border-zinc-700 focus:ring-1 focus:ring-zinc-800 transition-all shadow-inner resize-none overflow-y-auto leading-relaxed tab-size-2"
+            class="w-full h-full bg-white border border-zinc-200 rounded-lg p-4 text-xs font-mono text-zinc-850 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 dark:bg-zinc-900/50 dark:border-zinc-800/80 dark:text-zinc-100 dark:placeholder-zinc-700 dark:focus:border-zinc-700 dark:focus:ring-zinc-800 transition-all shadow-sm resize-none overflow-y-auto leading-relaxed tab-size-2"
             spellcheck="false"
           ></textarea>
         </div>
@@ -242,7 +251,7 @@
         <button 
           @click="compileDiagram" 
           :disabled="!jsonInput.trim()"
-          class="w-full py-2.5 bg-zinc-100 hover:bg-zinc-200 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none text-zinc-950 font-semibold text-xs rounded-lg shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer group"
+          class="w-full py-2.5 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-zinc-200 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none font-semibold text-xs rounded-lg shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer group"
         >
           <svg class="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -263,9 +272,9 @@ const diagramStore = useDiagramStore()
 
 // State management
 const activeTab = ref('prompt')
-const isConfigOpen = ref(false)
+const isConfigOpen = ref(localStorage.getItem('umlify_terminal_config_open') === 'true')
 const aiApiKey = ref(localStorage.getItem('umlify_ai_key') || '')
-const activeVendor = ref('gemini')
+const activeVendor = ref(localStorage.getItem('umlify_active_vendor') || 'gemini')
 const userRequirement = ref('')
 const jsonInput = ref('')
 const errorLog = ref(null)
@@ -276,6 +285,23 @@ const isGenerating = ref(false)
 // Watcher to cache AI API key to localStorage automatically
 watch(aiApiKey, (newVal) => {
   localStorage.setItem('umlify_ai_key', newVal.trim())
+})
+
+// Watcher to cache active vendor choice automatically
+watch(activeVendor, (newVal) => {
+  localStorage.setItem('umlify_active_vendor', newVal)
+})
+
+// Watcher to cache config accordion open state automatically
+watch(isConfigOpen, (newVal) => {
+  localStorage.setItem('umlify_terminal_config_open', String(newVal))
+})
+
+// Clear validation alert/feedback states on tab switch
+watch(activeTab, () => {
+  validationWarning.value = ''
+  errorLog.value = null
+  successMessage.value = ''
 })
 
 // Validation Alert Clear helper
@@ -535,9 +561,19 @@ CRITICAL RESTRAINT: Do not wrap your response output inside markdown code blocks
 
     // Telemetry Cleanup Layer
     let cleanText = responseText.trim()
-    if (cleanText.startsWith('```')) {
-      cleanText = cleanText.replace(/^```(?:json)?\n?/, '')
-      cleanText = cleanText.replace(/\n?```$/, '')
+    
+    // Try to locate JSON content between markdown backticks or within text
+    const jsonBlockRegex = /```(?:json)?\s*(\{[\s\S]*?\})\s*```/i
+    const match = cleanText.match(jsonBlockRegex)
+    if (match && match[1]) {
+      cleanText = match[1]
+    } else {
+      // If no backticks, try to extract anything between the first '{' and last '}'
+      const firstBrace = cleanText.indexOf('{')
+      const lastBrace = cleanText.lastIndexOf('}')
+      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        cleanText = cleanText.slice(firstBrace, lastBrace + 1)
+      }
     }
     cleanText = cleanText.trim()
 
@@ -546,69 +582,7 @@ CRITICAL RESTRAINT: Do not wrap your response output inside markdown code blocks
 
     // Parse cleansed string directly into data models
     const payload = JSON.parse(cleanText)
-
-    if (!payload.elements || !Array.isArray(payload.elements)) {
-      throw new Error("Missing root 'elements' node tracking array layer.")
-    }
-
-    // 1. SAFE STATE INITIALIZATION
-    diagramStore.resetDiagram()
-    diagramStore.saveToHistory() // Track historical state for undo
-
-    const elementIdMapping = {}
-
-    // 2. COMPONENT CASING ALIGNMENT & NODE GENERATION
-    payload.elements.forEach((el, index) => {
-      // Create a unique ID using components' type and timestamps
-      const generatedId = `${el.type?.toLowerCase() || 'node'}-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`
-      
-      // Map both the original element ID and the array index to the generated ID
-      elementIdMapping[index] = generatedId
-      if (el.id !== undefined && el.id !== null) {
-        elementIdMapping[String(el.id)] = generatedId
-      }
-
-      let normalizedType = el.type || 'usecase'
-      const lowerType = String(normalizedType).toLowerCase()
-
-      if (lowerType === 'actor') {
-        normalizedType = 'actor'
-      } else if (lowerType === 'usecase' || lowerType === 'use-case') {
-        normalizedType = 'usecase'
-      } else if (lowerType === 'system') {
-        normalizedType = 'System'
-      }
-
-      const nodePayload = {
-        id: generatedId,
-        type: normalizedType,
-        label: el.label || 'Default Node',
-        x: Number(el.x) || 100,
-        y: Number(el.y) || 100,
-        width: Number(el.width) || (normalizedType === 'actor' ? 80 : normalizedType === 'System' ? 300 : 140),
-        height: Number(el.height) || (normalizedType === 'actor' ? 120 : normalizedType === 'System' ? 400 : 80)
-      }
-      
-      diagramStore.elements.push(nodePayload)
-    })
-
-    // 3. CONNECTIONS RESOLUTION VIA STORE ACTIONS
-    if (payload.connections && Array.isArray(payload.connections)) {
-      payload.connections.forEach(conn => {
-        const fromId = elementIdMapping[conn.from]
-        const toId = elementIdMapping[conn.to]
-
-        if (fromId && toId) {
-          diagramStore.connectElements(
-            fromId,
-            toId,
-            conn.fromSide || 'right',
-            conn.toSide || 'left',
-            conn.type || 'association'
-          )
-        }
-      })
-    }
+    applyPayload(payload)
 
     successMessage.value = `AI compiled successfully! Loaded ${diagramStore.elements.length} components and ${diagramStore.connections.length} relational vectors.`
   } catch (err) {
@@ -622,6 +596,72 @@ CRITICAL RESTRAINT: Do not wrap your response output inside markdown code blocks
     }
   } finally {
     isGenerating.value = false
+  }
+}
+
+// -------------------------------------------------------------------------
+// METHOD: Apply Compiled Payload to Diagram Store
+// -------------------------------------------------------------------------
+const applyPayload = (payload) => {
+  if (!payload.elements || !Array.isArray(payload.elements)) {
+    throw new Error("Missing root 'elements' node tracking array layer.")
+  }
+
+  // 1. SAFE STATE INITIALIZATION
+  diagramStore.resetDiagram()
+  diagramStore.saveToHistory()
+
+  const elementIdMapping = {}
+
+  // 2. COMPONENT CASING ALIGNMENT & NODE GENERATION
+  payload.elements.forEach((el, index) => {
+    const generatedId = `${el.type?.toLowerCase() || 'node'}-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`
+    
+    elementIdMapping[index] = generatedId
+    if (el.id !== undefined && el.id !== null) {
+      elementIdMapping[String(el.id)] = generatedId
+    }
+
+    let normalizedType = el.type || 'usecase'
+    const lowerType = String(normalizedType).toLowerCase()
+
+    if (lowerType === 'actor') {
+      normalizedType = 'actor'
+    } else if (lowerType === 'usecase' || lowerType === 'use-case') {
+      normalizedType = 'usecase'
+    } else if (lowerType === 'system') {
+      normalizedType = 'System'
+    }
+
+    const nodePayload = {
+      id: generatedId,
+      type: normalizedType,
+      label: el.label || 'Default Node',
+      x: Number(el.x) || 100,
+      y: Number(el.y) || 100,
+      width: Number(el.width) || (normalizedType === 'actor' ? 80 : normalizedType === 'System' ? 300 : 140),
+      height: Number(el.height) || (normalizedType === 'actor' ? 120 : normalizedType === 'System' ? 400 : 80)
+    }
+    
+    diagramStore.elements.push(nodePayload)
+  })
+
+  // 3. CONNECTIONS RESOLUTION VIA STORE ACTIONS
+  if (payload.connections && Array.isArray(payload.connections)) {
+    payload.connections.forEach(conn => {
+      const fromId = elementIdMapping[conn.from]
+      const toId = elementIdMapping[conn.to]
+
+      if (fromId && toId) {
+        diagramStore.connectElements(
+          fromId,
+          toId,
+          conn.fromSide || 'right',
+          conn.toSide || 'left',
+          conn.type || 'association'
+        )
+      }
+    })
   }
 }
 
@@ -641,69 +681,7 @@ const compileDiagram = () => {
 
   try {
     const payload = JSON.parse(jsonInput.value)
-
-    if (!payload.elements || !Array.isArray(payload.elements)) {
-      throw new Error("Missing root 'elements' node tracking array layer.")
-    }
-
-    // 1. SAFE STATE INITIALIZATION
-    diagramStore.resetDiagram()
-    diagramStore.saveToHistory()
-
-    // Map referencing dictionary for index matching pipelines
-    const elementIdMapping = {}
-
-    // 2. COMPONENT CASING ALIGNMENT & NODE GENERATION
-    payload.elements.forEach((el, index) => {
-      const generatedId = `${el.type?.toLowerCase() || 'node'}-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`
-      
-      elementIdMapping[index] = generatedId
-      if (el.id !== undefined && el.id !== null) {
-        elementIdMapping[String(el.id)] = generatedId
-      }
-
-      let normalizedType = el.type || 'usecase'
-      const lowerType = String(normalizedType).toLowerCase()
-
-      if (lowerType === 'actor') {
-        normalizedType = 'actor'
-      } else if (lowerType === 'usecase' || lowerType === 'use-case') {
-        normalizedType = 'usecase'
-      } else if (lowerType === 'system') {
-        normalizedType = 'System'
-      }
-
-      const nodePayload = {
-        id: generatedId,
-        type: normalizedType,
-        label: el.label || 'Default Node',
-        x: Number(el.x) || 100,
-        y: Number(el.y) || 100,
-        width: Number(el.width) || (normalizedType === 'actor' ? 80 : normalizedType === 'System' ? 300 : 140),
-        height: Number(el.height) || (normalizedType === 'actor' ? 120 : normalizedType === 'System' ? 400 : 80)
-      }
-      
-      diagramStore.elements.push(nodePayload)
-    })
-
-    // 3. CONNECTIONS RESOLUTION VIA STORE ACTIONS
-    if (payload.connections && Array.isArray(payload.connections)) {
-      payload.connections.forEach(conn => {
-        const fromId = elementIdMapping[conn.from]
-        const toId = elementIdMapping[conn.to]
-
-        if (fromId && toId) {
-          diagramStore.connectElements(
-            fromId,
-            toId,
-            conn.fromSide || 'right',
-            conn.toSide || 'left',
-            conn.type || 'association'
-          )
-        }
-      })
-    }
-
+    applyPayload(payload)
     successMessage.value = `Rendered ${diagramStore.elements.length} components and ${diagramStore.connections.length} relational vectors.`
   } catch (err) {
     errorLog.value = err.message || "Invalid JSON syntactic topology formatting rule detected."
