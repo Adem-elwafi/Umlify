@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen h-screen w-full flex flex-col bg-[#f8fafc] dark:bg-[#0b0f19] text-zinc-900 dark:text-zinc-100 transition-colors duration-200 select-none overflow-hidden font-sans">
     <!-- Master Workspace Header -->
-    <header class="h-14 w-full bg-[#f1f5f9] text-[#0f172a] border-b border-slate-200/80 dark:bg-[#111827] dark:text-[#f1f5f9] dark:border-zinc-800/80 transition-colors duration-200 px-6 flex justify-between items-center shrink-0 z-30 shadow-xs">
+    <header class="h-14 w-full bg-[#f1f5f9] text-[#0f172a] border-b border-slate-200/80 dark:bg-[#111827] dark:text-[#f1f5f9] dark:border-zinc-800/80 transition-colors duration-200 px-6 flex justify-between items-center shrink-0 z-30 shadow-[0_4px_20px_rgba(9,9,11,0.03)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.15)]">
       <!-- Left Branding -->
       <div class="flex items-center gap-2.5 select-none">
         <svg class="w-6 h-6 text-zinc-800 dark:text-zinc-100 transition-colors duration-200" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -223,7 +223,8 @@
       <!-- Collapsible Cloud File Slider Drawer -->
       <aside 
         :class="[
-          'absolute top-0 left-0 h-full flex flex-col shrink-0 overflow-hidden bg-[#f1f5f9] dark:bg-[#111827] text-zinc-900 dark:text-zinc-100 border-r border-zinc-200/80 dark:border-zinc-800/60 transition-colors duration-200 z-40 shadow-lg',
+          'absolute top-0 left-0 h-full flex flex-col shrink-0 overflow-hidden bg-[#f1f5f9] dark:bg-[#111827] text-zinc-900 dark:text-zinc-100 border-r border-zinc-200/80 dark:border-zinc-800/60 transition-colors duration-200 z-40',
+          isSidebarDrawerOpen ? 'shadow-[8px_0_24px_rgba(9,9,11,0.04)] dark:shadow-[8px_0_32px_rgba(0,0,0,0.3)]' : '',
           isResizing ? '' : 'transition-all duration-300 ease-in-out'
         ]"
         :style="{ width: isSidebarDrawerOpen ? sidebarWidth + 'px' : '0px' }"
@@ -353,7 +354,7 @@
       <div 
         :class="[
           'h-full border-l border-slate-200/80 dark:border-zinc-800/50 transition-all duration-300 ease-in-out z-20 shrink-0 overflow-hidden',
-          isTerminalOpen ? 'w-[32rem]' : 'w-0'
+          isTerminalOpen ? 'w-[32rem] shadow-[-8px_0_24px_rgba(9,9,11,0.04)] dark:shadow-[-8px_0_32px_rgba(0,0,0,0.3)]' : 'w-0'
         ]"
       >
         <TerminalEditor class="w-[32rem]" />
