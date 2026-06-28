@@ -33,12 +33,20 @@
           v-for="element in elements" 
           :key="element.id" 
           :data-element-id="element.id"
-          class="absolute element-draggable-wrapper select-none will-change-transform"
+          class="absolute element-draggable-wrapper select-none will-change-transform group/element"
           :style="getElementStyle(element)"
           @mousedown.stop="initiateElementsDrag($event, element)"
         >
           <!-- Task 1: Premium Hairline Selection Highlight -->
-          <div v-if="selectedElements.includes(String(element.id))" class="absolute inset-0 pointer-events-none border border-[var(--accent-violet)] shadow-[0_0_12px_var(--accent-violet-glow)] rounded-xl z-20"></div>
+          <div 
+            v-if="selectedElements.includes(String(element.id))"
+            class="absolute border border-[var(--accent-violet)] shadow-[0_0_12px_var(--accent-violet-glow)] pointer-events-none z-20"
+            :class="element.type === 'usecase' ? 'rounded-full' : 'rounded-xl'"
+            :style="{
+              top: '-4px', left: '-4px',
+              width: ((element.width || element.w || 140) + 8) + 'px', height: ((element.height || element.h || 80) + 8) + 'px'
+            }"
+          ></div>
 
           <System
             v-if="element.type === 'System'"
@@ -50,7 +58,7 @@
             :onDrag="null"
             :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
-            @click="selectElement(element.id)"
+            @click="selectElement(element.id, $event)"
             @delete="deleteElement(element.id)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
           />
@@ -64,7 +72,7 @@
             :onDrag="null"
             :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
-            @click="selectElement(element.id)"
+            @click="selectElement(element.id, $event)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
             @delete="deleteElement(element.id)"
           />
@@ -78,7 +86,7 @@
             :onDrag="null"
             :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
-            @click="selectElement(element.id)"
+            @click="selectElement(element.id, $event)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
             @delete="deleteElement(element.id)"
           />
@@ -92,7 +100,7 @@
             :onDrag="null"
             :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
-            @click="selectElement(element.id)"
+            @click="selectElement(element.id, $event)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
             @delete="deleteElement(element.id)"
           />
@@ -106,18 +114,18 @@
             :onDrag="null"
             :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
-            @click="selectElement(element.id)"
+            @click="selectElement(element.id, $event)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
             @delete="deleteElement(element.id)"
           />
 
           <!-- Interactive Connection Anchors (Task 2: Hover perimeter handles) -->
-          <div class="absolute inset-0 pointer-events-none group">
+          <div class="absolute inset-0 pointer-events-none">
             <div 
               v-for="side in ['top', 'right', 'bottom', 'left']" 
               :key="side"
               :data-anchor-side="side"
-              class="absolute w-3 h-3 rounded-full border border-zinc-300 bg-white shadow-xs flex items-center justify-center text-[9px] font-bold text-zinc-400 hover:text-accent-blue hover:border-accent-blue active:scale-75 transform opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-auto cursor-crosshair z-30"
+              class="absolute w-3 h-3 bg-white dark:bg-zinc-900 border-2 border-[var(--accent-violet)] rounded-full opacity-0 group-hover/element:opacity-100 transition-opacity duration-150 z-30 cursor-crosshair pointer-events-auto flex items-center justify-center text-[9px] font-bold text-zinc-400 hover:text-accent-blue hover:border-accent-blue active:scale-75 transform"
               :class="{
                 'top-0 left-1/2 -translate-x-1/2 -translate-y-1/2': side === 'top',
                 'top-1/2 right-0 translate-x-1/2 -translate-y-1/2': side === 'right',
@@ -272,17 +280,22 @@ function getElementDimensions(el) {
   };
 }
 
-function getElementBounds(el) {
-  const { width: w, height: h } = getElementDimensions(el);
+const getElementBounds = (element) => {
+  const w = Number(element.width || element.w || 200);
+  const h = Number(element.height || element.h || 120);
   return {
-    left: el.x,
-    right: el.x + w,
-    top: el.y,
-    bottom: el.y + h,
-    centerX: el.x + w / 2,
-    centerY: el.y + h / 2
+    x: element.x,
+    y: element.y,
+    width: w,
+    height: h,
+    left: element.x,
+    top: element.y,
+    right: element.x + w,
+    bottom: element.y + h,
+    centerX: element.x + w / 2,
+    centerY: element.y + h / 2
   };
-}
+};
 
 // ==========================================
 // 🔗 INTERACTIVE CONNECTION ENGINE (Task 3)
@@ -825,19 +838,20 @@ function getEditorStyle(conn) {
   return { left: `${left}px`, top: `${top}px` };
 }
 
-function selectElement(id) {
+const selectElement = (id, event) => {
   const idStr = String(id);
-  const isCtrlClick = window.event && (window.event.ctrlKey || window.event.metaKey);
+  const isCtrlClick = event && (event.ctrlKey || event.metaKey);
+
   if (isCtrlClick) {
     if (selectedElements.value.includes(idStr)) {
-      selectedElements.value = selectedElements.value.filter(e => e !== idStr);
+      selectedElements.value = selectedElements.value.filter(eid => eid !== idStr);
     } else {
       selectedElements.value.push(idStr);
     }
   } else {
     selectedElements.value = [idStr];
   }
-}
+};
 
 
 
@@ -876,8 +890,4 @@ onBeforeUnmount(() => {
   cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%23000' d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/></svg>") 8 24, auto !important;
 }
 
-.sheet-grid {
-  background-image: radial-gradient(var(--color-secondary-gray) 1px, transparent 1px);
-  background-size: 16px 16px;
-}
 </style>

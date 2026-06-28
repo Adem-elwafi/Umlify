@@ -32,6 +32,7 @@
         @input="updateLabel"
         @mousedown.stop
         rows="2"
+        autocomplete="off"
         class="text-zinc-700 dark:text-zinc-300 text-xs mt-2 font-medium px-2 py-1 rounded-lg bg-white/60 dark:bg-zinc-900/60 border border-zinc-200/50 dark:border-zinc-800/50 text-center w-full outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/60 resize-none overflow-hidden whitespace-normal text-wrap break-words h-9"
       ></textarea>
     </div>

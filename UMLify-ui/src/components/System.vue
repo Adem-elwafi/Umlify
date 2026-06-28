@@ -15,6 +15,7 @@
         <input
           type="text"
           v-model="localLabel"
+          autocomplete="off"
           class="bg-transparent border-none outline-none focus:ring-0 text-inherit font-semibold text-center w-full min-w-[60px]"
           placeholder="SYSTEM"
         />

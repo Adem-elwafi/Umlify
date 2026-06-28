@@ -13,6 +13,7 @@
       type="text" 
       v-model="localLabel" 
       @input="updateLabel"
+      autocomplete="off"
       class="text-xs font-medium tracking-tight text-inherit text-center w-full bg-transparent border-none outline-none focus:ring-0"
     >
 

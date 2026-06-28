@@ -167,8 +167,8 @@ export const useDiagramStore = defineStore('diagram', () => {
 
     try {
       const response = await axios.post('http://localhost:5000/api/diagrams/save', payloadBundle, getAuthHeaders());
-      if (response.data && response.data.diagramId) {
-        currentDiagramId.value = response.data.diagramId;
+      if (response.data && response.data.diagram) {
+        currentDiagramId.value = response.data.diagram.id;
         globalSaveStatusMessage.value = 'Saved Successfully!';
         isDirty.value = false;
         await fetchUserDiagrams(); // Refresh metadata dashboard drawer

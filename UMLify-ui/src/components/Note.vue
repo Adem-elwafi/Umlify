@@ -15,6 +15,7 @@
       <textarea
         v-model="localLabel"
         @mousedown.stop
+        autocomplete="off"
         class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-[11px] text-inherit leading-normal resize-none overflow-hidden text-center py-1"
         placeholder="Note Text"
       ></textarea>

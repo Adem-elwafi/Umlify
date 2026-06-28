@@ -13,6 +13,7 @@
         <input
           type="text"
           v-model="localLabel"
+          autocomplete="off"
           class="text-inherit bg-transparent border-none outline-none focus:ring-0 text-[10px] font-bold uppercase tracking-wider w-full"
           placeholder="PACKAGE"
         />

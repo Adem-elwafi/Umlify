@@ -3,12 +3,17 @@
     <!-- Master Workspace Header -->
     <header class="h-14 w-full bg-[#f1f5f9] text-[#0f172a] border-b border-slate-200/80 dark:bg-[#111827] dark:text-[#f1f5f9] dark:border-zinc-800/80 transition-colors duration-200 px-6 flex justify-between items-center shrink-0 z-30 shadow-xs">
       <!-- Left Branding -->
-      <div class="flex items-center gap-3">
-        <div class="flex items-center gap-2">
-          <div class="w-6 h-6 rounded-lg bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center font-bold text-white text-xs select-none shadow-sm">U</div>
-          <span class="text-sm font-bold tracking-tight text-zinc-800 dark:text-zinc-100 font-sans">UMLify</span>
-        </div>
-        <span class="text-[9px] font-semibold text-zinc-500 bg-zinc-200/50 px-1.5 py-0.5 rounded-md border border-zinc-200 dark:text-zinc-400 dark:bg-white/10 dark:border-white/5">v1.1</span>
+      <div class="flex items-center gap-2.5 select-none">
+        <svg class="w-6 h-6 text-zinc-800 dark:text-zinc-100 transition-colors duration-200" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="3" width="7" height="6" rx="1.5" class="stroke-current" stroke-width="2" stroke-linejoin="round"/>
+          <rect x="15" y="3" width="7" height="6" rx="1.5" class="stroke-current" stroke-width="2" stroke-linejoin="round"/>
+          <rect x="8.5" y="15" width="7" height="6" rx="1.5" class="stroke-current" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M5.5 9V12H8.5V15" class="stroke-current" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M18.5 9V12H15.5V15" class="stroke-current" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        
+        <span class="font-bold tracking-tight text-zinc-800 dark:text-zinc-100 text-lg">UMLify</span>
+        <span class="text-[10px] font-semibold bg-zinc-200/60 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 px-1.5 py-0.5 rounded-md border border-zinc-300/40 dark:border-zinc-700/40">v1.1</span>
       </div>
 
       <!-- Center Enterprise Menu -->
@@ -216,16 +221,16 @@
 
     <main class="flex-1 w-full flex min-h-0 relative bg-transparent">
       <!-- Collapsible Cloud File Slider Drawer -->
-      <div 
+      <aside 
         :class="[
-          'absolute top-0 left-0 h-full flex flex-col shrink-0 overflow-hidden bg-white/80 backdrop-blur-md text-zinc-800 border-r border-zinc-200/50 dark:bg-[#111827]/75 dark:backdrop-blur-md dark:text-zinc-100 dark:border-r dark:border-zinc-800/40 z-40 shadow-lg',
+          'absolute top-0 left-0 h-full flex flex-col shrink-0 overflow-hidden bg-[#f1f5f9] dark:bg-[#111827] text-zinc-900 dark:text-zinc-100 border-r border-zinc-200/80 dark:border-zinc-800/60 transition-colors duration-200 z-40 shadow-lg',
           isResizing ? '' : 'transition-all duration-300 ease-in-out'
         ]"
         :style="{ width: isSidebarDrawerOpen ? sidebarWidth + 'px' : '0px' }"
       >
         <div class="w-full flex-1 flex flex-col min-h-0">
           <!-- Dual-tab Header Bar -->
-          <div class="flex items-center justify-between bg-zinc-100 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 select-none px-3 py-2 shrink-0 border-b border-zinc-200 dark:border-zinc-850">
+          <div class="flex items-center justify-between bg-[#e2e8f0] dark:bg-[#0f172a] text-zinc-800 dark:text-zinc-200 select-none px-3 py-2 shrink-0 border-b border-zinc-200/80 dark:border-zinc-800/60">
             <div class="flex items-center gap-1.5 flex-1 mr-2">
               <!-- Toolbench Tab Button -->
               <button 
@@ -233,8 +238,8 @@
                 :class="[
                   'flex-1 text-center py-1.5 text-[11px] font-bold rounded-lg transition-all cursor-pointer',
                   activeSidebarTab === 'tools' 
-                    ? 'bg-zinc-200/80 dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs' 
-                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50'
+                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs' 
+                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-250/50 dark:hover:bg-zinc-800/50'
                 ]"
               >
                 Toolbench
@@ -245,15 +250,15 @@
                 :class="[
                   'flex-1 text-center py-1.5 text-[11px] font-bold rounded-lg transition-all cursor-pointer',
                   activeSidebarTab === 'cloud' 
-                    ? 'bg-zinc-200/80 dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs' 
-                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50'
+                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs' 
+                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-250/50 dark:hover:bg-zinc-800/50'
                 ]"
               >
                 Cloud Files
               </button>
             </div>
             <!-- Close button -->
-            <button @click="isSidebarDrawerOpen = false" class="p-1 text-zinc-550 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors cursor-pointer rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="Close Drawer">
+            <button @click="isSidebarDrawerOpen = false" class="p-1 text-zinc-550 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors cursor-pointer rounded-lg hover:bg-zinc-250 dark:hover:bg-zinc-800" title="Close Drawer">
               <X class="w-4 h-4" />
             </button>
           </div>
@@ -295,14 +300,14 @@
                   </button>
                 </div>
 
-                <!-- Foreground Layer (Project Details) -->
+                <!-- Foreground Layer (Project Details) - Solid mask bg-white dark:bg-[#111827] -->
                 <div 
                   @click="handleSelectCloudDiagram(diag.id)"
                   :class="[
-                    'absolute inset-0 h-full p-3 transition-transform duration-300 ease-in-out cursor-pointer flex items-center justify-between border rounded-xl',
+                    'absolute inset-0 h-full p-3 transition-transform duration-300 ease-in-out cursor-pointer flex items-center justify-between border rounded-xl bg-white dark:bg-[#111827]',
                     diagramStore.currentDiagramId === diag.id 
-                      ? 'bg-zinc-200/80 border-zinc-350 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100' 
-                      : 'bg-white border-zinc-200/80 text-zinc-700 hover:bg-zinc-100/50 hover:text-zinc-900 dark:bg-zinc-900/50 dark:border-zinc-800/80 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100',
+                      ? 'border-zinc-350 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100' 
+                      : 'border-zinc-200/80 text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800/50',
                     swipedRowId === diag.id ? '-translate-x-[80px]' : 'translate-x-0'
                   ]"
                 >
@@ -322,17 +327,9 @@
                 </div>
               </div>
             </div>
-
-            <!-- Trash/Delete Zone Placeholder -->
-            <div class="p-4 border-t border-zinc-100 mt-auto flex-shrink-0">
-              <div class="w-full py-3 border border-dashed border-zinc-200 rounded-xl flex flex-col items-center justify-center gap-1.5 text-zinc-400 group hover:border-rose-200 hover:bg-rose-50/30 transition-all">
-                <Trash2 class="w-4 h-4 group-hover:text-rose-500" />
-                <span class="text-[9px] uppercase font-bold tracking-widest group-hover:text-rose-600">Drop to Delete</span>
-              </div>
-            </div>
           </div>
         </div>
-      </div>
+      </aside>
 
       <!-- Resizable Sidebar Drag Handle -->
       <div 
@@ -541,6 +538,7 @@ const executeGlobalConfirm = async () => {
 };
 
 const handleSelectCloudDiagram = async (id) => {
+  swipedRowId.value = null;
   const loaded = await diagramStore.loadDiagramById(id);
   if (loaded) {
     isSidebarDrawerOpen.value = false;
@@ -548,6 +546,7 @@ const handleSelectCloudDiagram = async (id) => {
 };
 
 const createNewCanvasAction = () => {
+  swipedRowId.value = null;
   diagramStore.resetDiagram();
   isSidebarDrawerOpen.value = false;
 };

@@ -15,13 +15,13 @@
 
 /* Custom Blueprint Sheet Grid Engine overrides */
 .sheet-grid {
-  background-size: 24px 24px;
-  background-image: radial-gradient(circle, rgba(148, 163, 184, 0.12) 1.5px, transparent 1.5px);
+  background-size: 16px 16px;
+  background-image: radial-gradient(circle, rgba(9, 9, 11, 0.16) 1.2px, transparent 1.2px);
   transition: background-color 0.2s ease, background-image 0.2s ease;
 }
 
 .dark .sheet-grid {
-  background-image: radial-gradient(circle, rgba(75, 85, 99, 0.2) 1.5px, transparent 1.5px);
+  background-image: radial-gradient(circle, rgba(241, 245, 249, 0.08) 1.2px, transparent 1.2px);
 }
 
 /* 

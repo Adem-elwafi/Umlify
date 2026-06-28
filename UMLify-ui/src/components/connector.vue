@@ -1,9 +1,9 @@
 <template>
   <svg class="connector">
     <defs>
-      <!-- Sharp solid triangle for associations -->
+      <!-- Dynamic Marker containing responsive elements based on type -->
       <marker 
-        id="marker-association" 
+        :id="`arrow-${props.id}`" 
         viewBox="0 0 10 10" 
         refX="7" 
         refY="5" 
@@ -12,35 +12,31 @@
         orient="auto-start-reverse" 
         markerUnits="strokeWidth"
       >
-        <path d="M 0 2 L 8 5 L 0 8 z" fill="var(--color-primary-slate)" />
-      </marker>
-      
-      <!-- Open chevron for dependencies, includes, and extends -->
-      <marker 
-        id="marker-dependency" 
-        viewBox="0 0 10 10" 
-        refX="7" 
-        refY="5" 
-        markerWidth="6" 
-        markerHeight="6" 
-        orient="auto-start-reverse" 
-        markerUnits="strokeWidth"
-      >
-        <path d="M 1 2 L 7 5 L 1 8" fill="none" stroke="var(--color-primary-slate)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-      </marker>
-      
-      <!-- Hollow triangle for generalizations -->
-      <marker 
-        id="marker-generalisation" 
-        viewBox="0 0 10 10" 
-        refX="7" 
-        refY="5" 
-        markerWidth="6" 
-        markerHeight="6" 
-        orient="auto-start-reverse" 
-        markerUnits="strokeWidth"
-      >
-        <path d="M 1 2 L 7 5 L 1 8 z" fill="white" stroke="var(--color-primary-slate)" stroke-width="1.5" stroke-linejoin="round" />
+        <path 
+          v-if="type === 'association' || type === ''" 
+          d="M 0 2 L 8 5 L 0 8 z" 
+          :class="isSelected ? 'fill-[var(--accent-violet)]' : 'fill-zinc-400 dark:fill-zinc-500'" 
+          class="transition-colors duration-200"
+        />
+        <path 
+          v-else-if="['include', 'extend', 'dependency'].includes(type)" 
+          d="M 1 2 L 7 5 L 1 8" 
+          fill="none" 
+          :class="isSelected ? 'stroke-[var(--accent-violet)]' : 'stroke-zinc-400 dark:stroke-zinc-500'" 
+          class="transition-colors duration-200"
+          stroke-width="1.5" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+        />
+        <path 
+          v-else-if="type === 'generalization'" 
+          d="M 1 2 L 7 5 L 1 8 z" 
+          fill="white" 
+          :class="isSelected ? 'stroke-[var(--accent-violet)]' : 'stroke-zinc-400 dark:stroke-zinc-500'" 
+          class="transition-colors duration-200"
+          stroke-width="1.5" 
+          stroke-linejoin="round" 
+        />
       </marker>
     </defs>
     
@@ -58,12 +54,13 @@
     <path 
       :d="pathString" 
       fill="none" 
-      :stroke="isSelected ? 'var(--color-accent-violet)' : 'var(--color-primary-slate)'" 
-      stroke-width="2.5" 
+      stroke-width="2" 
       :stroke-dasharray="isDash ? '6,4' : 'none'"
-      :marker-end="computedMarker"
-      class="pointer-events-none transition-colors duration-150"
-      :class="{ 'selected-glow': isSelected }"
+      :marker-end="`url(#arrow-${props.id})`"
+      class="pointer-events-none transition-colors duration-200"
+      :class="[
+        isSelected ? 'stroke-[var(--accent-violet)] selected-glow' : 'stroke-zinc-400 dark:stroke-zinc-500'
+      ]"
     />
     
     <text
@@ -73,8 +70,8 @@
       font-size="11"
       font-weight="700"
       text-anchor="middle"
-      fill="var(--color-primary-slate)"
-      class="connector-label tracking-tight"
+      :class="isSelected ? 'fill-[var(--accent-violet)]' : 'fill-zinc-450 dark:fill-zinc-400'"
+      class="connector-label tracking-tight transition-colors duration-200"
     >
       {{ type }}
     </text>
