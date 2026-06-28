@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full h-full bg-[#f1f5f9] text-[#0f172a] border-l border-slate-200/80 dark:bg-[#0b0f19] dark:text-zinc-300 dark:border-zinc-800/50 flex flex-col p-4 font-sans transition-colors duration-200">
+  <div class="w-full h-full bg-[#f1f5f9] text-[#0f172a] border-l border-slate-200/80 dark:bg-[#111827] dark:text-zinc-300 dark:border-zinc-800/50 flex flex-col p-4 font-sans transition-colors duration-200">
     <!-- Panel Header -->
     <div class="flex items-center justify-between mb-4 shrink-0">
       <div class="flex items-center space-x-3">
