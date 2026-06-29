@@ -5,7 +5,8 @@ import Login from '../Views/Login.vue'
 import Signup from '../Views/Signup.vue'
 
 const routes = [
-  { path: '/', name: 'Home', component: Home, meta: { requiresAuth: true } },
+  { path: '/', name: 'Landing', component: () => import('@/Views/Landing.vue') },
+  { path: '/workspace', name: 'Workspace', component: Home, meta: { requiresAuth: true } },
   { path: '/login', name: 'Login', component: Login },
   { path: '/signup', name: 'Signup', component: Signup },
   { path: '/:pathMatch(.*)*', redirect: '/' }
@@ -25,7 +26,7 @@ router.beforeEach((to, from, next) => {
     next('/login')
   } else if ((to.path === '/login' || to.path === '/signup') && authStore.isAuthenticated) {
     // Fast-forward authenticated workers past visual login sequences
-    next('/')
+    next('/workspace')
   } else {
     next()
   }
