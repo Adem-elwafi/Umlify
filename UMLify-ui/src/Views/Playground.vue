@@ -22,6 +22,15 @@
     <Container size="xl">
       <Stack gap="xl">
         
+        <!-- Hero Section Layout Demo -->
+        <section class="border border-border-default rounded-panel bg-bg-surface/10 overflow-hidden">
+          <div class="px-md py-xs border-b border-border-default bg-bg-surface flex items-center justify-between">
+            <span class="text-xs font-mono uppercase tracking-widest text-text-muted">Hero Composition Section Layout</span>
+            <Badge variant="neutral">Proportional Grid Bounding</Badge>
+          </div>
+          <Hero />
+        </section>
+
         <!-- 1. Color Surfaces & Depth Section -->
         <section>
           <h2 class="text-xs font-mono uppercase tracking-widest text-text-muted mb-md">01. Colors & Surface Elevations</h2>
@@ -231,6 +240,7 @@
 <script setup>
 import { ref } from 'vue'
 import Navbar from '@/components/ui/layout/Navbar.vue'
+import Hero from '@/components/ui/Hero.vue'
 import Button from '@/components/ui/Button.vue'
 import Input from '@/components/ui/Input.vue'
 import Textarea from '@/components/ui/Textarea.vue'
