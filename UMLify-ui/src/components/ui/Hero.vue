@@ -8,22 +8,43 @@
           <Stack gap="lg" align="start">
             
             <!-- Product Badge -->
-            <Badge variant="accent">
+            <Badge
+              variant="accent"
+              class="transition-all duration-350 ease-tactile transform"
+              :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+              style="transition-delay: 100ms;"
+            >
               Professional UML Editor
             </Badge>
 
             <!-- Headline -->
-            <h1 class="text-4xl lg:text-5xl font-bold tracking-tight text-text-primary leading-[1.1] text-left">
+            <h1
+              class="text-4xl lg:text-5xl font-bold tracking-tight text-text-primary leading-[1.1] text-left transition-all duration-350 ease-tactile transform"
+              :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+              style="transition-delay: 200ms;"
+            >
               The fastest way to design professional UML diagrams.
             </h1>
 
             <!-- Supporting Paragraph -->
-            <p class="text-base text-text-secondary leading-relaxed max-w-lg text-left">
+            <p
+              class="text-base text-text-secondary leading-relaxed max-w-lg text-left transition-all duration-350 ease-tactile transform"
+              :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+              style="transition-delay: 300ms;"
+            >
               Create, edit, and export professional UML diagrams directly in your browser. Umlify combines an intuitive, keyboard-driven workspace with auto-routing layouts to speed up system design.
             </p>
 
             <!-- CTA Row -->
-            <Stack direction="row" gap="md" align="center" wrap class="w-full justify-start">
+            <Stack
+              direction="row"
+              gap="md"
+              align="center"
+              wrap
+              class="w-full justify-start transition-all duration-350 ease-tactile transform"
+              :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+              style="transition-delay: 400ms;"
+            >
               <Button variant="primary" @click="handlePrimaryCTA">
                 Launch Editor
               </Button>
@@ -33,7 +54,11 @@
             </Stack>
 
             <!-- Trust Row -->
-            <div class="pt-md w-full border-t border-border-default/50 text-left">
+            <div
+              class="pt-md w-full border-t border-border-default/50 text-left transition-all duration-350 ease-tactile transform"
+              :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+              style="transition-delay: 500ms;"
+            >
               <span class="text-xxs font-mono uppercase tracking-widest text-text-muted block mb-xs">
                 Engineered for speed, compliance, and workflow integration
               </span>
@@ -52,7 +77,11 @@
         </div>
 
         <!-- Right Column: Workspace Editor Preview -->
-        <div class="col-span-12 lg:col-span-7 flex items-stretch min-h-[460px] md:min-h-[520px] lg:min-h-[560px]">
+        <div
+          class="col-span-12 lg:col-span-7 flex items-stretch min-h-[460px] md:min-h-[520px] lg:min-h-[560px] transition-all duration-350 ease-tactile transform"
+          :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+          style="transition-delay: 600ms;"
+        >
           <Surface
             depth="2"
             radius="lg"
@@ -216,7 +245,10 @@
                   </div>
                   <div>
                     <span class="text-[9px] font-mono text-text-muted block mb-xxs">Class Name</span>
-                    <span class="font-mono text-xs text-text-primary bg-bg-elevated px-xs py-xxs rounded block w-full border border-border-default">Order</span>
+                    <div class="font-mono text-xs text-text-primary bg-bg-elevated px-xs py-xxs rounded flex items-center gap-[2px] w-full border border-border-default select-none">
+                      <span>Order</span>
+                      <span class="w-[1.5px] h-3 bg-interactive-accent cursor-blink"></span>
+                    </div>
                   </div>
                   <div>
                     <span class="text-[9px] font-mono text-text-muted block mb-xxs">Visibility</span>
@@ -228,10 +260,18 @@
             </div>
 
             <!-- 3. Bottom Status Bar -->
-            <div class="h-6 border-t border-border-default bg-bg-surface flex items-center justify-between px-md text-[9px] font-mono text-text-muted select-none shrink-0">
+            <div class="h-6 border-t border-border-default bg-bg-surface flex items-center justify-between px-md text-[9px] font-mono text-text-muted select-none shrink-0 animate-fade">
               <div class="flex items-center gap-xs">
-                <span class="text-success">●</span>
-                <span>Compiled: 6 Classes, 4 Connectors</span>
+                <transition name="fade-compile" mode="out-in">
+                  <div v-if="!isCompiled" key="compiling" class="flex items-center gap-xs">
+                    <span class="text-warning animate-pulse">●</span>
+                    <span>Compiling class structures...</span>
+                  </div>
+                  <div v-else key="compiled" class="flex items-center gap-xs">
+                    <span class="text-success">●</span>
+                    <span>Compiled: 6 Classes, 4 Connectors</span>
+                  </div>
+                </transition>
               </div>
               <div>
                 <span>Zoom: 100%</span>
@@ -247,6 +287,7 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Section from './layout/Section.vue'
 import Container from './layout/Container.vue'
@@ -257,6 +298,8 @@ import Button from './Button.vue'
 import Badge from './Badge.vue'
 
 const router = useRouter()
+const isMounted = ref(false)
+const isCompiled = ref(false)
 
 const handlePrimaryCTA = () => {
   router.push('/workspace')
@@ -268,4 +311,47 @@ const handleSecondaryCTA = () => {
     el.scrollIntoView({ behavior: 'smooth' })
   }
 }
+
+onMounted(() => {
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      isMounted.value = true
+    }, 50)
+  })
+
+  setTimeout(() => {
+    isCompiled.value = true
+  }, 1400)
+})
 </script>
+
+<style scoped>
+@keyframes blink {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+.fade-compile-enter-active,
+.fade-compile-leave-active {
+  transition: opacity 0.15s ease;
+}
+.fade-compile-enter-from,
+.fade-compile-leave-to {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transition-all,
+  .animate-pulse,
+  .cursor-blink {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+</style>

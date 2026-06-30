@@ -1,5 +1,15 @@
 <template>
-  <header class="sticky top-0 w-full border-b border-border-default bg-bg-base/80 backdrop-blur-md z-navigation">
+  <header
+    class="sticky top-0 w-full border-b transition-all duration-350 ease-tactile z-navigation transform"
+    :class="[
+      isScrolled 
+        ? 'bg-bg-base/95 backdrop-blur-lg border-border-elevated shadow-sm' 
+        : 'bg-bg-base/70 backdrop-blur-md border-border-default',
+      isMounted 
+        ? 'opacity-100 translate-y-0' 
+        : 'opacity-0 -translate-y-4'
+    ]"
+  >
     <Container size="xl">
       <div class="h-14 flex items-center justify-between">
         
@@ -102,8 +112,29 @@ import { useRouter } from 'vue-router'
 import Container from './Container.vue'
 import Button from '../Button.vue'
 
+import { onMounted, onUnmounted } from 'vue'
+
 const router = useRouter()
 const isMobileMenuOpen = ref(false)
+const isScrolled = ref(false)
+const isMounted = ref(false)
+
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 12
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      isMounted.value = true
+    }, 50)
+  })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
 
 const navLinks = [
   { name: 'Features', href: '#features' },
