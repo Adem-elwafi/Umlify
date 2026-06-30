@@ -1,5 +1,8 @@
 <template>
-  <div class="min-h-screen bg-bg-base text-text-primary p-lg overflow-y-auto">
+  <div class="min-h-screen bg-bg-base text-text-primary overflow-y-auto">
+    <Navbar />
+    
+    <div class="p-lg">
     <!-- Navbar / Header -->
     <header class="border-b border-border-default pb-md mb-xl flex items-center justify-between">
       <div>
@@ -221,11 +224,13 @@
         </Button>
       </template>
     </Dialog>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import Navbar from '@/components/ui/layout/Navbar.vue'
 import Button from '@/components/ui/Button.vue'
 import Input from '@/components/ui/Input.vue'
 import Textarea from '@/components/ui/Textarea.vue'
