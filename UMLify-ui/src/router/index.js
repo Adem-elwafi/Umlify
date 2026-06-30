@@ -9,6 +9,7 @@ const routes = [
   { path: '/workspace', name: 'Workspace', component: Home, meta: { requiresAuth: true } },
   { path: '/login', name: 'Login', component: Login },
   { path: '/signup', name: 'Signup', component: Signup },
+  { path: '/playground', name: 'Playground', component: () => import('@/Views/Playground.vue') },
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
 

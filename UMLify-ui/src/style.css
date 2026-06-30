@@ -2,43 +2,95 @@
 
 @variant dark (.dark &);
 
-@theme {
-  /* Redefined monochromatic SaaS colors */
-  --color-primary-slate: #111827;
-  --color-accent-blue: #6b7280;
-  --color-accent-violet: #9ca3af;
-  --color-secondary-gray: #f1f5f9;
+:root {
+  --color-bg-base: #ffffff;
+  --color-bg-surface: #f4f4f5;
+  --color-bg-elevated: #e4e4e7;
+  
+  --color-text-primary: #09090b;
+  --color-text-secondary: #52525b;
+  --color-text-muted: #a1a1aa;
+  
+  --color-interactive-primary: #09090b;
+  --color-interactive-accent: #2563eb;
+  --color-interactive-hover: #1d4ed8;
+  
+  --color-border-default: rgba(0, 0, 0, 0.08);
+  --color-border-elevated: rgba(0, 0, 0, 0.12);
+}
 
-  --accent-violet: #9ca3af;
-  --accent-violet-glow: rgba(156, 163, 175, 0.2);
+.dark {
+  --color-bg-base: #09090b;
+  --color-bg-surface: #18181b;
+  --color-bg-elevated: #27272a;
+  
+  --color-text-primary: #fafafa;
+  --color-text-secondary: #a1a1aa;
+  --color-text-muted: #71717a;
+  
+  --color-interactive-primary: #ffffff;
+  --color-interactive-accent: #3b82f6;
+  --color-interactive-hover: #60a5fa;
+  
+  --color-border-default: rgba(255, 255, 255, 0.08);
+  --color-border-elevated: rgba(255, 255, 255, 0.12);
+}
+
+@theme {
+  --color-bg-base: var(--color-bg-base);
+  --color-bg-surface: var(--color-bg-surface);
+  --color-bg-elevated: var(--color-bg-elevated);
+  
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+  
+  --color-interactive-primary: var(--color-interactive-primary);
+  --color-interactive-accent: var(--color-interactive-accent);
+  --color-interactive-hover: var(--color-interactive-hover);
+  
+  --color-border-default: var(--color-border-default);
+  --color-border-elevated: var(--color-border-elevated);
+
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+
+  --spacing-xxs: 4px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+  --spacing-xxxl: 64px;
+
+  --radius-interactive: 6px;
+  --radius-card: 12px;
+  --radius-panel: 16px;
+
+  --ease-tactile: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-medium: 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slow: 350ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Custom Blueprint Sheet Grid Engine overrides */
 .sheet-grid {
-  background-size: 16px 16px;
-  background-image: radial-gradient(circle, rgba(9, 9, 11, 0.16) 1.2px, transparent 1.2px);
-  transition: background-color 0.2s ease, background-image 0.2s ease;
+  background-size: 20px 20px;
+  background-image: radial-gradient(circle, rgba(9, 9, 11, 0.05) 1px, transparent 1px);
+  transition: background-color var(--animate-fast), background-image var(--animate-fast);
 }
 
 .dark .sheet-grid {
-  background-image: radial-gradient(circle, rgba(241, 245, 249, 0.08) 1.2px, transparent 1.2px);
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
 }
 
-/* 
-  UMLify Global Styles - Tailwind v4 
-  Established in Visual Overhaul Part 1
-*/
-
-/* Force document level baseline variables to guarantee compliance */
+/* Reset baseline document styles and bind transitions */
 html, body, #app {
-  background-color: #f8fafc;
-  color: #0f172a;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-html.dark, html.dark body, html.dark #app {
-  background-color: #0b0f19;
-  color: #f1f5f9;
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  transition: background-color 0.25s var(--ease-tactile), color 0.25s var(--ease-tactile);
 }
 
 body {
@@ -67,3 +119,4 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(156, 163, 175, 0.4);
 }
+
