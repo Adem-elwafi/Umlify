@@ -9,7 +9,7 @@
             
             <!-- Product Badge -->
             <Badge variant="accent">
-              Umlify v1.0
+              Professional UML Editor
             </Badge>
 
             <!-- Headline -->
@@ -19,7 +19,7 @@
 
             <!-- Supporting Paragraph -->
             <p class="text-base text-text-secondary leading-relaxed max-w-lg text-left">
-              Write standard-compliant UML code or use our keyboard-first canvas to auto-layout class hierarchies, sequence flows, and system architectures in seconds. Built for engineers.
+              Create, edit, and export professional UML diagrams directly in your browser. Umlify combines an intuitive, keyboard-driven workspace with auto-routing layouts to speed up system design.
             </p>
 
             <!-- CTA Row -->
@@ -35,16 +35,16 @@
             <!-- Trust Row -->
             <div class="pt-md w-full border-t border-border-default/50 text-left">
               <span class="text-xxs font-mono uppercase tracking-widest text-text-muted block mb-xs">
-                Standard compliant. Output ready.
+                Engineered for speed, compliance, and workflow integration
               </span>
-              <div class="flex flex-wrap items-center gap-sm text-text-muted text-xs font-medium">
-                <span>UML 2.5</span>
-                <span class="text-border-default/80">•</span>
-                <span>GitHub Sync</span>
-                <span class="text-border-default/80">•</span>
-                <span>Markdown Embed</span>
-                <span class="text-border-default/80">•</span>
-                <span>SVG / PNG</span>
+              <div class="flex flex-wrap items-center gap-sm text-text-muted text-xs font-semibold">
+                <span>✓ UML 2.5 Compliance</span>
+                <span class="text-border-default/85">•</span>
+                <span>✓ Auto-Layout Snapping</span>
+                <span class="text-border-default/85">•</span>
+                <span>✓ Instant SVG Export</span>
+                <span class="text-border-default/85">•</span>
+                <span>✓ Keyboard Shortcuts</span>
               </div>
             </div>
             
