@@ -15,6 +15,9 @@
 
       <!-- Supported Diagram Types Showcase -->
       <DiagramShowcase />
+
+      <!-- Export & Integrations Section -->
+      <ExportIntegrations />
     </main>
   </div>
 </template>
@@ -25,4 +28,5 @@ import Hero from '../components/ui/Hero.vue'
 import InteractiveShowcase from '../components/ui/InteractiveShowcase.vue'
 import Capabilities from '../components/ui/Capabilities.vue'
 import DiagramShowcase from '../components/ui/DiagramShowcase.vue'
+import ExportIntegrations from '../components/ui/ExportIntegrations.vue'
 </script>
