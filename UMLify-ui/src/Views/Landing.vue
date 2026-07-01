@@ -12,6 +12,9 @@
 
       <!-- Core Capabilities Section -->
       <Capabilities />
+
+      <!-- Supported Diagram Types Showcase -->
+      <DiagramShowcase />
     </main>
   </div>
 </template>
@@ -21,4 +24,5 @@ import Navbar from '../components/ui/layout/Navbar.vue'
 import Hero from '../components/ui/Hero.vue'
 import InteractiveShowcase from '../components/ui/InteractiveShowcase.vue'
 import Capabilities from '../components/ui/Capabilities.vue'
+import DiagramShowcase from '../components/ui/DiagramShowcase.vue'
 </script>
