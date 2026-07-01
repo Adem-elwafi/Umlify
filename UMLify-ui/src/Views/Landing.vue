@@ -18,6 +18,9 @@
 
       <!-- Export & Integrations Section -->
       <ExportIntegrations />
+
+      <!-- Keyboard-First Productivity Section -->
+      <ProductivitySection />
     </main>
   </div>
 </template>
@@ -29,4 +32,5 @@ import InteractiveShowcase from '../components/ui/InteractiveShowcase.vue'
 import Capabilities from '../components/ui/Capabilities.vue'
 import DiagramShowcase from '../components/ui/DiagramShowcase.vue'
 import ExportIntegrations from '../components/ui/ExportIntegrations.vue'
+import ProductivitySection from '../components/ui/ProductivitySection.vue'
 </script>
