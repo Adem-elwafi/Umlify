@@ -80,3 +80,37 @@
 *   **Decision:** Establish a visual sandbox (`/playground`) and complete all foundational design system rules and UI primitives before building any page layout or editor feature.
 *   **Rationale:** Ensures all features are built on a consistent, verified layout foundation, minimizing refactoring cycles.
 *   **Consequences:** Development starts by validating design system primitives on the playground page, keeping styling organized.
+## ADR-009 — Explicit Tailwind v4 Namespace Overrides
+
+### Status
+Accepted
+
+### Context
+
+Tailwind CSS v4 generates utilities from theme namespaces.
+
+When only semantic spacing tokens were defined, sizing utilities
+(max-width, width, height, etc.) inherited spacing values.
+
+This caused utilities like `max-w-xl` to compile to
+`max-width: var(--spacing-xl)` rather than their expected rem values.
+
+### Decision
+
+Explicitly declare the following namespaces:
+
+- --max-width-*
+- --min-width-*
+- --width-*
+- --height-*
+- --min-height-*
+- --max-height-*
+
+Spacing tokens remain semantic and independent.
+
+### Consequences
+
+- Standard Tailwind sizing utilities behave correctly.
+- Semantic spacing tokens remain reusable.
+- Future contributors can safely use standard utility classes.
+- Prevents hidden namespace collisions.

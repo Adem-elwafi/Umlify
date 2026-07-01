@@ -9,6 +9,9 @@
 
       <!-- Interactive Walkthrough Tour -->
       <InteractiveShowcase />
+
+      <!-- Core Capabilities Section -->
+      <Capabilities />
     </main>
   </div>
 </template>
@@ -17,4 +20,5 @@
 import Navbar from '../components/ui/layout/Navbar.vue'
 import Hero from '../components/ui/Hero.vue'
 import InteractiveShowcase from '../components/ui/InteractiveShowcase.vue'
+import Capabilities from '../components/ui/Capabilities.vue'
 </script>
