@@ -10,7 +10,7 @@
         : 'opacity-0 -translate-y-4'
     ]"
   >
-    <Container size="xl">
+    <Container size="2xl">
       <div class="h-14 flex items-center justify-between">
         
         <!-- Left: Brand Logo & Title -->
@@ -71,7 +71,7 @@
         v-if="isMobileMenuOpen"
         class="md:hidden absolute top-14 left-0 w-full border-b border-border-default bg-bg-base/95 backdrop-blur-lg overflow-hidden z-dropdown shadow-xl"
       >
-        <Container size="xl">
+        <Container size="2xl">
           <div class="py-md flex flex-col gap-md">
             <!-- Navigation Links -->
             <nav class="flex flex-col gap-xs">

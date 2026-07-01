@@ -1,6 +1,6 @@
 <template>
-  <Section spacing="xxl" custom-class="flex items-center min-h-[calc(100vh-56px)]">
-    <Container size="xl">
+  <Section spacing="xl" custom-class="flex flex-col justify-center min-h-[calc(100vh-56px)] pb-lg lg:pb-xl">
+    <Container size="2xl">
       <Grid cols="12" colsTablet="12" colsMobile="1" gap="xl" align="center" custom-class="items-stretch">
         
         <!-- Left Column: Content Content -->
@@ -19,7 +19,7 @@
 
             <!-- Headline -->
             <h1
-              class="text-4xl lg:text-5xl font-bold tracking-tight text-text-primary leading-[1.1] text-left transition-all duration-350 ease-tactile transform"
+              class="text-4xl lg:text-5xl font-bold tracking-tight text-text-primary leading-[1.1] w-full text-left transition-all duration-350 ease-tactile transform"
               :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
               style="transition-delay: 200ms;"
             >
@@ -28,7 +28,7 @@
 
             <!-- Supporting Paragraph -->
             <p
-              class="text-base text-text-secondary leading-relaxed max-w-lg text-left transition-all duration-350 ease-tactile transform"
+              class="text-base text-text-secondary leading-relaxed max-w-xl w-full text-left transition-all duration-350 ease-tactile transform"
               :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
               style="transition-delay: 300ms;"
             >
@@ -78,7 +78,7 @@
 
         <!-- Right Column: Workspace Editor Preview -->
         <div
-          class="col-span-12 lg:col-span-7 flex items-stretch min-h-[460px] md:min-h-[520px] lg:min-h-[560px] transition-all duration-350 ease-tactile transform"
+          class="col-span-12 lg:col-span-7 flex items-stretch min-h-[300px] md:min-h-[360px] lg:min-h-[400px] xl:min-h-[440px] 2xl:min-h-[460px] transition-all duration-350 ease-tactile transform"
           :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
           style="transition-delay: 600ms;"
         >
@@ -125,7 +125,7 @@
               <!-- Main Canvas area with dot grid and UML diagrams -->
               <div class="flex-1 sheet-grid relative overflow-hidden flex items-center justify-center p-sm">
                 <!-- Wrapper scaled down for responsiveness to fit all viewports without clipping -->
-                <div class="relative w-[520px] h-[340px] scale-[0.7] xs:scale-[0.8] sm:scale-95 md:scale-100 origin-center shrink-0">
+                <div class="relative w-[520px] h-[340px] scale-[0.7] xs:scale-[0.8] sm:scale-90 md:scale-95 lg:scale-100 xl:scale-105 2xl:scale-115 origin-center shrink-0">
                   
                   <!-- SVG Connector Paths (UML lines) -->
                   <svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">

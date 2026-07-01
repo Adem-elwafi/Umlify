@@ -15,7 +15,7 @@ defineProps({
   size: {
     type: String,
     default: 'xl',
-    validator: (value) => ['sm', 'md', 'lg', 'xl', 'full'].includes(value)
+    validator: (value) => ['sm', 'md', 'lg', 'xl', '2xl', 'full'].includes(value)
   },
   narrow: {
     type: Boolean,
@@ -32,6 +32,7 @@ const sizeClasses = {
   md: 'max-w-[800px]',
   lg: 'max-w-[1024px]',
   xl: 'max-w-[1200px]',
+  '2xl': 'max-w-[1440px]',
   full: 'max-w-full'
 }
 </script>

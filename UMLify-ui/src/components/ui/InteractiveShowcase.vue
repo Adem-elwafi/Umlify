@@ -1,15 +1,15 @@
 <template>
-  <Section id="features" spacing="xxl" custom-class="border-t border-border-default bg-bg-base/50">
-    <Container size="xl">
+  <Section id="features" spacing="xl" custom-class="border-t border-border-default bg-bg-base/50 pt-lg lg:pt-xl">
+    <Container size="2xl">
       <Stack gap="xl">
         
         <!-- Section Header -->
-        <Stack gap="xs" align="start" class="max-w-xl text-left">
+        <Stack gap="xs" align="start" class="max-w-2xl text-left">
           <span class="text-xxs font-mono uppercase tracking-widest text-interactive-accent">Guided Tour</span>
-          <h2 class="text-3xl font-bold tracking-tight text-text-primary">
+          <h2 class="text-3xl font-bold tracking-tight text-text-primary w-full">
             How Umlify works.
           </h2>
-          <p class="text-sm text-text-secondary leading-relaxed">
+          <p class="text-sm text-text-secondary leading-relaxed w-full">
             See how Umlify accelerates your technical system design flow from initial entity definition to final documentation asset creation.
           </p>
         </Stack>
@@ -80,7 +80,7 @@
 
           <!-- Right Column: Simulative Live Workspace Preview -->
           <div 
-            class="col-span-12 lg:col-span-7 flex items-stretch min-h-[460px] md:min-h-[520px] lg:min-h-[560px]"
+            class="col-span-12 lg:col-span-7 flex items-stretch min-h-[300px] md:min-h-[360px] lg:min-h-[400px] xl:min-h-[440px] 2xl:min-h-[460px]"
             @mouseenter="pauseRotation"
             @mouseleave="resumeRotation"
           >
@@ -131,7 +131,7 @@
                     <!-- Wrapper scaled down for responsiveness -->
                     <div 
                       :key="activeStep"
-                      class="relative w-[520px] h-[340px] scale-[0.7] xs:scale-[0.8] sm:scale-95 md:scale-100 origin-center shrink-0 transition-transform duration-350"
+                      class="relative w-[520px] h-[340px] scale-[0.7] xs:scale-[0.8] sm:scale-90 md:scale-95 lg:scale-100 xl:scale-105 2xl:scale-115 origin-center shrink-0 transition-transform duration-350"
                     >
                       
                       <!-- Canvas Elements for Step 1: Create Classes -->
