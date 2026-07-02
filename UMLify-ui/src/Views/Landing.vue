@@ -33,6 +33,9 @@
 
       <!-- Simple Pricing Section -->
       <PricingSection />
+
+      <!-- Final Conversion CTA Section -->
+      <FinalCTASection />
     </main>
   </div>
 </template>
@@ -49,4 +52,5 @@ import RoadmapSection from '../components/ui/RoadmapSection.vue'
 import FAQSection from '../components/ui/FAQSection.vue'
 import TrustSection from '../components/ui/TrustSection.vue'
 import PricingSection from '../components/ui/PricingSection.vue'
+import FinalCTASection from '../components/ui/FinalCTASection.vue'
 </script>
