@@ -45,29 +45,33 @@
             gap="md"
             class="w-full"
           >
-            <Card
+            <div
               v-for="(s, index) in stats"
               :key="s.title"
-              hoverable
-              tabindex="0"
-              custom-class="h-full focus-visible:bg-bg-elevated focus-visible:border-border-elevated focus-visible:translate-y-[-2px] focus-visible:shadow-lg focus-visible:ring-2 focus-visible:ring-interactive-accent focus-visible:outline-none transition-all duration-500 ease-tactile transform"
+              class="h-full transition-all duration-500 ease-tactile transform"
               :class="[
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               ]"
               :style="{ transitionDelay: `${(index * 75) + 350}ms` }"
             >
-              <Stack gap="xs">
-                <span class="text-3xl lg:text-4xl font-bold font-mono text-interactive-accent select-none">
-                  {{ s.value }}
-                </span>
-                <h3 class="text-xs font-bold text-text-primary">
-                  {{ s.title }}
-                </h3>
-                <p class="text-xxs text-text-secondary leading-relaxed">
-                  {{ s.description }}
-                </p>
-              </Stack>
-            </Card>
+              <Card
+                hoverable
+                tabindex="0"
+                custom-class="h-full focus-visible:bg-bg-elevated focus-visible:border-border-elevated focus-visible:translate-y-[-2px] focus-visible:shadow-lg focus-visible:ring-2 focus-visible:ring-interactive-accent focus-visible:outline-none"
+              >
+                <Stack gap="xs">
+                  <span class="text-3xl lg:text-4xl font-bold font-mono text-interactive-accent select-none">
+                    {{ s.value }}
+                  </span>
+                  <h3 class="text-xs font-bold text-text-primary">
+                    {{ s.title }}
+                  </h3>
+                  <p class="text-xxs text-text-secondary leading-relaxed">
+                    {{ s.description }}
+                  </p>
+                </Stack>
+              </Card>
+            </div>
           </Grid>
         </div>
 
@@ -87,31 +91,35 @@
             gap="md"
             class="w-full"
           >
-            <Card
+            <div
               v-for="(t, index) in testimonials"
               :key="t.author"
-              hoverable
-              tabindex="0"
-              custom-class="h-full focus-visible:bg-bg-elevated focus-visible:border-border-elevated focus-visible:translate-y-[-2px] focus-visible:shadow-lg focus-visible:ring-2 focus-visible:ring-interactive-accent focus-visible:outline-none transition-all duration-500 ease-tactile transform bg-bg-base/20 border border-border-default/60"
+              class="h-full transition-all duration-500 ease-tactile transform"
               :class="[
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               ]"
               :style="{ transitionDelay: `${(index * 75) + 700}ms` }"
             >
-              <Stack gap="md" justify="between" class="h-full">
-                <p class="text-xs text-text-primary leading-relaxed">
-                  "{{ t.quote }}"
-                </p>
-                <Stack gap="none">
-                  <span class="text-[11px] font-bold text-text-primary">
-                    {{ t.author }}
-                  </span>
-                  <span class="text-[9px] font-mono text-text-muted uppercase tracking-wider select-none">
-                    {{ t.role }}
-                  </span>
+              <Card
+                hoverable
+                tabindex="0"
+                custom-class="h-full focus-visible:bg-bg-elevated focus-visible:border-border-elevated focus-visible:translate-y-[-2px] focus-visible:shadow-lg focus-visible:ring-2 focus-visible:ring-interactive-accent focus-visible:outline-none bg-bg-base/20 border border-border-default/60"
+              >
+                <Stack gap="md" justify="between" class="h-full">
+                  <p class="text-xs text-text-primary leading-relaxed">
+                    "{{ t.quote }}"
+                  </p>
+                  <Stack gap="none">
+                    <span class="text-[11px] font-bold text-text-primary">
+                      {{ t.author }}
+                    </span>
+                    <span class="text-[9px] font-mono text-text-muted uppercase tracking-wider select-none">
+                      {{ t.role }}
+                    </span>
+                  </Stack>
                 </Stack>
-              </Stack>
-            </Card>
+              </Card>
+            </div>
           </Grid>
         </div>
 

@@ -44,20 +44,23 @@
             gap="lg"
             class="w-full items-stretch"
           >
-            <Card
+            <div
               v-for="(plan, index) in plans"
               :key="plan.name"
-              :hoverable="true"
-              :depth="plan.highlighted ? '2' : '1'"
-              :custom-class="[
-                'w-full h-full flex flex-col justify-between transition-all duration-500 ease-tactile transform border',
-                plan.highlighted ? 'border-interactive-accent ring-1 ring-interactive-accent/30 bg-bg-surface/50' : 'border-border-default',
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
-                focusedIndex === index ? 'ring-2 ring-interactive-accent border-interactive-accent translate-y-[-2px] shadow-lg bg-bg-elevated/45' : ''
-              ].join(' ')"
+              class="w-full h-full flex flex-col transition-all duration-500 ease-tactile transform"
+              :class="isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
               :style="{ transitionDelay: `${(index * 100) + 350}ms` }"
             >
-              <div class="flex flex-col h-full justify-between">
+              <Card
+                :hoverable="true"
+                :depth="plan.highlighted ? '2' : '1'"
+                :custom-class="[
+                  'w-full h-full flex flex-col justify-between border',
+                  plan.highlighted ? 'border-interactive-accent ring-1 ring-interactive-accent/30 bg-bg-surface/50' : 'border-border-default',
+                  focusedIndex === index ? 'ring-2 ring-interactive-accent border-interactive-accent translate-y-[-2px] shadow-lg bg-bg-elevated/45' : ''
+                ].join(' ')"
+              >
+                <div class="flex flex-col h-full justify-between">
                 <div>
                   <!-- Header info -->
                   <Stack gap="xs">
@@ -123,6 +126,7 @@
                 </div>
               </div>
             </Card>
+          </div>
           </Grid>
         </div>
 

@@ -38,19 +38,22 @@
         <!-- Accordion Container -->
         <div class="w-full max-w-3xl mx-auto mt-lg">
           <Stack gap="sm">
-            <Card
+            <div
               v-for="(item, index) in faqs"
               :key="item.question"
-              hoverable
-              :custom-class="[
-                'w-full transition-all duration-300 transform',
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
-                activeIndex === index ? 'border-border-elevated bg-bg-base/35 shadow-sm' : '',
-                focusedIndex === index ? 'ring-2 ring-interactive-accent border-interactive-accent translate-y-[-2px] shadow-lg bg-bg-elevated/45' : ''
-              ].join(' ')"
+              class="w-full transition-all duration-500 ease-tactile transform"
+              :class="isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
               :style="{ transitionDelay: `${(index * 75) + 350}ms` }"
             >
-              <div class="flex flex-col">
+              <Card
+                hoverable
+                :custom-class="[
+                  'w-full',
+                  activeIndex === index ? 'border-border-elevated bg-bg-base/35 shadow-sm' : '',
+                  focusedIndex === index ? 'ring-2 ring-interactive-accent border-interactive-accent translate-y-[-2px] shadow-lg bg-bg-elevated/45' : ''
+                ].join(' ')"
+              >
+                <div class="flex flex-col">
                 <!-- Accordion Header Button -->
                 <button
                   :ref="el => { if (el) buttonRefs[index] = el }"
@@ -96,6 +99,7 @@
                 </div>
               </div>
             </Card>
+          </div>
           </Stack>
         </div>
       </Stack>

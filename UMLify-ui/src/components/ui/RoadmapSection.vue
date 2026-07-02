@@ -87,21 +87,19 @@
               <!-- Content (Card) -->
               <!-- Tablet: slightly compressed spacing. Mobile: single column. Desktop: centered/alternating. -->
               <div
-                class="pl-16 pr-xs lg:px-0 w-full flex"
+                class="pl-16 pr-xs lg:px-0 w-full flex transition-all duration-500 ease-tactile transform"
                 :class="[
                   index % 2 === 0 
                     ? 'lg:w-1/2 lg:mr-auto lg:ml-0 lg:justify-end lg:pr-12' 
-                    : 'lg:w-1/2 lg:ml-auto lg:mr-0 lg:justify-start lg:pl-12'
+                    : 'lg:w-1/2 lg:ml-auto lg:mr-0 lg:justify-start lg:pl-12',
+                  isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                 ]"
+                :style="{ transitionDelay: `${(index * 75) + 350}ms` }"
               >
                 <Card
                   hoverable
                   tabindex="0"
-                  custom-class="w-full max-w-[480px] focus-visible:bg-bg-elevated focus-visible:border-border-elevated focus-visible:translate-y-[-2px] focus-visible:shadow-lg focus-visible:ring-2 focus-visible:ring-interactive-accent focus-visible:outline-none transition-all duration-500 ease-tactile transform"
-                  :class="[
-                    isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-                  ]"
-                  :style="{ transitionDelay: `${(index * 75) + 350}ms` }"
+                  custom-class="w-full max-w-[480px] focus-visible:bg-bg-elevated focus-visible:border-border-elevated focus-visible:translate-y-[-2px] focus-visible:shadow-lg focus-visible:ring-2 focus-visible:ring-interactive-accent focus-visible:outline-none"
                 >
                   <Stack gap="xs">
                     <Stack direction="row" align="center" justify="between" class="w-full">
