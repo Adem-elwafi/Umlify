@@ -36,6 +36,9 @@
 
       <!-- Final Conversion CTA Section -->
       <FinalCTASection />
+
+      <!-- Footer Section -->
+      <FooterSection />
     </main>
   </div>
 </template>
@@ -53,4 +56,5 @@ import FAQSection from '../components/ui/FAQSection.vue'
 import TrustSection from '../components/ui/TrustSection.vue'
 import PricingSection from '../components/ui/PricingSection.vue'
 import FinalCTASection from '../components/ui/FinalCTASection.vue'
+import FooterSection from '../components/ui/FooterSection.vue'
 </script>
