@@ -2,80 +2,66 @@
   <svg
     viewBox="0 0 240 160"
     preserveAspectRatio="xMidYMid meet"
-    class="w-full h-full text-text-primary transition-all duration-300"
+    class="absolute inset-0 w-full h-full pointer-events-none overflow-visible z-10"
   >
-    <!-- Frontend Component -->
-    <g class="transition-all duration-300">
-      <rect
-        x="25"
-        y="25"
-        width="70"
-        height="36"
-        rx="2"
-        class="fill-bg-base stroke-border-default group-hover:stroke-interactive-accent/50 transition-colors duration-300"
-        stroke-width="1.5"
-      />
-      <!-- Component Symbol Tabs (left edge) -->
-      <rect
-        x="20"
-        y="31"
-        width="10"
-        height="6"
-        rx="1"
-        class="fill-bg-base stroke-border-default group-hover:stroke-interactive-accent/50 transition-colors duration-300"
-        stroke-width="1.2"
-      />
-      <rect
-        x="20"
-        y="43"
-        width="10"
-        height="6"
-        rx="1"
-        class="fill-bg-base stroke-border-default group-hover:stroke-interactive-accent/50 transition-colors duration-300"
-        stroke-width="1.2"
-      />
-      <text
-        x="63"
-        y="46"
-        text-anchor="middle"
-        class="fill-text-primary text-[7.5px] font-bold font-sans"
+    <defs>
+      <!-- Dependency Arrow -->
+      <marker
+        id="comp-dep-preview"
+        viewBox="0 0 10 10"
+        refX="8"
+        refY="5"
+        markerWidth="5"
+        markerHeight="5"
+        orient="auto-start-reverse"
       >
-        Frontend
-      </text>
-    </g>
+        <path
+          d="M 2 1 L 10 5 L 2 9"
+          fill="none"
+          stroke="#71717a"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </marker>
+    </defs>
 
-    <!-- API Gateway Component -->
+    <!-- Component 1: API Gateway -->
     <g class="transition-all duration-300">
+      <!-- Outer Box -->
       <rect
-        x="145"
-        y="25"
+        x="20"
+        y="45"
         width="70"
-        height="36"
-        rx="2"
+        height="50"
+        rx="3"
         class="fill-bg-base stroke-border-default group-hover:stroke-interactive-accent/50 transition-colors duration-300"
         stroke-width="1.5"
       />
+      <!-- Left Edge Tab 1 -->
       <rect
-        x="140"
-        y="31"
-        width="10"
-        height="6"
-        rx="1"
+        x="13"
+        y="53"
+        width="14"
+        height="10"
+        rx="1.5"
         class="fill-bg-base stroke-border-default group-hover:stroke-interactive-accent/50 transition-colors duration-300"
-        stroke-width="1.2"
+        stroke-width="1.5"
       />
+      <!-- Left Edge Tab 2 -->
       <rect
-        x="140"
-        y="43"
-        width="10"
-        height="6"
-        rx="1"
+        x="13"
+        y="72"
+        width="14"
+        height="10"
+        rx="1.5"
         class="fill-bg-base stroke-border-default group-hover:stroke-interactive-accent/50 transition-colors duration-300"
-        stroke-width="1.2"
+        stroke-width="1.5"
       />
+      <!-- Title -->
       <text
-        x="183"
-        y="46"
+        x="55"
+        y="73"
         text-anchor="middle"
         class="fill-text-primary text-[7.5px] font-bold font-sans"
       >
@@ -83,77 +69,38 @@
       </text>
     </g>
 
-    <!-- Database Component -->
+    <!-- Component 2: Auth Service -->
     <g class="transition-all duration-300">
       <rect
-        x="145"
-        y="95"
-        width="70"
-        height="36"
-        rx="2"
+        x="150"
+        y="15"
+        width="75"
+        height="45"
+        rx="3"
         class="fill-bg-base stroke-border-default group-hover:stroke-interactive-accent/50 transition-colors duration-300"
         stroke-width="1.5"
       />
       <rect
-        x="140"
-        y="101"
-        width="10"
-        height="6"
+        x="143"
+        y="22"
+        width="14"
+        height="9"
         rx="1"
-        class="fill-bg-base stroke-border-default group-hover:stroke-interactive-accent/50 transition-colors duration-300"
-        stroke-width="1.2"
-      />
-      <rect
-        x="140"
-        y="113"
-        width="10"
-        height="6"
-        rx="1"
-        class="fill-bg-base stroke-border-default group-hover:stroke-interactive-accent/50 transition-colors duration-300"
-        stroke-width="1.2"
-      />
-      <text
-        x="183"
-        y="116"
-        text-anchor="middle"
-        class="fill-text-primary text-[7.5px] font-bold font-sans"
-      >
-        Database
-      </text>
-    </g>
-
-    <!-- Auth Service Component -->
-    <g class="transition-all duration-300">
-      <rect
-        x="25"
-        y="95"
-        width="70"
-        height="36"
-        rx="2"
         class="fill-bg-base stroke-border-default group-hover:stroke-interactive-accent/50 transition-colors duration-300"
         stroke-width="1.5"
       />
       <rect
-        x="20"
-        y="101"
-        width="10"
-        height="6"
+        x="143"
+        y="38"
+        width="14"
+        height="9"
         rx="1"
         class="fill-bg-base stroke-border-default group-hover:stroke-interactive-accent/50 transition-colors duration-300"
-        stroke-width="1.2"
-      />
-      <rect
-        x="20"
-        y="113"
-        width="10"
-        height="6"
-        rx="1"
-        class="fill-bg-base stroke-border-default group-hover:stroke-interactive-accent/50 transition-colors duration-300"
-        stroke-width="1.2"
+        stroke-width="1.5"
       />
       <text
-        x="63"
-        y="116"
+        x="187.5"
+        y="41"
         text-anchor="middle"
         class="fill-text-primary text-[7.5px] font-bold font-sans"
       >
@@ -161,82 +108,79 @@
       </text>
     </g>
 
-    <!-- Assembly Connectors (Ball-and-Socket) -->
-    <!-- Frontend ---> API Gateway -->
-    <line
-      x1="95"
-      y1="43"
-      x2="110"
-      y2="43"
-      class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
-      stroke-width="1.2"
-    />
-    <path
-      d="M 115 39 A 4 4 0 0 1 115 47"
-      fill="none"
-      class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
-      stroke-width="1.2"
-    />
-    <circle
-      cx="114"
-      cy="43"
-      r="2.2"
-      class="fill-text-secondary group-hover:fill-interactive-accent transition-colors duration-300"
-    />
-    <line
-      x1="117"
-      y1="43"
-      x2="140"
-      y2="43"
-      class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
-      stroke-width="1.2"
-    />
+    <!-- Component 3: Order Service -->
+    <g class="transition-all duration-300">
+      <rect
+        x="150"
+        y="85"
+        width="75"
+        height="45"
+        rx="3"
+        class="fill-bg-base stroke-border-default group-hover:stroke-interactive-accent/50 transition-colors duration-300"
+        stroke-width="1.5"
+      />
+      <rect
+        x="143"
+        y="92"
+        width="14"
+        height="9"
+        rx="1"
+        class="fill-bg-base stroke-border-default group-hover:stroke-interactive-accent/50 transition-colors duration-300"
+        stroke-width="1.5"
+      />
+      <rect
+        x="143"
+        y="108"
+        width="14"
+        height="9"
+        rx="1"
+        class="fill-bg-base stroke-border-default group-hover:stroke-interactive-accent/50 transition-colors duration-300"
+        stroke-width="1.5"
+      />
+      <text
+        x="187.5"
+        y="111"
+        text-anchor="middle"
+        class="fill-text-primary text-[7.5px] font-bold font-sans"
+      >
+        Order Service
+      </text>
+    </g>
 
-    <!-- API Gateway ---> Database -->
-    <line
-      x1="180"
-      y1="61"
-      x2="180"
-      y2="73"
-      class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
-      stroke-width="1.2"
-    />
-    <path
-      d="M 176 77 A 4 4 0 0 0 184 77"
-      fill="none"
-      class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
-      stroke-width="1.2"
-    />
-    <circle
-      cx="180"
-      cy="78.5"
-      r="2.2"
-      class="fill-text-secondary group-hover:fill-interactive-accent transition-colors duration-300"
-    />
-    <line
-      x1="180"
-      y1="82"
-      x2="180"
-      y2="95"
-      class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
-      stroke-width="1.2"
-    />
-
+    <!-- Connectors -->
     <!-- API Gateway ---> Auth Service (dependency dashed arrow) -->
     <path
-      d="M 145 43 L 115 43 L 115 113 L 95 113"
-      fill="none"
-      class="stroke-text-secondary group-hover:stroke-interactive-accent transition-all duration-300"
-      stroke-width="1.2"
+      d="M 90 60 L 115 60 L 115 37.5 L 143 37.5"
+      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] group-hover:stroke-interactive-accent group-hover:stroke-[2.5px] transition-colors duration-300"
       stroke-dasharray="3 3"
+      marker-end="url(#comp-dep-preview)"
     />
+
+    <!-- API Gateway ---> Order Service (Assembly joint: ball-and-socket) -->
+    <!-- Ball / Socket vector details -->
+    <!-- Socket (Crescent arc facing left) -->
     <path
-      d="M 100 109 L 95 113 L 100 117"
+      d="M 124 103 A 5 5 0 0 1 124 113"
       fill="none"
-      class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
-      stroke-width="1.2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      class="stroke-zinc-400 dark:stroke-zinc-500 group-hover:stroke-interactive-accent transition-colors duration-300"
+      stroke-width="1.5"
+    />
+    <!-- Line from Order Service to Socket -->
+    <path
+      d="M 143 108 L 128 108"
+      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] group-hover:stroke-interactive-accent group-hover:stroke-[2.5px] transition-colors duration-300"
+    />
+    <!-- Line from API Gateway to Ball -->
+    <path
+      d="M 90 80 L 118 80 L 118 108"
+      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] group-hover:stroke-interactive-accent group-hover:stroke-[2.5px] transition-colors duration-300"
+    />
+    <!-- Ball (Small circle sitting inside the socket) -->
+    <circle
+      cx="118"
+      cy="108"
+      r="2"
+      class="fill-zinc-400 dark:fill-zinc-500 group-hover:fill-interactive-accent transition-colors duration-300"
     />
   </svg>
 </template>

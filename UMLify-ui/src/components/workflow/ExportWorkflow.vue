@@ -3,7 +3,7 @@
     <!-- Desktop Layout (Surrounding elements with SVG connector lines) -->
     <div
       ref="containerRef"
-      class="relative w-full max-w-[850px] mx-auto h-[420px] hidden lg:block select-none"
+      class="relative w-full max-w-[850px] mx-auto aspect-[85/42] hidden lg:block select-none"
     >
       <!-- Background SVG Connector Lines -->
       <svg
@@ -11,7 +11,7 @@
         width="100%"
         height="100%"
         preserveAspectRatio="none"
-        class="absolute inset-0 w-full h-full pointer-events-none z-10"
+        class="absolute inset-0 w-full h-full pointer-events-none overflow-visible z-10"
       >
         <!-- Connector Line Definitions -->
         <!-- Left Cards -->
@@ -23,7 +23,7 @@
             isVisible ? 'animate-draw-line' : 'opacity-0 stroke-transparent',
             activeCard === 'svg'
               ? 'stroke-interactive-accent stroke-[2.5px]'
-              : 'stroke-border-default dark:stroke-border-elevated stroke-[1.5px]'
+              : 'stroke-zinc-400 dark:stroke-zinc-500 stroke-[1.5px]'
           ]"
           style="animation-delay: 100ms;"
         />
@@ -35,7 +35,7 @@
             isVisible ? 'animate-draw-line' : 'opacity-0 stroke-transparent',
             activeCard === 'png'
               ? 'stroke-interactive-accent stroke-[2.5px]'
-              : 'stroke-border-default dark:stroke-border-elevated stroke-[1.5px]'
+              : 'stroke-zinc-400 dark:stroke-zinc-500 stroke-[1.5px]'
           ]"
           style="animation-delay: 200ms;"
         />
@@ -47,7 +47,7 @@
             isVisible ? 'animate-draw-line' : 'opacity-0 stroke-transparent',
             activeCard === 'pdf'
               ? 'stroke-interactive-accent stroke-[2.5px]'
-              : 'stroke-border-default dark:stroke-border-elevated stroke-[1.5px]'
+              : 'stroke-zinc-400 dark:stroke-zinc-500 stroke-[1.5px]'
           ]"
           style="animation-delay: 300ms;"
         />
@@ -61,7 +61,7 @@
             isVisible ? 'animate-draw-line' : 'opacity-0 stroke-transparent',
             activeCard === 'plantuml'
               ? 'stroke-interactive-accent stroke-[2.5px]'
-              : 'stroke-border-default dark:stroke-border-elevated stroke-[1.5px]'
+              : 'stroke-zinc-400 dark:stroke-zinc-500 stroke-[1.5px]'
           ]"
           style="animation-delay: 400ms;"
         />
@@ -73,7 +73,7 @@
             isVisible ? 'animate-draw-line' : 'opacity-0 stroke-transparent',
             activeCard === 'mermaid'
               ? 'stroke-interactive-accent stroke-[2.5px]'
-              : 'stroke-border-default dark:stroke-border-elevated stroke-[1.5px]'
+              : 'stroke-zinc-400 dark:stroke-zinc-500 stroke-[1.5px]'
           ]"
           style="animation-delay: 500ms;"
         />
@@ -85,7 +85,7 @@
             isVisible ? 'animate-draw-line' : 'opacity-0 stroke-transparent',
             activeCard === 'json'
               ? 'stroke-interactive-accent stroke-[2.5px]'
-              : 'stroke-border-default dark:stroke-border-elevated stroke-[1.5px]'
+              : 'stroke-zinc-400 dark:stroke-zinc-500 stroke-[1.5px]'
           ]"
           style="animation-delay: 600ms;"
         />
@@ -110,9 +110,25 @@
         <!-- Workspace Body -->
         <div class="flex-1 sheet-grid relative flex items-center justify-center p-xs overflow-hidden">
           <div class="relative w-[130px] h-[70px] flex items-center justify-center gap-xs">
-            <svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-              <line x1="45" y1="35" x2="85" y2="35" class="stroke-text-secondary" stroke-width="1.2" />
-              <path d="M 85 35 L 80 31 M 85 35 L 80 39" fill="none" class="stroke-text-secondary" stroke-width="1.2" />
+            <svg class="absolute inset-0 w-full h-full pointer-events-none overflow-visible z-10" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="export-center-assoc" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path
+                    d="M 0 1.5 L 10 5 L 0 8.5"
+                    fill="none"
+                    stroke="#a1a1aa"
+                    class="dark:stroke-[#71717a]"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </marker>
+              </defs>
+              <path
+                d="M 45 35 L 85 35"
+                class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.2px]"
+                marker-end="url(#export-center-assoc)"
+              />
             </svg>
             <!-- Class 1 -->
             <div class="w-12 h-10 border border-border-default bg-bg-base rounded p-0.5 flex flex-col justify-between z-10 text-[5px] text-left">

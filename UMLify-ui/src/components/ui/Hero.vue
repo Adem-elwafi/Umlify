@@ -128,31 +128,48 @@
                 <div class="relative w-[520px] h-[340px] scale-[0.7] xs:scale-[0.8] sm:scale-90 md:scale-95 lg:scale-100 xl:scale-105 2xl:scale-115 origin-center shrink-0">
                   
                   <!-- SVG Connector Paths (UML lines) -->
-                  <svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+                  <svg class="absolute inset-0 w-full h-full pointer-events-none overflow-visible z-10" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                       <!-- Generalization (Hollow triangle) -->
-                      <marker id="generalization" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                        <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--color-bg-surface)" stroke="var(--color-text-secondary)" stroke-width="1.5" />
+                      <marker id="hero-generalization" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--color-bg-surface)" stroke="#a1a1aa" class="dark:stroke-[#71717a]" stroke-width="1.5" />
                       </marker>
                       <!-- Composition (Filled diamond) -->
-                      <marker id="composition" viewBox="0 0 12 10" refX="0" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                        <path d="M 0 5 L 6 0 L 12 5 L 6 10 z" fill="var(--color-text-secondary)" stroke="var(--color-text-secondary)" stroke-width="1.5" />
+                      <marker id="hero-composition" viewBox="0 0 12 10" refX="11" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 5 L 6 0 L 12 5 L 6 10 z" fill="#a1a1aa" class="dark:fill-[#71717a]" stroke="none" />
                       </marker>
                       <!-- Association (Simple arrowhead) -->
-                      <marker id="association" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                        <path d="M 0 1.5 L 10 5 L 0 8.5" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                      <marker id="hero-association" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 10 5 L 0 8.5" fill="none" stroke="#a1a1aa" class="dark:stroke-[#71717a]" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                       </marker>
                     </defs>
 
                     <!-- Lines -->
                     <!-- Customer to Order (Composition) -->
-                    <path d="M 90 130 L 90 70" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" marker-start="url(#composition)" />
+                    <path
+                      d="M 90 130 L 90 70"
+                      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] transition-all duration-300"
+                      marker-start="url(#hero-composition)"
+                    />
                     <!-- OrderController to Order (Association) -->
-                    <path d="M 90 220 L 90 190" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" marker-end="url(#association)" />
+                    <path
+                      d="M 90 220 L 90 190"
+                      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] transition-all duration-300"
+                      marker-end="url(#hero-association)"
+                    />
                     <!-- PaymentService to Order (Association) -->
-                    <path d="M 230 150 L 175 150" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" marker-end="url(#association)" />
+                    <path
+                      d="M 230 150 L 175 150"
+                      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] transition-all duration-300"
+                      marker-end="url(#hero-association)"
+                    />
                     <!-- Repository to OrderRepository (Realization - dashed) -->
-                    <path d="M 405 220 L 405 160" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#generalization)" />
+                    <path
+                      d="M 405 220 L 405 160"
+                      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] transition-all duration-300"
+                      stroke-dasharray="4 3"
+                      marker-end="url(#hero-generalization)"
+                    />
                   </svg>
 
                   <!-- HTML UML Nodes -->

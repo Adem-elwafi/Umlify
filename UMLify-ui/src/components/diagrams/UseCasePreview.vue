@@ -2,7 +2,7 @@
   <svg
     viewBox="0 0 240 160"
     preserveAspectRatio="xMidYMid meet"
-    class="w-full h-full text-text-primary transition-all duration-300"
+    class="absolute inset-0 w-full h-full pointer-events-none overflow-visible z-10"
   >
     <!-- System Boundary -->
     <rect
@@ -28,7 +28,6 @@
       <!-- Head -->
       <circle
         cx="35"
-        y="58"
         cy="58"
         r="7.5"
         class="fill-bg-base stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
@@ -144,31 +143,19 @@
 
     <!-- Associations -->
     <!-- Actor ---> Search Items -->
-    <line
-      x1="48"
-      y1="75"
-      x2="115"
-      y2="50"
-      class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
-      stroke-width="1.2"
+    <path
+      d="M 48 75 L 115 50"
+      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] group-hover:stroke-interactive-accent group-hover:stroke-[2.5px] transition-colors duration-300"
     />
     <!-- Actor ---> Checkout -->
-    <line
-      x1="48"
-      y1="78"
-      x2="115"
-      y2="82"
-      class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
-      stroke-width="1.2"
+    <path
+      d="M 48 78 L 115 82"
+      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] group-hover:stroke-interactive-accent group-hover:stroke-[2.5px] transition-colors duration-300"
     />
     <!-- Actor ---> Make Payment -->
-    <line
-      x1="48"
-      y1="82"
-      x2="115"
-      y2="114"
-      class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
-      stroke-width="1.2"
+    <path
+      d="M 48 82 L 115 114"
+      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] group-hover:stroke-interactive-accent group-hover:stroke-[2.5px] transition-colors duration-300"
     />
   </svg>
 </template>

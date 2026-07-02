@@ -2,14 +2,14 @@
   <svg
     viewBox="0 0 240 160"
     preserveAspectRatio="xMidYMid meet"
-    class="w-full h-full text-text-primary transition-all duration-300"
+    class="absolute inset-0 w-full h-full pointer-events-none overflow-visible z-10"
   >
     <defs>
       <!-- Composition (Filled diamond) -->
       <marker
-        id="class-composition"
+        id="class-comp-preview"
         viewBox="0 0 12 10"
-        refX="0"
+        refX="11"
         refY="5"
         markerWidth="6"
         markerHeight="6"
@@ -17,15 +17,15 @@
       >
         <path
           d="M 0 5 L 6 1 L 12 5 L 6 9 Z"
-          class="fill-text-secondary group-hover:fill-interactive-accent transition-colors duration-300"
+          fill="#71717a"
           stroke="none"
         />
       </marker>
       <!-- Association (Open arrowhead) -->
       <marker
-        id="class-association"
+        id="class-assoc-preview"
         viewBox="0 0 10 10"
-        refX="10"
+        refX="8"
         refY="5"
         markerWidth="5"
         markerHeight="5"
@@ -34,7 +34,7 @@
         <path
           d="M 2 1 L 10 5 L 2 9"
           fill="none"
-          class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
+          stroke="#71717a"
           stroke-width="1.5"
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -44,24 +44,16 @@
 
     <!-- Connectors -->
     <!-- Customer [Composition] ---> Order -->
-    <line
-      x1="102"
-      y1="40"
-      x2="140"
-      y2="40"
-      class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
-      stroke-width="1.5"
-      marker-start="url(#class-composition)"
+    <path
+      d="M 102 40 L 140 40"
+      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] group-hover:stroke-interactive-accent group-hover:stroke-[2.5px] transition-colors duration-300"
+      marker-start="url(#class-comp-preview)"
     />
     <!-- Order ---> Product (Association) -->
-    <line
-      x1="180"
-      y1="70"
-      x2="180"
-      y2="95"
-      class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
-      stroke-width="1.5"
-      marker-end="url(#class-association)"
+    <path
+      d="M 182 70 L 182 95"
+      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] group-hover:stroke-interactive-accent group-hover:stroke-[2.5px] transition-colors duration-300"
+      marker-end="url(#class-assoc-preview)"
     />
 
     <!-- Customer Class Box -->

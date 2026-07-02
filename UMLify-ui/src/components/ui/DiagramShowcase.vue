@@ -71,7 +71,7 @@
 
                 <!-- Vector Preview Component -->
                 <div
-                  class="w-full aspect-[3/2] p-sm bg-bg-base/30 rounded-interactive border border-border-default/60 overflow-hidden flex items-center justify-center 
+                  class="relative w-full aspect-[3/2] overflow-visible bg-bg-surface flex items-center justify-center p-sm rounded-interactive border border-border-default/60
                          transition-all duration-300 group-hover:bg-bg-base/80 group-hover:border-interactive-accent/25 group-hover:scale-[1.01]"
                 >
                   <component :is="item.preview" />

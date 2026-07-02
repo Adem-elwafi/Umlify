@@ -2,14 +2,14 @@
   <svg
     viewBox="0 0 240 160"
     preserveAspectRatio="xMidYMid meet"
-    class="w-full h-full text-text-primary transition-all duration-300"
+    class="absolute inset-0 w-full h-full pointer-events-none overflow-visible z-10"
   >
     <defs>
       <!-- Solid Arrowhead -->
       <marker
-        id="seq-solid-arrow"
+        id="seq-solid-preview"
         viewBox="0 0 10 10"
-        refX="10"
+        refX="8"
         refY="5"
         markerWidth="5"
         markerHeight="5"
@@ -17,15 +17,15 @@
       >
         <path
           d="M 0 1 L 10 5 L 0 9 Z"
-          class="fill-text-secondary group-hover:fill-interactive-accent transition-colors duration-300"
+          fill="#71717a"
           stroke="none"
         />
       </marker>
       <!-- Open Arrowhead -->
       <marker
-        id="seq-open-arrow"
+        id="seq-open-preview"
         viewBox="0 0 10 10"
-        refX="10"
+        refX="8"
         refY="5"
         markerWidth="5"
         markerHeight="5"
@@ -34,7 +34,7 @@
         <path
           d="M 2 1 L 10 5 L 2 9"
           fill="none"
-          class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
+          stroke="#71717a"
           stroke-width="1.5"
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -132,7 +132,6 @@
     </g>
 
     <!-- Activation Bars -->
-    <!-- Controller Activation -->
     <rect
       x="117"
       y="48"
@@ -142,7 +141,6 @@
       class="fill-bg-surface stroke-border-default group-hover:stroke-interactive-accent/50 transition-colors duration-300"
       stroke-width="1"
     />
-    <!-- Database Activation -->
     <rect
       x="192"
       y="68"
@@ -155,14 +153,10 @@
 
     <!-- Message Flows -->
     <!-- login() -->
-    <line
-      x1="45"
-      y1="53"
-      x2="117"
-      y2="53"
-      class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
-      stroke-width="1.2"
-      marker-end="url(#seq-solid-arrow)"
+    <path
+      d="M 45 53 L 117 53"
+      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] group-hover:stroke-interactive-accent group-hover:stroke-[2.5px] transition-colors duration-300"
+      marker-end="url(#seq-solid-preview)"
     />
     <text
       x="81"
@@ -174,14 +168,10 @@
     </text>
 
     <!-- validate() -->
-    <line
-      x1="123"
-      y1="73"
-      x2="192"
-      y2="73"
-      class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
-      stroke-width="1.2"
-      marker-end="url(#seq-solid-arrow)"
+    <path
+      d="M 123 73 L 192 73"
+      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] group-hover:stroke-interactive-accent group-hover:stroke-[2.5px] transition-colors duration-300"
+      marker-end="url(#seq-solid-preview)"
     />
     <text
       x="157"
@@ -193,15 +183,11 @@
     </text>
 
     <!-- success (return) -->
-    <line
-      x1="192"
-      y1="98"
-      x2="123"
-      y2="98"
-      class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
-      stroke-width="1.2"
+    <path
+      d="M 192 98 L 123 98"
+      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] group-hover:stroke-interactive-accent group-hover:stroke-[2.5px] transition-colors duration-300"
       stroke-dasharray="3 2"
-      marker-end="url(#seq-open-arrow)"
+      marker-end="url(#seq-open-preview)"
     />
     <text
       x="157"
@@ -213,15 +199,11 @@
     </text>
 
     <!-- token (return) -->
-    <line
-      x1="117"
-      y1="118"
-      x2="45"
-      y2="118"
-      class="stroke-text-secondary group-hover:stroke-interactive-accent transition-colors duration-300"
-      stroke-width="1.2"
+    <path
+      d="M 117 118 L 45 118"
+      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] group-hover:stroke-interactive-accent group-hover:stroke-[2.5px] transition-colors duration-300"
       stroke-dasharray="3 2"
-      marker-end="url(#seq-open-arrow)"
+      marker-end="url(#seq-open-preview)"
     />
     <text
       x="81"

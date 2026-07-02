@@ -23,23 +23,50 @@
       
       <!-- UML Connector Lines -->
       <svg
-        v-if="showClass1 && showClass2"
+        v-if="showClass1 && showClass2 && class2Position.x > 145"
         class="absolute inset-0 w-full h-full pointer-events-none z-10"
       >
-        <line
-          x1="180"
-          y1="130"
-          :x2="class2Position.x + 35"
-          y2="130"
-          class="stroke-text-secondary transition-all duration-100"
-          stroke-width="1.2"
-        />
-        <path
-          :d="`M ${class2Position.x + 35} 130 L ${class2Position.x + 40} 127 M ${class2Position.x + 35} 130 L ${class2Position.x + 40} 133`"
-          fill="none"
-          class="stroke-text-secondary transition-all duration-100"
-          stroke-width="1.2"
-        />
+        <!-- 1. Real Relation Line (shows ONLY when reached final position, x === 240) -->
+        <template v-if="class2Position.x === 240">
+          <line
+            x1="145"
+            y1="122.5"
+            x2="240"
+            y2="122.5"
+            stroke="var(--color-text-secondary)"
+            stroke-width="1.2"
+          />
+          <path
+            d="M 240 122.5 L 235 119.5 M 240 122.5 L 235 125.5"
+            fill="none"
+            stroke="var(--color-text-secondary)"
+            stroke-width="1.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </template>
+
+        <!-- 2. Preview Line (shows when drawing is in progress, x < 240) -->
+        <template v-else>
+          <line
+            x1="145"
+            y1="122.5"
+            :x2="class2Position.x"
+            y2="122.5"
+            stroke="var(--color-interactive-accent)"
+            stroke-width="1.5"
+            stroke-dasharray="4 4"
+          />
+          <!-- Connection handle dot (white circle with blue border) -->
+          <circle
+            :cx="class2Position.x"
+            cy="122.5"
+            r="3"
+            stroke="var(--color-interactive-accent)"
+            fill="var(--color-bg-base)"
+            stroke-width="1.5"
+          />
+        </template>
       </svg>
 
       <!-- UML Class Node 1 -->
