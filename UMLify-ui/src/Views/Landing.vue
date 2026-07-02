@@ -21,6 +21,9 @@
 
       <!-- Keyboard-First Productivity Section -->
       <ProductivitySection />
+
+      <!-- Open Development Roadmap Section -->
+      <RoadmapSection />
     </main>
   </div>
 </template>
@@ -33,4 +36,5 @@ import Capabilities from '../components/ui/Capabilities.vue'
 import DiagramShowcase from '../components/ui/DiagramShowcase.vue'
 import ExportIntegrations from '../components/ui/ExportIntegrations.vue'
 import ProductivitySection from '../components/ui/ProductivitySection.vue'
+import RoadmapSection from '../components/ui/RoadmapSection.vue'
 </script>
