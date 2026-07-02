@@ -27,6 +27,9 @@
 
       <!-- Engineering FAQ Section -->
       <FAQSection />
+
+      <!-- Engineering Trust & Social Proof Section -->
+      <TrustSection />
     </main>
   </div>
 </template>
@@ -41,4 +44,5 @@ import ExportIntegrations from '../components/ui/ExportIntegrations.vue'
 import ProductivitySection from '../components/ui/ProductivitySection.vue'
 import RoadmapSection from '../components/ui/RoadmapSection.vue'
 import FAQSection from '../components/ui/FAQSection.vue'
+import TrustSection from '../components/ui/TrustSection.vue'
 </script>
