@@ -24,6 +24,9 @@
 
       <!-- Open Development Roadmap Section -->
       <RoadmapSection />
+
+      <!-- Engineering FAQ Section -->
+      <FAQSection />
     </main>
   </div>
 </template>
@@ -37,4 +40,5 @@ import DiagramShowcase from '../components/ui/DiagramShowcase.vue'
 import ExportIntegrations from '../components/ui/ExportIntegrations.vue'
 import ProductivitySection from '../components/ui/ProductivitySection.vue'
 import RoadmapSection from '../components/ui/RoadmapSection.vue'
+import FAQSection from '../components/ui/FAQSection.vue'
 </script>
