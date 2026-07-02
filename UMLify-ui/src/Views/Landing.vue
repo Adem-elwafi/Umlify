@@ -30,6 +30,9 @@
 
       <!-- Engineering Trust & Social Proof Section -->
       <TrustSection />
+
+      <!-- Simple Pricing Section -->
+      <PricingSection />
     </main>
   </div>
 </template>
@@ -45,4 +48,5 @@ import ProductivitySection from '../components/ui/ProductivitySection.vue'
 import RoadmapSection from '../components/ui/RoadmapSection.vue'
 import FAQSection from '../components/ui/FAQSection.vue'
 import TrustSection from '../components/ui/TrustSection.vue'
+import PricingSection from '../components/ui/PricingSection.vue'
 </script>
