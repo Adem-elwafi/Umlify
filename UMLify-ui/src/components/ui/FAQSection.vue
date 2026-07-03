@@ -55,31 +55,33 @@
               >
                 <div class="flex flex-col">
                 <!-- Accordion Header Button -->
-                <button
-                  :ref="el => { if (el) buttonRefs[index] = el }"
-                  :id="'faq-btn-' + index"
-                  role="button"
-                  :aria-expanded="activeIndex === index ? 'true' : 'false'"
-                  :aria-controls="'faq-content-' + index"
-                  class="w-full text-left flex items-center justify-between font-bold text-sm text-text-primary focus-visible:outline-none cursor-pointer py-xxs select-none"
-                  @click="toggleItem(index)"
-                  @keydown="handleKeyDown($event, index)"
-                  @focus="focusedIndex = index"
-                  @blur="focusedIndex = null"
-                >
-                  <span class="pr-md">{{ item.question }}</span>
-                  <!-- Chevron Icon -->
-                  <svg
-                    class="h-4 w-4 text-text-secondary transition-transform duration-300 ease-tactile shrink-0"
-                    :class="{ 'rotate-180': activeIndex === index }"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    stroke-width="2.5"
+                <h3 class="w-full flex">
+                  <button
+                    :ref="el => { if (el) buttonRefs[index] = el }"
+                    :id="'faq-btn-' + index"
+                    role="button"
+                    :aria-expanded="activeIndex === index ? 'true' : 'false'"
+                    :aria-controls="'faq-content-' + index"
+                    class="w-full text-left flex items-center justify-between font-bold text-sm text-text-primary focus-visible:outline-none cursor-pointer py-xxs select-none"
+                    @click="toggleItem(index)"
+                    @keydown="handleKeyDown($event, index)"
+                    @focus="focusedIndex = index"
+                    @blur="focusedIndex = null"
                   >
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
+                    <span class="pr-md">{{ item.question }}</span>
+                    <!-- Chevron Icon -->
+                    <svg
+                      class="h-4 w-4 text-text-secondary transition-transform duration-300 ease-tactile shrink-0"
+                      :class="{ 'rotate-180': activeIndex === index }"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                </h3>
 
                 <!-- Accordion Content (Smooth height animation) -->
                 <div

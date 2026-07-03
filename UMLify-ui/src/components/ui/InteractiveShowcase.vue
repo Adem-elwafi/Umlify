@@ -1,12 +1,12 @@
 <template>
-  <Section id="features" spacing="xl" custom-class="border-t border-border-default bg-bg-base/50 pt-lg lg:pt-xl">
-    <Container size="2xl">
+  <Section id="features" spacing="xxl" custom-class="border-t border-border-default bg-bg-base/30 relative overflow-hidden">
+    <Container size="xl">
       <Stack gap="xl">
         
         <!-- Section Header -->
-        <Stack gap="xs" align="start" class="max-w-2xl text-left">
-          <span class="text-xxs font-mono uppercase tracking-widest text-interactive-accent">Guided Tour</span>
-          <h2 class="text-3xl font-bold tracking-tight text-text-primary w-full">
+        <Stack gap="sm" align="start" class="max-w-2xl text-left">
+          <Badge variant="accent">Guided Tour</Badge>
+          <h2 class="text-3xl lg:text-4xl font-bold tracking-tight text-text-primary w-full">
             How Umlify works.
           </h2>
           <p class="text-sm text-text-secondary leading-relaxed w-full">

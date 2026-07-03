@@ -6,7 +6,7 @@
     custom-class="border-t border-border-default bg-bg-base/30 relative overflow-hidden"
   >
     <Container size="xl">
-      <Stack gap="xxl" align="center" class="w-full">
+      <Stack gap="xl" align="center" class="w-full">
         
         <!-- Section Header -->
         <Stack gap="sm" align="center" class="max-w-2xl text-center">

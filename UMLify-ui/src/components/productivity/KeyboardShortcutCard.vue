@@ -1,5 +1,11 @@
 <template>
-  <Card custom-class="p-sm bg-gradient-to-b from-bg-surface to-bg-surface/30 border border-border-default/80 hover:border-interactive-accent/30 transition-colors duration-300">
+  <Surface
+    depth="1"
+    radius="md"
+    border
+    hoverable
+    custom-class="p-md bg-gradient-to-b from-bg-surface to-bg-surface/30 border border-border-default/80 hover:border-interactive-accent/30 flex flex-col justify-center h-full"
+  >
     <Stack direction="row" gap="md" align="center" justify="between" class="w-full">
       <!-- Shortcut Keys -->
       <div class="flex items-center gap-xxs shrink-0 select-none">
@@ -17,11 +23,11 @@
         {{ description }}
       </span>
     </Stack>
-  </Card>
+  </Surface>
 </template>
 
 <script setup>
-import Card from '../ui/Card.vue'
+import Surface from '../ui/layout/Surface.vue'
 import Stack from '../ui/layout/Stack.vue'
 
 defineProps({

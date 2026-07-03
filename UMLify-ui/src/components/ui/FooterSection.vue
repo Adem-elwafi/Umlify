@@ -1,8 +1,8 @@
 <template>
   <footer
-    ref="footerRef"
-    class="w-full border-t border-border-default bg-bg-base/30 py-xl lg:py-[64px] relative overflow-hidden transition-all duration-700 ease-tactile transform"
-    :class="isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+     ref="footerRef"
+     class="w-full border-t border-border-default bg-bg-base/30 py-xl lg:py-[64px] relative overflow-hidden transition-all duration-600 ease-tactile transform"
+     :class="isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
   >
     <Container size="lg">
       <!-- 5-Column Grid -->

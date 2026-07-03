@@ -7,8 +7,8 @@
   >
     <Container size="lg">
       <div
-        class="w-full transition-all duration-700 ease-tactile transform"
-        :class="isVisible ? 'opacity-100 translate-y-0 scale-[1.01]' : 'opacity-0 translate-y-8 scale-100'"
+        class="w-full transition-all duration-600 ease-tactile transform"
+        :class="isVisible ? 'opacity-100 translate-y-0 scale-[1.01]' : 'opacity-0 translate-y-4 scale-100'"
         style="transition-delay: 50ms;"
       >
         <Surface

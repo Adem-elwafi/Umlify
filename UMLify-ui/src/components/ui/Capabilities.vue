@@ -53,7 +53,7 @@
           >
             <Card
               hoverable
-              custom-class="group h-full text-left transition-all duration-300 focus-visible:ring-2 focus-visible:ring-interactive-accent focus-visible:outline-none hover:border-interactive-accent/50 bg-gradient-to-b from-bg-surface to-bg-surface/30"
+              custom-class="group h-full text-left transition-all duration-300 focus-visible:ring-2 focus-visible:ring-interactive-accent focus-visible:outline-none hover:border-interactive-accent/30 bg-gradient-to-b from-bg-surface to-bg-surface/30"
               tabindex="0"
               :aria-label="`Capability: ${cap.title}. ${cap.description}`"
             >
