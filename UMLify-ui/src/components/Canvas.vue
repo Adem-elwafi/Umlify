@@ -240,6 +240,7 @@ import UseCase from './UseCase.vue';
 import System from './System.vue'; 
 import Package from './Package.vue';
 import Note from './Note.vue';
+import { useInteractionEngine, InteractionState } from '../engines/interaction';
 
 const props = defineProps({ 
   onLogout: Function
@@ -248,6 +249,8 @@ const props = defineProps({
 const diagramStore = useDiagramStore();
 const { elements, connections, selectedElements, selectedConnectionId, zoomLevel } = storeToRefs(diagramStore);
 const { updateSize, updateLabel, deleteElement, connectElements, undo, redo, saveToHistory } = diagramStore;
+
+const interaction = useInteractionEngine();
 
 const isSelecting = ref(false);
 const selectionBox = ref({ startX: 0, startY: 0, currentX: 0, currentY: 0 });
@@ -318,6 +321,13 @@ const initiateConnectionDrag = (event, element, side) => {
     targetSide: null
   };
 
+  // Temporary FSM shadow synchronization point
+  interaction.transitionTo(InteractionState.DRAWING_CONNECTION, {
+    sourceId: element.id,
+    sourceAnchor: side,
+    mouse: { x: startX, y: startY }
+  });
+
   window.addEventListener('mousemove', handleConnectionMouseMove);
   window.addEventListener('mouseup', handleConnectionMouseUp);
 };
@@ -372,6 +382,9 @@ const handleConnectionMouseUp = (event) => {
   }
 
   activeDraggingLink.value = null;
+  // Temporary FSM shadow synchronization point
+  interaction.transitionTo(InteractionState.IDLE);
+
   window.removeEventListener('mousemove', handleConnectionMouseMove);
   window.removeEventListener('mouseup', handleConnectionMouseUp);
 };
@@ -547,6 +560,13 @@ const initiateElementsDrag = (event, element) => {
       currentY: el.y
     }));
 
+  // Temporary FSM shadow synchronization point
+  interaction.transitionTo(InteractionState.DRAGGING_ELEMENTS, {
+    ids: activeTrackedElements.value.map(item => item.id),
+    origin: { x: dragStartMouseX, y: dragStartMouseY },
+    current: { x: dragStartMouseX, y: dragStartMouseY }
+  });
+
   window.addEventListener('mousemove', handleElementDragMove);
   window.addEventListener('mouseup', handleElementDragMouseUp);
 };
@@ -634,6 +654,9 @@ const handleElementDragMouseUp = () => {
   if (!isDraggingElements.value) return;
   isDraggingElements.value = false;
 
+  // Temporary FSM shadow synchronization point
+  interaction.transitionTo(InteractionState.IDLE);
+
   // Clear alignment guides
   alignmentGuides.value = { vertical: null, horizontal: null };
 
@@ -704,6 +727,12 @@ function handleCanvasMouseDown(e) {
   boxWidth.value = 0;
   boxHeight.value = 0;
   
+  // Temporary FSM shadow synchronization point
+  interaction.transitionTo(InteractionState.MARQUEE_SELECTING, {
+    start: { x, y },
+    current: { x, y }
+  });
+  
   if (!e.ctrlKey) {
     selectedElements.value = [];
   }
@@ -732,6 +761,8 @@ function handleCanvasMouseMove(e) {
 
 function handleCanvasMouseUp() { 
   isSelecting.value = false; 
+  // Temporary FSM shadow synchronization point
+  interaction.transitionTo(InteractionState.IDLE);
 }
 
 function updateSelectionFromBox() {
