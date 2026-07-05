@@ -306,6 +306,9 @@ const getElementBounds = (element) => {
 const activeDraggingLink = ref(null);
 
 const initiateConnectionDrag = (event, element, side) => {
+  // Guard: Only allow drawing connections in IDLE state
+  if (!interaction.is(InteractionState.IDLE)) return;
+
   const fromPt = getConnectionPoint(element, side);
   const startX = fromPt.x;
   const startY = fromPt.y;
@@ -333,7 +336,7 @@ const initiateConnectionDrag = (event, element, side) => {
 };
 
 const handleConnectionMouseMove = (event) => {
-  if (!activeDraggingLink.value) return;
+  if (!interaction.is(InteractionState.DRAWING_CONNECTION) || !activeDraggingLink.value) return;
   const canvasArea = document.querySelector('#uml-canvas div[class*="overflow-auto"]');
   const rect = canvasArea.getBoundingClientRect();
   
@@ -361,7 +364,7 @@ const handleConnectionMouseMove = (event) => {
 };
 
 const handleConnectionMouseUp = (event) => {
-  if (!activeDraggingLink.value) return;
+  if (!interaction.is(InteractionState.DRAWING_CONNECTION) || !activeDraggingLink.value) return;
 
   const elementUnderCursor = document.elementFromPoint(event.clientX, event.clientY);
   const target = elementUnderCursor ? elementUnderCursor.closest('[data-anchor-side]') : null;
@@ -536,6 +539,8 @@ let animationFrameId = null;
 
 const initiateElementsDrag = (event, element) => {
   if (event.button !== 0) return;
+  // Guard: Only allow starting drag in IDLE state
+  if (!interaction.is(InteractionState.IDLE)) return;
   
   const idStr = String(element.id);
   if (!selectedElements.value.includes(idStr)) {
@@ -572,7 +577,7 @@ const initiateElementsDrag = (event, element) => {
 };
 
 const handleElementDragMove = (event) => {
-  if (!isDraggingElements.value) return;
+  if (!interaction.is(InteractionState.DRAGGING_ELEMENTS) || !isDraggingElements.value) return;
 
   const deltaX = (event.clientX - dragStartMouseX) / zoomLevel.value;
   const deltaY = (event.clientY - dragStartMouseY) / zoomLevel.value;
@@ -651,7 +656,7 @@ const handleElementDragMove = (event) => {
 };
 
 const handleElementDragMouseUp = () => {
-  if (!isDraggingElements.value) return;
+  if (!interaction.is(InteractionState.DRAGGING_ELEMENTS) || !isDraggingElements.value) return;
   isDraggingElements.value = false;
 
   // Temporary FSM shadow synchronization point
@@ -713,6 +718,8 @@ const getElementStyle = (element) => {
 // ==========================================
 function handleCanvasMouseDown(e) {
   if (e.button !== 0 || e.target.closest('.element, [data-anchor-side], .conn-edit-anchor, .conn-editor')) return;
+  // Guard: Only allow marquee selection when IDLE
+  if (!interaction.is(InteractionState.IDLE)) return;
   
   const canvas = e.currentTarget;
   const rect = canvas.getBoundingClientRect();
@@ -738,7 +745,7 @@ function handleCanvasMouseDown(e) {
   }
 }
 function handleCanvasMouseMove(e) {
-  if (!isSelecting.value || isDraggingElements.value || activeDraggingLink.value) return;
+  if (!interaction.is(InteractionState.MARQUEE_SELECTING)) return;
   
   const canvas = document.querySelector('#uml-canvas div[class*="overflow-auto"]');
   if (!canvas) return;
@@ -760,6 +767,7 @@ function handleCanvasMouseMove(e) {
 }
 
 function handleCanvasMouseUp() { 
+  if (!interaction.is(InteractionState.MARQUEE_SELECTING)) return;
   isSelecting.value = false; 
   // Temporary FSM shadow synchronization point
   interaction.transitionTo(InteractionState.IDLE);
@@ -819,8 +827,16 @@ const handleDrop = (event) => {
   elements.value.push(elementPayload);
 };
 
-function selectConnection(id) { selectedConnectionId.value = id; }
-function clearSelectedConnection() { selectedConnectionId.value = null; }
+function selectConnection(id) { 
+  selectedConnectionId.value = id; 
+  interaction.transitionTo(InteractionState.CONTEXT_MENU_OPEN, { connectionId: id });
+}
+function clearSelectedConnection() { 
+  selectedConnectionId.value = null; 
+  if (interaction.is(InteractionState.CONTEXT_MENU_OPEN)) {
+    interaction.reset();
+  }
+}
 
 
 function changeSelectedConnectionType(newType) {
@@ -886,12 +902,36 @@ const selectElement = (id, event) => {
 
 
 
+const handleFocus = (event) => {
+  const target = event.target;
+  if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+    // Temporary FSM shadow synchronization point
+    interaction.transitionTo(InteractionState.EDITING_LABEL, {
+      target,
+      value: target.value
+    });
+  }
+};
+
+const handleBlur = (event) => {
+  const target = event.target;
+  if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+    if (interaction.is(InteractionState.EDITING_LABEL)) {
+      // Temporary FSM shadow synchronization point
+      interaction.reset();
+    }
+  }
+};
+
 function handleKeydown(e) {
   const active = document.activeElement;
   const isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
+  
+  // Keyboard protection: do not execute canvas shortcuts if editing a label
+  if (isTyping || interaction.is(InteractionState.EDITING_LABEL)) return;
+
   if (e.ctrlKey && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); return; }
   if (e.ctrlKey && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); return; }
-  if (isTyping) return;
   if (e.key === 'Delete' || e.key === 'Backspace') {
     if (selectedElements.value.length > 0) {
       [...selectedElements.value].forEach(id => diagramStore.deleteElement(id));
@@ -904,11 +944,15 @@ function handleKeydown(e) {
 }
 
 onMounted(() => {
+  window.addEventListener('focus', handleFocus, true);
+  window.addEventListener('blur', handleBlur, true);
   window.addEventListener('keydown', handleKeydown);
   window.addEventListener('mousemove', handleCanvasMouseMove);
   window.addEventListener('mouseup', handleCanvasMouseUp);
 });
 onBeforeUnmount(() => {
+  window.removeEventListener('focus', handleFocus, true);
+  window.removeEventListener('blur', handleBlur, true);
   window.removeEventListener('keydown', handleKeydown);
   window.removeEventListener('mousemove', handleCanvasMouseMove);
   window.removeEventListener('mouseup', handleCanvasMouseUp);
