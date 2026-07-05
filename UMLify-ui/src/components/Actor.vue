@@ -39,7 +39,7 @@
     <div 
       v-if="selected" 
       class="absolute -bottom-2.5 -right-2.5 w-6 h-6 flex items-center justify-center cursor-nwse-resize z-30 select-none"
-      @mousedown.stop="startResize"
+      @mousedown.stop="emit('resize-start', $event)"
     >
       <div class="w-2.5 h-2.5 bg-white border border-accent-blue rounded-md shadow-sm hover:bg-accent-blue/10 transition-all active:scale-90"></div>
     </div>
@@ -71,7 +71,7 @@ const props = defineProps({
   onResize: Function,
   selected: { type: Boolean, default: false }
 })
-const emit = defineEmits(['click', 'update:label', 'delete'])
+const emit = defineEmits(['click', 'update:label', 'delete', 'resize-start'])
 
 const localLabel = ref(props.label || 'Actor')
 
@@ -83,31 +83,4 @@ function updateLabel() {
   emit('update:label', localLabel.value)
 }
 
-const resizing = ref(false)
-
-function startResize(event) {
-  event.stopPropagation()
-  resizing.value = true
-  const startX = event.clientX
-  const startY = event.clientY
-  const initialWidth = props.width || 80
-  const initialHeight = props.height || 120
-
-  const resize = (e) => {
-    const dx = e.clientX - startX
-    const dy = e.clientY - startY
-    const newWidth = Math.max(80, initialWidth + dx)
-    const newHeight = Math.max(80, initialHeight + dy)
-    if (props.onResize) props.onResize(newWidth, newHeight)
-  }
-
-  const stopResize = () => {
-    window.removeEventListener('mousemove', resize)
-    window.removeEventListener('mouseup', stopResize)
-    setTimeout(() => { resizing.value = false }, 0)
-  }
-
-  window.addEventListener('mousemove', resize)
-  window.addEventListener('mouseup', stopResize)
-}
 </script>

@@ -56,11 +56,11 @@
             :width="element.width || 300"
             :height="element.height || 400"
             :onDrag="null"
-            :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
             @click="selectElement(element.id, $event)"
             @delete="deleteElement(element.id)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
+            @resize-start="initiateResize($event, element)"
           />
           <Actor
             v-else-if="element.type === 'actor'"
@@ -70,11 +70,11 @@
             :width="element.width || 80"
             :height="element.height || 120"
             :onDrag="null"
-            :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
             @click="selectElement(element.id, $event)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
             @delete="deleteElement(element.id)"
+            @resize-start="initiateResize($event, element)"
           />
           <UseCase 
             v-else-if="element.type === 'usecase'"
@@ -84,11 +84,11 @@
             :width="element.width || 140"
             :height="element.height || 80"
             :onDrag="null"
-            :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
             @click="selectElement(element.id, $event)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
             @delete="deleteElement(element.id)"
+            @resize-start="initiateResize($event, element)"
           />
           <Package
             v-else-if="element.type === 'package'"
@@ -98,11 +98,11 @@
             :width="element.width || 200"
             :height="element.height || 150"
             :onDrag="null"
-            :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
             @click="selectElement(element.id, $event)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
             @delete="deleteElement(element.id)"
+            @resize-start="initiateResize($event, element)"
           />
           <Note
             v-else-if="element.type === 'note'"
@@ -112,11 +112,11 @@
             :width="element.width || 120"
             :height="element.height || 120"
             :onDrag="null"
-            :onResize="(newWidth, newHeight) => updateSize(element.id, newWidth, newHeight)"
             :selected="selectedElements.includes(String(element.id))"
             @click="selectElement(element.id, $event)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
             @delete="deleteElement(element.id)"
+            @resize-start="initiateResize($event, element)"
           />
 
           <!-- Interactive Connection Anchors (Task 2: Hover perimeter handles) -->
@@ -537,6 +537,15 @@ let dragStartMouseX = 0;
 let dragStartMouseY = 0;
 let animationFrameId = null;
 
+// ==========================================
+// 📐 CENTRALIZED ELEMENT RESIZING (Task 4B)
+// ==========================================
+const activeResizingElement = ref(null);
+let resizeStartMouseX = 0;
+let resizeStartMouseY = 0;
+let resizeStartWidth = 0;
+let resizeStartHeight = 0;
+
 const initiateElementsDrag = (event, element) => {
   if (event.button !== 0) return;
   // Guard: Only allow starting drag in IDLE state
@@ -681,6 +690,74 @@ const handleElementDragMouseUp = () => {
     diagramStore.updatePositionWithGroup(item.id, item.currentX, item.currentY);
   });
   activeTrackedElements.value = [];
+};
+
+const initiateResize = (event, element) => {
+  if (event.button !== 0) return;
+  // Guard: Only allow resizing in IDLE state
+  if (!interaction.is(InteractionState.IDLE)) return;
+
+  const { width: w, height: h } = getElementDimensions(element);
+
+  activeResizingElement.value = {
+    id: element.id,
+    type: element.type,
+    baseWidth: w,
+    baseHeight: h
+  };
+
+  resizeStartMouseX = event.clientX;
+  resizeStartMouseY = event.clientY;
+  resizeStartWidth = w;
+  resizeStartHeight = h;
+
+  interaction.transitionTo(InteractionState.RESIZING_ELEMENT, {
+    targetId: element.id,
+    initialWidth: w,
+    initialHeight: h
+  });
+
+  window.addEventListener('mousemove', handleResizeMouseMove);
+  window.addEventListener('mouseup', handleResizeMouseUp);
+};
+
+const handleResizeMouseMove = (event) => {
+  if (!interaction.is(InteractionState.RESIZING_ELEMENT) || !activeResizingElement.value) return;
+
+  const deltaX = (event.clientX - resizeStartMouseX) / zoomLevel.value;
+  const deltaY = (event.clientY - resizeStartMouseY) / zoomLevel.value;
+
+  const minWidth = activeResizingElement.value.type === 'actor' ? 80 : activeResizingElement.value.type === 'usecase' ? 100 : 100;
+  const minHeight = activeResizingElement.value.type === 'actor' ? 80 : activeResizingElement.value.type === 'usecase' ? 50 : 100;
+
+  const newWidth = Math.max(minWidth, resizeStartWidth + deltaX);
+  const newHeight = Math.max(minHeight, resizeStartHeight + deltaY);
+
+  // REACTIVE PATCH: Update coordinates for dynamic connector arrows update in real-time
+  const el = elements.value.find(e => String(e.id) === String(activeResizingElement.value.id));
+  if (el) {
+    el.width = newWidth;
+    el.height = newHeight;
+  }
+};
+
+const handleResizeMouseUp = () => {
+  if (!interaction.is(InteractionState.RESIZING_ELEMENT) || !activeResizingElement.value) return;
+
+  const el = elements.value.find(e => String(e.id) === String(activeResizingElement.value.id));
+  if (el) {
+    diagramStore.updateSize(activeResizingElement.value.id, el.width, el.height);
+  }
+
+  if (typeof diagramStore.saveToHistory === 'function') {
+    diagramStore.saveToHistory();
+  }
+
+  activeResizingElement.value = null;
+  interaction.transitionTo(InteractionState.IDLE);
+
+  window.removeEventListener('mousemove', handleResizeMouseMove);
+  window.removeEventListener('mouseup', handleResizeMouseUp);
 };
 
 const getElementStyle = (element) => {
