@@ -2,12 +2,9 @@
   <div
     class="uml-element element relative w-full h-full cursor-grab active:cursor-grabbing transition-colors duration-200 select-none flex items-center justify-center bg-white text-zinc-900 border border-zinc-200/80 shadow-sm shadow-zinc-200/40 dark:bg-[#111827] dark:text-zinc-100 dark:border dark:border-zinc-800/80 dark:shadow-none rounded-full px-4 py-2"
     :class="[
-      selected ? 'scale-[1.02]' : 'hover:border-zinc-400/80 dark:hover:border-zinc-700/80',
-      { 'opacity-80': dragging }
+      selected ? 'scale-[1.02]' : 'hover:border-zinc-400/80 dark:hover:border-zinc-700/80'
     ]"
     :style="{}"
-    @mousedown="startDrag"
-    @mouseup="handleMouseUp"
   >
     <input 
       type="text" 
@@ -65,43 +62,7 @@ function updateLabel() {
   emit('update:label', localLabel.value)
 }
 
-const dragging = ref(false)
 const resizing = ref(false)
-const moved = ref(false)
-
-function handleMouseUp(event) {
-  if (!moved.value) {
-    emit('click', event)
-  }
-  moved.value = false
-}
-
-function startDrag(event) {
-  if (event.target.tagName === 'INPUT') return
-  
-  dragging.value = true
-  moved.value = false
-  const startX = event.clientX
-  const startY = event.clientY
-  const initialX = props.x
-  const initialY = props.y
-
-  const move = (e) => {
-    const dx = e.clientX - startX
-    const dy = e.clientY - startY
-    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved.value = true
-    if (props.onDrag) props.onDrag(initialX + dx, initialY + dy)
-  }
-
-  const stop = () => {
-    window.removeEventListener('mousemove', move)
-    window.removeEventListener('mouseup', stop)
-    setTimeout(() => { dragging.value = false }, 0)
-  }
-
-  window.addEventListener('mousemove', move)
-  window.addEventListener('mouseup', stop)
-}
 
 function startResize(event) {
   if (event && typeof event.stopPropagation === 'function') {

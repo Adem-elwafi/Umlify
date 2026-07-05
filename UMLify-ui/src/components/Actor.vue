@@ -2,11 +2,9 @@
   <div
     class="actor element relative w-full h-full cursor-grab active:cursor-grabbing transition-colors duration-200 select-none"
     :class="[
-      { 'scale-[1.02]': selected, 'opacity-80': dragging }
+      { 'scale-[1.02]': selected }
     ]"
     :style="{}"
-    @mousedown="startDrag"
-    @mouseup="handleMouseUp"
   >
     <!-- Stick-man SVG Container -->
     <div class="flex flex-col items-center w-full h-full p-2">
@@ -85,42 +83,7 @@ function updateLabel() {
   emit('update:label', localLabel.value)
 }
 
-const dragging = ref(false)
 const resizing = ref(false)
-const moved = ref(false)
-
-function handleMouseUp(event) {
-  if (!moved.value) {
-    emit('click', event)
-  }
-  moved.value = false
-}
-
-function startDrag(event) {
-  if (event.target.tagName === 'INPUT') return
-  
-  dragging.value = true
-  const startX = event.clientX
-  const startY = event.clientY
-  const initialX = props.x
-  const initialY = props.y
-
-  const move = (e) => {
-    const dx = e.clientX - startX
-    const dy = e.clientY - startY
-    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved.value = true
-    if (props.onDrag) props.onDrag(initialX + dx, initialY + dy)
-  }
-
-  const stop = () => {
-    window.removeEventListener('mousemove', move)
-    window.removeEventListener('mouseup', stop)
-    setTimeout(() => { dragging.value = false }, 0)
-  }
-
-  window.addEventListener('mousemove', move)
-  window.addEventListener('mouseup', stop)
-}
 
 function startResize(event) {
   event.stopPropagation()

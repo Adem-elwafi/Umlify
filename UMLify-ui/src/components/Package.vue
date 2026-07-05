@@ -1,8 +1,6 @@
 <template>
   <div
     class="package element relative w-full h-full cursor-grab active:cursor-grabbing transition-all duration-200 ease-in-out select-none"
-    @mousedown="startDrag"
-    @mouseup="handleMouseUp"
   >
     <div class="w-full h-full flex flex-col relative">
       <!-- Folder Tab -->
@@ -71,42 +69,7 @@ watch(
 )
 watch(localLabel, (val) => emit('update:label', val))
 
-const dragging = ref(false)
 const resizing = ref(false)
-const moved = ref(false)
-
-function handleMouseUp(event) {
-  if (!moved.value) {
-    emit('click', event)
-  }
-  moved.value = false
-}
-
-function startDrag(event) {
-  if (event.target.tagName === 'INPUT') return
-  
-  dragging.value = true
-  const startX = event.clientX
-  const startY = event.clientY
-  const initialX = props.x
-  const initialY = props.y
-
-  const move = (e) => {
-    const dx = e.clientX - startX
-    const dy = e.clientY - startY
-    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved.value = true
-    if (props.onDrag) props.onDrag(initialX + dx, initialY + dy)
-  }
-
-  const stop = () => {
-    window.removeEventListener('mousemove', move)
-    window.removeEventListener('mouseup', stop)
-    setTimeout(() => { dragging.value = false }, 0)
-  }
-
-  window.addEventListener('mousemove', move)
-  window.addEventListener('mouseup', stop)
-}
 
 function startResize(event) {
   event.stopPropagation()
