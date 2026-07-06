@@ -344,9 +344,6 @@
         <div class="flex-1 w-full relative bg-[radial-gradient(var(--color-border-default)_1px,transparent_1px)] [background-size:16px_16px] bg-bg-base transition-all duration-300 overflow-hidden">
           <Canvas :onLogout="handleSignOutFlow" />
         </div>
-
-        <!-- StatusBar pinned underneath the canvas strictly across the center viewport width -->
-        <StatusBar />
       </Stack>
 
       <!-- Right Column: AI Terminal Outer Wrapper -->
@@ -364,6 +361,9 @@
         </div>
       </div>
     </div>
+
+    <!-- Bottom: Unified Status Ribbon -->
+    <StatusBar />
 
     <!-- Global Confirmation Modal Wrapper -->
     <transition name="fade">
