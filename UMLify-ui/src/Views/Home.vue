@@ -42,327 +42,328 @@
       </div>
     </Surface>
 
-    <!-- Horizontal Engineering Telemetry & Property Control Strip -->
-    <Surface as="section" depth="1" :border="false" customClass="h-11 w-full flex items-center justify-between px-6 shrink-0 z-20 border-b border-border-default bg-bg-surface/30 shadow-xs">
-      <!-- Left side: Spawner toggle and Undo/Redo -->
-      <div class="flex items-center gap-3">
-        <!-- Spawner Toggle Button -->
-        <button 
-          @click="isSidebarDrawerOpen = !isSidebarDrawerOpen"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/50 hover:bg-zinc-100 dark:bg-zinc-900/50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium transition-all active:scale-95 cursor-pointer shadow-xs select-none group"
-          title="Toggle Shapes Drawer"
-        >
-          <Folder class="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-white" />
-          <span>{{ isSidebarDrawerOpen ? 'Close Spawner' : 'Open Spawner' }}</span>
-        </button>
-
-        <!-- Undo/Redo Controls -->
-        <div class="flex items-center bg-zinc-50/50 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg p-0.5 shadow-xs gap-0.5">
-          <button 
-            @click="diagramStore.undo()"
-            :class="['w-7 h-7 flex items-center justify-center rounded hover:bg-zinc-200/60 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-all active:scale-90', diagramStore.undoStack.length === 0 ? 'opacity-40 pointer-events-none' : '']"
-            title="Undo (Ctrl+Z)"
-          >
-            <Undo2 class="w-3.5 h-3.5" />
-          </button>
-          <div class="w-px h-3 bg-zinc-200 dark:bg-zinc-800 mx-0.5" />
-          <button 
-            @click="diagramStore.redo()"
-            :class="['w-7 h-7 flex items-center justify-center rounded hover:bg-zinc-200/60 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-all active:scale-90', diagramStore.redoStack.length === 0 ? 'opacity-40 pointer-events-none' : '']"
-            title="Redo (Ctrl+Y)"
-          >
-            <Redo2 class="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-
-      <!-- Center side: Telemetry parameters or placeholder -->
-      <div class="flex-1 flex justify-center px-4">
-        <div v-if="inspectorElement" class="flex items-center gap-6 text-xs text-zinc-700 dark:text-zinc-300">
-          <!-- GROUP A: Identity -->
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-mono tracking-wider">Name:</span>
-            <input 
-              v-model="inspectorElement.label" 
-              type="text" 
-              class="px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/60 bg-zinc-50/80 border-zinc-200 text-zinc-900 dark:bg-zinc-900/60 dark:border-zinc-800/80 dark:text-zinc-100 dark:placeholder-zinc-600 w-48 shadow-xs"
-              placeholder="Element Name"
-            />
-            <span class="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase ml-1">ID: {{ inspectorElement.id.split('_')[1] || inspectorElement.id.slice(-6) }}</span>
-          </div>
-
-          <div class="w-px h-4 bg-zinc-200 dark:bg-zinc-800/80" />
-
-          <!-- GROUP B: Coordinates -->
-          <div class="flex items-center gap-3">
-            <div class="flex items-center gap-1.5">
-              <span class="font-bold text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-mono tracking-wider">X:</span>
-              <input 
-                v-model.number="inspectorElement.x" 
-                type="number" 
-                class="w-16 px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/60 bg-zinc-50/80 border-zinc-200 text-zinc-900 dark:bg-zinc-900/60 dark:border-zinc-800/80 dark:text-zinc-100 dark:placeholder-zinc-600 shadow-xs"
-              />
-            </div>
-            <div class="flex items-center gap-1.5">
-              <span class="font-bold text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-mono tracking-wider">Y:</span>
-              <input 
-                v-model.number="inspectorElement.y" 
-                type="number" 
-                class="w-16 px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/60 bg-zinc-50/80 border-zinc-200 text-zinc-900 dark:bg-zinc-900/60 dark:border-zinc-800/80 dark:text-zinc-100 dark:placeholder-zinc-600 shadow-xs"
-              />
-            </div>
-          </div>
-
-          <div class="w-px h-4 bg-zinc-200 dark:bg-zinc-800/80" />
-
-          <!-- GROUP C: Dimensions -->
-          <div class="flex items-center gap-3">
-            <div class="flex items-center gap-1.5">
-              <span class="font-bold text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-mono tracking-wider">W:</span>
-              <input 
-                v-model.number="inspectorElement.width" 
-                type="number" 
-                class="w-16 px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/60 bg-zinc-50/80 border-zinc-200 text-zinc-900 dark:bg-zinc-900/60 dark:border-zinc-800/80 dark:text-zinc-100 dark:placeholder-zinc-600 shadow-xs"
-                placeholder="Auto"
-              />
-            </div>
-            <div class="flex items-center gap-1.5">
-              <span class="font-bold text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-mono tracking-wider">H:</span>
-              <input 
-                v-model.number="inspectorElement.height" 
-                type="number" 
-                class="w-16 px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/60 bg-zinc-50/80 border-zinc-200 text-zinc-900 dark:bg-zinc-900/60 dark:border-zinc-800/80 dark:text-zinc-100 dark:placeholder-zinc-600 shadow-xs"
-                placeholder="Auto"
-              />
-            </div>
-          </div>
-
-          <div class="w-px h-4 bg-zinc-200 dark:bg-zinc-800/80" />
-
-          <!-- GROUP D: Layering Bench -->
-          <div class="flex items-center gap-3">
-            <div class="flex items-center gap-1.5">
-              <span class="font-bold text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-mono tracking-wider">Layer (Z):</span>
-              <input 
-                v-model.number="inspectorElement.zIndex" 
-                type="number" 
-                class="w-16 px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/60 bg-zinc-50/80 border-zinc-200 text-zinc-900 dark:bg-zinc-900/60 dark:border-zinc-800/80 dark:text-zinc-100 dark:placeholder-zinc-600 shadow-xs"
-                placeholder="Auto"
-              />
-            </div>
-            <div class="flex items-center gap-1 bg-zinc-100/40 border border-zinc-200 dark:bg-zinc-900/40 dark:border-zinc-800/80 rounded-xl p-0.5 shadow-xs">
-              <button 
-                @click="adjustLayer(1)"
-                class="p-2 rounded-xl transition-all duration-200 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 dark:text-zinc-300 active:scale-90 cursor-pointer flex items-center justify-center"
-                title="Bring Forward"
-              >
-                <ChevronUp class="w-3.5 h-3.5" />
-              </button>
-              <button 
-                @click="adjustLayer(-1)"
-                class="p-2 rounded-xl transition-all duration-200 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 dark:text-zinc-300 active:scale-90 cursor-pointer flex items-center justify-center"
-                title="Send Backward"
-              >
-                <ChevronDown class="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-        </div>
-        <div v-else class="text-xs text-zinc-400 dark:text-zinc-500 font-mono italic select-none">
-          Select an asset to view engineering telemetry...
-        </div>
-      </div>
-
-      <!-- Right side: Zoom and AI Terminal Controls -->
-      <div class="flex items-center gap-3">
-        <!-- Zoom Controls -->
-        <div class="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-0.5 shadow-xs">
-          <button 
-            @click="zoomIn" 
-            class="w-6 h-6 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded transition-all active:scale-95 cursor-pointer text-sm font-bold" 
-            title="Zoom In"
-          >
-            <span>+</span>
-          </button>
-          <span class="min-w-[36px] text-center text-[10px] font-bold text-zinc-500 dark:text-zinc-400 font-mono select-none">
-            {{ Math.round(diagramStore.zoomLevel * 100) }}%
-          </span>
-          <button 
-            @click="zoomOut" 
-            class="w-6 h-6 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded transition-all active:scale-95 cursor-pointer text-sm font-bold" 
-            title="Zoom Out"
-          >
-            <span>−</span>
-          </button>
-          <button 
-            @click="resetZoom" 
-            class="w-6 h-6 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-400 dark:text-zinc-500 rounded transition-all active:scale-95 cursor-pointer text-xs" 
-            title="Reset Zoom"
-          >
-            <span>⟲</span>
-          </button>
-        </div>
-
-        <!-- AI Terminal Toggle Switch -->
-        <button 
-          @click="isTerminalOpen = !isTerminalOpen"
-          :class="[
-            'w-9 h-9 flex items-center justify-center p-0 rounded-xl transition-all duration-200 cursor-pointer shadow-xs select-none border',
-            isTerminalOpen 
-              ? 'bg-zinc-200 hover:bg-zinc-300 text-zinc-850 border-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 dark:text-white dark:border-zinc-700 shadow-inner' 
-              : 'bg-zinc-50 hover:bg-zinc-100 border-zinc-200 text-zinc-500 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800'
-          ]"
-          title="Toggle AI Terminal"
-        >
-          <Terminal class="w-4 h-4" />
-        </button>
-      </div>
-    </Surface>
-
-    <Stack class="flex-1 min-h-0 relative" direction="row" gap="none">
-      <!-- Collapsible Cloud File Slider Drawer -->
-      <aside 
-        :class="[
-          'h-full flex flex-col shrink-0 overflow-hidden bg-bg-surface text-text-primary border-r border-border-default transition-colors duration-200',
-          isSidebarDrawerOpen ? 'shadow-md z-10' : '',
-          isResizing ? '' : 'transition-all duration-300 ease-in-out'
-        ]"
+    <!-- Main Workspace Matrix -->
+    <div class="flex-1 flex flex-row w-full min-h-0 overflow-hidden relative">
+      <!-- Left Column: Left Sidebar Outer Wrapper -->
+      <div 
+        class="h-full shrink-0 transition-all duration-300 ease-tactile overflow-hidden bg-bg-surface border-r border-border-default relative"
         :style="{ width: isSidebarDrawerOpen ? sidebarWidth + 'px' : '0px' }"
       >
-        <div class="w-full flex-1 flex flex-col min-h-0">
-          <!-- Dual-tab Header Bar -->
-          <div class="flex items-center justify-between bg-bg-elevated text-text-primary select-none px-3 py-2 shrink-0 border-b border-border-default">
-            <div class="flex items-center gap-1.5 flex-1 mr-2">
-              <!-- Toolbench Tab Button -->
-              <button 
-                @click="activeSidebarTab = 'tools'"
-                :class="[
-                  'flex-1 text-center py-1.5 text-[11px] font-bold rounded-lg transition-all cursor-pointer',
-                  activeSidebarTab === 'tools' 
-                    ? 'bg-bg-base text-text-primary shadow-xs' 
-                    : 'text-text-secondary hover:text-text-primary hover:bg-bg-surface'
-                ]"
-              >
-                Toolbench
-              </button>
-              <!-- Cloud Files Tab Button -->
-              <button 
-                @click="activeSidebarTab = 'cloud'"
-                :class="[
-                  'flex-1 text-center py-1.5 text-[11px] font-bold rounded-lg transition-all cursor-pointer',
-                  activeSidebarTab === 'cloud' 
-                    ? 'bg-bg-base text-text-primary shadow-xs' 
-                    : 'text-text-secondary hover:text-text-primary hover:bg-bg-surface'
-                ]"
-              >
-                Cloud Files
-              </button>
-            </div>
-            <!-- Close button -->
-            <button @click="isSidebarDrawerOpen = false" class="p-1 text-text-secondary hover:text-text-primary transition-colors cursor-pointer rounded-lg hover:bg-bg-surface" title="Close Drawer">
-              <X class="w-4 h-4" />
-            </button>
-          </div>
-
-          <!-- Conditional Tab Content Rendering -->
-          <div v-if="activeSidebarTab === 'tools'" class="flex-1 flex flex-col min-h-0 overflow-y-auto">
-            <Toolbar />
-          </div>
-          <div v-else class="flex-1 flex flex-col min-h-0 overflow-y-auto">
-            <div class="p-4 border-b border-border-default flex-shrink-0">
-              <button 
-                @click="createNewCanvasAction" 
-                class="w-full py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold rounded-lg shadow-sm transition-all active:scale-98 cursor-pointer text-center"
-              >
-                New Clean Canvas
-              </button>
-            </div>
-
-            <div class="flex-1 overflow-y-auto px-2 pb-4 space-y-1 mt-2">
-              <div v-if="diagramStore.savedDiagramsList.length === 0" class="text-center text-text-muted text-[11px] p-8 italic font-mono">
-                No cloud storage records found.
-              </div>
-              
-              <!-- Saved Diagram Database Rows (Swipe-to-Reveal-Delete Pattern) -->
-              <div 
-                v-for="diag in diagramStore.savedDiagramsList" 
-                :key="diag.id"
-                class="relative h-[60px] mx-1 rounded-xl overflow-hidden bg-rose-600 shadow-sm"
-              >
-                <!-- Background Layer (Delete Button) -->
-                <div class="absolute inset-0 flex justify-end">
-                  <button 
-                    @click.stop="promptDelete(diag)"
-                    class="w-[80px] h-full flex flex-col items-center justify-center text-white hover:bg-rose-700 transition-colors cursor-pointer"
-                    title="Permanently Delete"
-                  >
-                    <Trash2 class="w-4 h-4 mb-1" />
-                    <span class="text-[9px] font-bold uppercase tracking-widest">Delete</span>
-                  </button>
-                </div>
-
-                <!-- Foreground Layer (Project Details) - Solid mask bg-white dark:bg-[#111827] -->
-                <div 
-                  @click="handleSelectCloudDiagram(diag.id)"
+        <!-- Inner Fixed-Width Content Container -->
+        <div :style="{ width: sidebarWidth + 'px' }" class="h-full flex flex-col">
+          <div class="w-full flex-1 flex flex-col min-h-0">
+            <!-- Dual-tab Header Bar -->
+            <div class="flex items-center justify-between bg-bg-elevated text-text-primary select-none px-3 py-2 shrink-0 border-b border-border-default">
+              <div class="flex items-center gap-1.5 flex-1 mr-2">
+                <!-- Toolbench Tab Button -->
+                <button 
+                  @click="activeSidebarTab = 'tools'"
                   :class="[
-                    'absolute inset-0 h-full p-3 transition-transform duration-300 ease-in-out cursor-pointer flex items-center justify-between border rounded-xl bg-bg-surface',
-                    diagramStore.currentDiagramId === diag.id 
-                      ? 'border-border-elevated text-text-primary' 
-                      : 'border-border-default text-text-secondary hover:bg-bg-elevated',
-                    swipedRowId === diag.id ? '-translate-x-[80px]' : 'translate-x-0'
+                    'flex-1 text-center py-1.5 text-[11px] font-bold rounded-lg transition-all cursor-pointer',
+                    activeSidebarTab === 'tools' 
+                      ? 'bg-bg-base text-text-primary shadow-xs' 
+                      : 'text-text-secondary hover:text-text-primary hover:bg-bg-surface'
                   ]"
                 >
-                  <div class="truncate mr-2 flex-1">
-                    <p class="text-xs font-semibold truncate">{{ diag.title || 'Untitled Diagram' }}</p>
-                    <p class="text-[10px] text-zinc-400 font-mono tracking-normal mt-0.5">
-                      {{ new Date(diag.updatedAt || diag.createdAt).toLocaleDateString() }}
-                    </p>
+                  Toolbench
+                </button>
+                <!-- Cloud Files Tab Button -->
+                <button 
+                  @click="activeSidebarTab = 'cloud'"
+                  :class="[
+                    'flex-1 text-center py-1.5 text-[11px] font-bold rounded-lg transition-all cursor-pointer',
+                    activeSidebarTab === 'cloud' 
+                      ? 'bg-bg-base text-text-primary shadow-xs' 
+                      : 'text-text-secondary hover:text-text-primary hover:bg-bg-surface'
+                  ]"
+                >
+                  Cloud Files
+                </button>
+              </div>
+              <!-- Close button -->
+              <button @click="isSidebarDrawerOpen = false" class="p-1 text-text-secondary hover:text-text-primary transition-colors cursor-pointer rounded-lg hover:bg-bg-surface" title="Close Drawer">
+                <X class="w-4 h-4" />
+              </button>
+            </div>
+
+            <!-- Conditional Tab Content Rendering -->
+            <div v-if="activeSidebarTab === 'tools'" class="flex-1 flex flex-col min-h-0 overflow-y-auto">
+              <Toolbar />
+            </div>
+            <div v-else class="flex-1 flex flex-col min-h-0 overflow-y-auto">
+              <div class="p-4 border-b border-border-default flex-shrink-0">
+                <button 
+                  @click="createNewCanvasAction" 
+                  class="w-full py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold rounded-lg shadow-sm transition-all active:scale-98 cursor-pointer text-center"
+                >
+                  New Clean Canvas
+                </button>
+              </div>
+
+              <div class="flex-1 overflow-y-auto px-2 pb-4 space-y-1 mt-2">
+                <div v-if="diagramStore.savedDiagramsList.length === 0" class="text-center text-text-muted text-[11px] p-8 italic font-mono">
+                  No cloud storage records found.
+                </div>
+                
+                <!-- Saved Diagram Database Rows (Swipe-to-Reveal-Delete Pattern) -->
+                <div 
+                  v-for="diag in diagramStore.savedDiagramsList" 
+                  :key="diag.id"
+                  class="relative h-[60px] mx-1 rounded-xl overflow-hidden bg-rose-600 shadow-sm"
+                >
+                  <!-- Background Layer (Delete Button) -->
+                  <div class="absolute inset-0 flex justify-end">
+                    <button 
+                      @click.stop="promptDelete(diag)"
+                      class="w-[80px] h-full flex flex-col items-center justify-center text-white hover:bg-rose-700 transition-colors cursor-pointer"
+                      title="Permanently Delete"
+                    >
+                      <Trash2 class="w-4 h-4 mb-1" />
+                      <span class="text-[9px] font-bold uppercase tracking-widest">Delete</span>
+                    </button>
                   </div>
-                  <button 
-                    @click.stop="toggleSwipe(diag.id)"
-                    class="p-1.5 text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-                    title="Options"
+
+                  <!-- Foreground Layer (Project Details) -->
+                  <div 
+                    @click="handleSelectCloudDiagram(diag.id)"
+                    :class="[
+                      'absolute inset-0 h-full p-3 transition-transform duration-300 ease-in-out cursor-pointer flex items-center justify-between border rounded-xl bg-bg-surface',
+                      diagramStore.currentDiagramId === diag.id 
+                        ? 'border-border-elevated text-text-primary' 
+                        : 'border-border-default text-text-secondary hover:bg-bg-elevated',
+                      swipedRowId === diag.id ? '-translate-x-[80px]' : 'translate-x-0'
+                    ]"
                   >
-                    <MoreVertical class="w-4 h-4" />
-                  </button>
+                    <div class="truncate mr-2 flex-1">
+                      <p class="text-xs font-semibold truncate">{{ diag.title || 'Untitled Diagram' }}</p>
+                      <p class="text-[10px] text-zinc-400 font-mono tracking-normal mt-0.5">
+                        {{ new Date(diag.updatedAt || diag.createdAt).toLocaleDateString() }}
+                      </p>
+                    </div>
+                    <button 
+                      @click.stop="toggleSwipe(diag.id)"
+                      class="p-1.5 text-zinc-400 hover:text-zinc-650 dark:text-zinc-500 dark:hover:text-zinc-300 rounded-lg hover:bg-bg-surface transition-colors cursor-pointer"
+                      title="Options"
+                    >
+                      <MoreVertical class="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </aside>
 
-      <!-- Resizable Sidebar Drag Handle -->
-      <div 
-        v-if="isSidebarDrawerOpen"
-        @mousedown="startResize"
-        :class="[
-          'absolute top-0 w-1.5 cursor-col-resize hover:bg-interactive-accent/40 active:bg-interactive-accent transition-colors h-full z-45 select-none bg-border-default',
-          isResizing ? '' : 'transition-all duration-300 ease-in-out'
-        ]"
-        :style="{ left: (sidebarWidth - 3) + 'px' }"
-      ></div>
-
-      <!-- Main Drawing Area Container -->
-      <div class="flex-1 h-full relative bg-[radial-gradient(var(--color-border-default)_1px,transparent_1px)] [background-size:16px_16px] bg-bg-base transition-all duration-300 overflow-hidden">
-        <Canvas 
-          :onLogout="handleSignOutFlow" 
-        />
+        <!-- Resizable Sidebar Drag Handle inside left column at the right edge -->
+        <div 
+          @mousedown="startResize"
+          class="absolute top-0 right-0 w-1 cursor-col-resize hover:bg-interactive-accent/40 active:bg-interactive-accent transition-colors h-full z-45 select-none"
+        ></div>
       </div>
 
-      <!-- AI Terminal Pane Layout Wrapper -->
+      <!-- Center Column: Canvas & StatusBar Viewport -->
+      <Stack class="flex-1 h-full min-w-0" gap="none">
+        <!-- Horizontal Engineering Telemetry & Property Control Strip -->
+        <Surface as="section" depth="1" :border="false" customClass="h-11 w-full flex items-center justify-between px-6 shrink-0 z-20 border-b border-border-default bg-bg-surface/30 shadow-xs">
+          <!-- Left side: Spawner toggle and Undo/Redo -->
+          <div class="flex items-center gap-3">
+            <!-- Spawner Toggle Button -->
+            <button 
+              @click="isSidebarDrawerOpen = !isSidebarDrawerOpen"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-default bg-bg-surface hover:bg-bg-elevated text-text-primary text-[11px] font-medium transition-all active:scale-95 cursor-pointer shadow-xs select-none group"
+              title="Toggle Shapes Drawer"
+            >
+              <Folder class="w-3.5 h-3.5 text-text-secondary group-hover:text-text-primary" />
+              <span>{{ isSidebarDrawerOpen ? 'Close Spawner' : 'Open Spawner' }}</span>
+            </button>
+
+            <!-- Undo/Redo Controls -->
+            <div class="flex items-center bg-bg-surface border border-border-default rounded-lg p-0.5 shadow-xs gap-0.5">
+              <button 
+                @click="diagramStore.undo()"
+                :class="['w-7 h-7 flex items-center justify-center rounded hover:bg-bg-elevated text-text-secondary transition-all active:scale-90', diagramStore.undoStack.length === 0 ? 'opacity-40 pointer-events-none' : '']"
+                title="Undo (Ctrl+Z)"
+              >
+                <Undo2 class="w-3.5 h-3.5" />
+              </button>
+              <div class="w-px h-3 bg-border-default mx-0.5" />
+              <button 
+                @click="diagramStore.redo()"
+                :class="['w-7 h-7 flex items-center justify-center rounded hover:bg-bg-elevated text-text-secondary transition-all active:scale-90', diagramStore.redoStack.length === 0 ? 'opacity-40 pointer-events-none' : '']"
+                title="Redo (Ctrl+Y)"
+              >
+                <Redo2 class="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          <!-- Center side: Telemetry parameters -->
+          <div class="flex-1 flex justify-center px-4">
+            <div v-if="inspectorElement" class="flex items-center gap-6 text-xs text-text-secondary">
+              <!-- GROUP A: Identity -->
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-[10px] text-text-muted uppercase font-mono tracking-wider">Name:</span>
+                <input 
+                  v-model="inspectorElement.label" 
+                  type="text" 
+                  class="px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-interactive-accent/45 bg-bg-base border-border-default text-text-primary w-48 shadow-xs"
+                  placeholder="Element Name"
+                />
+                <span class="text-[10px] font-mono text-text-muted uppercase ml-1">ID: {{ inspectorElement.id.split('_')[1] || inspectorElement.id.slice(-6) }}</span>
+              </div>
+
+              <div class="w-px h-4 bg-border-default" />
+
+              <!-- GROUP B: Coordinates -->
+              <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-[10px] text-text-muted uppercase font-mono tracking-wider">X:</span>
+                  <input 
+                    v-model.number="inspectorElement.x" 
+                    type="number" 
+                    class="w-16 px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-interactive-accent/45 bg-bg-base border-border-default text-text-primary shadow-xs"
+                  />
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-[10px] text-text-muted uppercase font-mono tracking-wider">Y:</span>
+                  <input 
+                    v-model.number="inspectorElement.y" 
+                    type="number" 
+                    class="w-16 px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-interactive-accent/45 bg-bg-base border-border-default text-text-primary shadow-xs"
+                  />
+                </div>
+              </div>
+
+              <div class="w-px h-4 bg-border-default" />
+
+              <!-- GROUP C: Dimensions -->
+              <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-[10px] text-text-muted uppercase font-mono tracking-wider">W:</span>
+                  <input 
+                    v-model.number="inspectorElement.width" 
+                    type="number" 
+                    class="w-16 px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-interactive-accent/45 bg-bg-base border-border-default text-text-primary shadow-xs"
+                    placeholder="Auto"
+                  />
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-[10px] text-text-muted uppercase font-mono tracking-wider">H:</span>
+                  <input 
+                    v-model.number="inspectorElement.height" 
+                    type="number" 
+                    class="w-16 px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-interactive-accent/45 bg-bg-base border-border-default text-text-primary shadow-xs"
+                    placeholder="Auto"
+                  />
+                </div>
+              </div>
+
+              <div class="w-px h-4 bg-border-default" />
+
+              <!-- GROUP D: Layering Bench -->
+              <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-[10px] text-text-muted uppercase font-mono tracking-wider">Layer:</span>
+                  <input 
+                    v-model.number="inspectorElement.zIndex" 
+                    type="number" 
+                    class="w-16 px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-interactive-accent/45 bg-bg-base border-border-default text-text-primary shadow-xs"
+                    placeholder="Auto"
+                  />
+                </div>
+                <div class="flex items-center gap-1 bg-bg-surface border border-border-default rounded-xl p-0.5 shadow-xs">
+                  <button 
+                    @click="adjustLayer(1)"
+                    class="p-2 rounded-xl transition-all duration-200 bg-bg-surface hover:bg-bg-elevated text-text-primary active:scale-90 cursor-pointer flex items-center justify-center"
+                    title="Bring Forward"
+                  >
+                    <ChevronUp class="w-3.5 h-3.5" />
+                  </button>
+                  <button 
+                    @click="adjustLayer(-1)"
+                    class="p-2 rounded-xl transition-all duration-200 bg-bg-surface hover:bg-bg-elevated text-text-primary active:scale-90 cursor-pointer flex items-center justify-center"
+                    title="Send Backward"
+                  >
+                    <ChevronDown class="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div v-else class="text-xs text-text-muted font-mono italic select-none">
+              Select an asset to view engineering telemetry...
+            </div>
+          </div>
+
+          <!-- Right side: Zoom and AI Terminal Controls -->
+          <div class="flex items-center gap-3">
+            <!-- Zoom Controls -->
+            <div class="flex items-center gap-2 bg-bg-surface border border-border-default rounded-lg p-0.5 shadow-xs">
+              <button 
+                @click="zoomIn" 
+                class="w-6 h-6 flex items-center justify-center hover:bg-bg-elevated text-text-primary rounded transition-all active:scale-95 cursor-pointer text-sm font-bold" 
+                title="Zoom In"
+              >
+                <span>+</span>
+              </button>
+              <span class="min-w-[36px] text-center text-[10px] font-bold text-text-secondary font-mono select-none">
+                {{ Math.round(diagramStore.zoomLevel * 100) }}%
+              </span>
+              <button 
+                @click="zoomOut" 
+                class="w-6 h-6 flex items-center justify-center hover:bg-bg-elevated text-text-primary rounded transition-all active:scale-95 cursor-pointer text-sm font-bold" 
+                title="Zoom Out"
+              >
+                <span>−</span>
+              </button>
+              <button 
+                @click="resetZoom" 
+                class="w-6 h-6 flex items-center justify-center hover:bg-bg-elevated text-text-muted rounded transition-all active:scale-95 cursor-pointer text-xs" 
+                title="Reset Zoom"
+              >
+                <span>⟲</span>
+              </button>
+            </div>
+
+            <!-- AI Terminal Toggle Switch -->
+            <button 
+              @click="isTerminalOpen = !isTerminalOpen"
+              :class="[
+                'w-9 h-9 flex items-center justify-center p-0 rounded-xl transition-all duration-200 cursor-pointer shadow-xs select-none border',
+                isTerminalOpen 
+                  ? 'bg-bg-elevated text-text-primary border-border-elevated shadow-inner' 
+                  : 'bg-bg-surface border-border-default text-text-secondary hover:bg-bg-elevated'
+              ]"
+              title="Toggle AI Terminal"
+            >
+              <Terminal class="w-4 h-4" />
+            </button>
+          </div>
+        </Surface>
+
+        <!-- Main Drawing Area Viewport -->
+        <div class="flex-1 w-full relative bg-[radial-gradient(var(--color-border-default)_1px,transparent_1px)] [background-size:16px_16px] bg-bg-base transition-all duration-300 overflow-hidden">
+          <Canvas :onLogout="handleSignOutFlow" />
+        </div>
+
+        <!-- StatusBar pinned underneath the canvas strictly across the center viewport width -->
+        <StatusBar />
+      </Stack>
+
+      <!-- Right Column: AI Terminal Outer Wrapper -->
       <div 
-        :class="[
-          'h-full border-l border-border-default transition-all duration-300 ease-in-out z-20 shrink-0 overflow-hidden',
-        ]"
-        :style="{ width: isTerminalOpen ? '32rem' : '0px' }"
+        class="h-full shrink-0 transition-all duration-300 ease-tactile overflow-hidden bg-bg-surface relative"
+        :style="{ width: isTerminalOpen ? '32rem' : '2.5rem' }"
       >
-        <TerminalEditor class="w-[32rem]" />
+        <!-- Inner Fixed-Width Content Container -->
+        <div :style="{ width: isTerminalOpen ? '32rem' : '2.5rem' }" class="h-full">
+          <TerminalEditor 
+            :isExpanded="isTerminalOpen" 
+            @toggle="isTerminalOpen = !isTerminalOpen"
+            class="w-full h-full"
+          />
+        </div>
       </div>
-    </Stack>
-
-    <!-- Bottom: Unified Status Ribbon -->
-    <StatusBar />
+    </div>
 
     <!-- Global Confirmation Modal Wrapper -->
     <transition name="fade">

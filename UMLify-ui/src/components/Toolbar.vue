@@ -3,7 +3,7 @@
     depth="1"
     radius="none"
     :border="false"
-    customClass="w-full h-full flex flex-col overflow-y-auto px-3 py-4 gap-4 select-none bg-bg-surface"
+    customClass="w-full h-full flex flex-col overflow-y-auto px-3 py-3 gap-3 select-none bg-bg-surface scrollbar-none"
   >
 
     <!-- ═══════════════════════════════════════════
@@ -18,7 +18,7 @@
         <div
           draggable="true"
           @dragstart="handleDragStart($event, 'actor')"
-          class="group relative flex flex-col items-center justify-center gap-2 py-4 rounded-2xl cursor-grab active:cursor-grabbing active:scale-95 select-none transition-all duration-150
+          class="group relative flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl cursor-grab active:cursor-grabbing active:scale-95 select-none transition-all duration-150
                  bg-white border border-zinc-200/70 hover:border-zinc-300 hover:shadow-md
                  dark:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-700 dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
         >
@@ -52,7 +52,7 @@
         <div
           draggable="true"
           @dragstart="handleDragStart($event, 'usecase')"
-          class="group relative flex flex-col items-center justify-center gap-2 py-4 rounded-2xl cursor-grab active:cursor-grabbing active:scale-95 select-none transition-all duration-150
+          class="group relative flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl cursor-grab active:cursor-grabbing active:scale-95 select-none transition-all duration-150
                  bg-white border border-zinc-200/70 hover:border-zinc-300 hover:shadow-md
                  dark:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-700 dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
         >
@@ -76,7 +76,7 @@
       <div
         draggable="true"
         @dragstart="handleDragStart($event, 'System')"
-        class="group relative flex items-center gap-3 px-4 py-3 rounded-2xl cursor-grab active:cursor-grabbing active:scale-[0.98] select-none transition-all duration-150
+        class="group relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl cursor-grab active:cursor-grabbing active:scale-[0.98] select-none transition-all duration-150
                bg-white border border-zinc-200/70 hover:border-zinc-300 hover:shadow-md
                dark:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-700 dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
       >
@@ -104,7 +104,7 @@
         <div
           draggable="true"
           @dragstart="handleDragStart($event, 'package')"
-          class="group relative flex flex-col items-center justify-center gap-2 py-3.5 rounded-2xl cursor-grab active:cursor-grabbing active:scale-95 select-none transition-all duration-150
+          class="group relative flex flex-col items-center justify-center gap-1.5 py-2 rounded-xl cursor-grab active:cursor-grabbing active:scale-95 select-none transition-all duration-150
                  bg-white border border-zinc-200/70 hover:border-zinc-300 hover:shadow-md
                  dark:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-700 dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
         >
@@ -120,7 +120,7 @@
         <div
           draggable="true"
           @dragstart="handleDragStart($event, 'note')"
-          class="group relative flex flex-col items-center justify-center gap-2 py-3.5 rounded-2xl cursor-grab active:cursor-grabbing active:scale-95 select-none transition-all duration-150
+          class="group relative flex flex-col items-center justify-center gap-1.5 py-2 rounded-xl cursor-grab active:cursor-grabbing active:scale-95 select-none transition-all duration-150
                  bg-white border border-zinc-200/70 hover:border-zinc-300 hover:shadow-md
                  dark:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-700 dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
         >
@@ -150,7 +150,7 @@
         <!-- Quick Link -->
         <button
           @click="handleLinkSpawnerClick"
-          class="group flex flex-col items-center gap-1.5 py-3 rounded-xl cursor-pointer transition-all duration-150
+          class="group flex flex-col items-center gap-1 py-2.5 rounded-lg cursor-pointer transition-all duration-150
                  bg-zinc-50 border border-zinc-200/60 hover:bg-white hover:border-zinc-300 hover:shadow-sm
                  dark:bg-zinc-900/60 dark:border-zinc-800/60 dark:hover:bg-zinc-800 dark:hover:border-zinc-700"
         >
@@ -161,7 +161,7 @@
         <!-- Add Text -->
         <button
           @click="handleTextAnnotationClick"
-          class="group flex flex-col items-center gap-1.5 py-3 rounded-xl cursor-pointer transition-all duration-150
+          class="group flex flex-col items-center gap-1 py-2.5 rounded-lg cursor-pointer transition-all duration-150
                  bg-zinc-50 border border-zinc-200/60 hover:bg-white hover:border-zinc-300 hover:shadow-sm
                  dark:bg-zinc-900/60 dark:border-zinc-800/60 dark:hover:bg-zinc-800 dark:hover:border-zinc-700"
         >
@@ -172,7 +172,7 @@
         <!-- Clear -->
         <button
           @click="handleClearCanvas"
-          class="group flex flex-col items-center gap-1.5 py-3 rounded-xl cursor-pointer transition-all duration-150
+          class="group flex flex-col items-center gap-1.5 py-2.5 rounded-lg cursor-pointer transition-all duration-150
                  bg-rose-50/40 border border-rose-100 hover:bg-rose-50 hover:border-rose-200
                  dark:bg-rose-950/10 dark:border-rose-900/20 dark:hover:bg-rose-950/20 dark:hover:border-rose-900/40"
         >
@@ -239,7 +239,7 @@
         <button
           @click="triggerFileInput"
           title="Import JSON"
-          class="group flex-1 flex flex-col items-center gap-1 py-2.5 rounded-xl cursor-pointer transition-all duration-150
+          class="group flex-1 flex flex-col items-center gap-1 py-2 rounded-lg cursor-pointer transition-all duration-150
                  bg-zinc-50 border border-zinc-200/60 hover:bg-white hover:border-zinc-300 hover:shadow-sm
                  dark:bg-zinc-900/60 dark:border-zinc-800/60 dark:hover:bg-zinc-800 dark:hover:border-zinc-700"
         >
@@ -251,7 +251,7 @@
         <button
           @click="emitLocalSnapshot"
           title="Save PNG"
-          class="group flex-1 flex flex-col items-center gap-1 py-2.5 rounded-xl cursor-pointer transition-all duration-150
+          class="group flex-1 flex flex-col items-center gap-1 py-2 rounded-lg cursor-pointer transition-all duration-150
                  bg-zinc-50 border border-zinc-200/60 hover:bg-white hover:border-zinc-300 hover:shadow-sm
                  dark:bg-zinc-900/60 dark:border-zinc-800/60 dark:hover:bg-zinc-800 dark:hover:border-zinc-700"
         >
@@ -378,4 +378,13 @@ const handleClearCanvas = () => { diagramStore.resetDiagram(); };
 <style scoped>
 .fade-enter-active, .fade-leave-active { transition: opacity 0.15s ease; }
 .fade-enter-from,  .fade-leave-to      { opacity: 0; }
+
+/* Hide scrollbars for sidebars */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 </style>

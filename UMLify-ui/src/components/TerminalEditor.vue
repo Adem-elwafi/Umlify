@@ -3,201 +3,247 @@
     depth="1"
     radius="none"
     :border="true"
-    customClass="w-full h-full flex flex-col p-4 font-sans border-l border-border-default bg-bg-surface"
+    :customClass="[
+      'w-full h-full flex flex-col font-sans border-l border-border-default bg-bg-surface overflow-hidden transition-all duration-350',
+      isExpanded ? 'p-4' : 'p-0 py-4 items-center justify-between'
+    ]"
   >
-    <!-- Panel Header -->
-    <div class="flex items-center justify-between mb-4 shrink-0">
-      <div class="flex items-center space-x-3">
-        <div class="flex space-x-1.5">
-          <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80 dark:bg-rose-500/60"></span>
-          <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80 dark:bg-amber-500/60"></span>
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80 dark:bg-emerald-500/60"></span>
-        </div>
-        <h2 class="text-[10px] font-bold tracking-wider uppercase text-zinc-600 dark:text-zinc-400 select-none font-mono">
-          AI Architecture Compiler
-        </h2>
-      </div>
-      <div class="flex items-center space-x-2">
-        <Badge :variant="isGenerating ? 'warning' : successMessage ? 'success' : 'neutral'" customClass="text-[9px] px-2 py-0.5">
-          <template #left>
-            <span class="w-1.5 h-1.5 rounded-full" :class="isGenerating ? 'bg-warning animate-pulse' : successMessage ? 'bg-success' : 'bg-text-muted'"></span>
-          </template>
-          {{ isGenerating ? 'Compiling' : successMessage ? 'Active' : 'Standby' }}
-        </Badge>
-      </div>
-    </div>
-
-    <!-- AI Configuration Accordion Overlay -->
-    <div class="mb-4 bg-zinc-200/20 border border-zinc-300/40 dark:bg-zinc-800/10 dark:border-zinc-700/30 rounded-xl overflow-hidden shrink-0 transition-all">
-      <!-- Accordion Toggle Header -->
+    <!-- Collapsed Vertical Tab Strip -->
+    <template v-if="!isExpanded">
+      <!-- Toggle Expand Button -->
       <button 
-        @click="isConfigOpen = !isConfigOpen"
-        class="w-full px-4 py-3 flex items-center justify-between bg-zinc-200/35 hover:bg-zinc-200/50 dark:bg-zinc-800/20 dark:hover:bg-zinc-800/30 transition-colors text-left"
+        @click="$emit('toggle')"
+        class="p-1.5 rounded-lg hover:bg-bg-elevated text-text-secondary transition-colors cursor-pointer"
+        title="Expand AI Compiler"
       >
-        <div class="flex items-center space-x-2">
-          <svg class="w-4 h-4 text-zinc-650 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          <span class="text-xs font-bold uppercase tracking-wider text-zinc-750 dark:text-zinc-200">AI Configuration</span>
-        </div>
-        <div class="flex items-center space-x-2">
-          <Badge variant="neutral" customClass="uppercase tracking-wider font-mono text-[9px] px-2 py-0.5">
-            {{ activeVendor === 'gemini' ? 'Gemini' : activeVendor === 'openai' ? 'OpenAI' : activeVendor === 'groq' ? 'Groq' : activeVendor === 'openrouter' ? 'OpenRouter' : 'Demo' }}
-          </Badge>
-          <svg 
-            class="w-4 h-4 text-zinc-400 transition-transform duration-200" 
-            :class="isConfigOpen ? 'rotate-180' : ''"
-            fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
+        <ChevronLeft class="w-4 h-4" />
       </button>
 
-      <!-- Accordion Content -->
-      <transition name="expand">
-        <div v-show="isConfigOpen" class="p-4 border-t border-zinc-200 dark:border-zinc-800/40 bg-zinc-100/30 dark:bg-zinc-900/40 space-y-4">
-          <!-- Vendor Selection Menu -->
-          <div class="flex flex-col space-y-1.5">
-            <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Endpoint Provider</label>
-            <div class="relative">
-              <select 
-                v-model="activeVendor"
-                class="w-full bg-white border border-zinc-200 dark:bg-zinc-950 dark:border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 dark:focus:border-zinc-650 dark:focus:ring-zinc-650 transition-all appearance-none cursor-pointer"
-              >
-                <option value="gemini">Google Gemini API</option>
-                <option value="openai">OpenAI Completion API</option>
-                <option value="groq">Groq Cloud API (Free Tier)</option>
-                <option value="openrouter">OpenRouter API (Free Tier)</option>
-                <option value="demo">Local Demo (No Key Required)</option>
-              </select>
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-500">
-                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                </svg>
+      <!-- Rotated Text Label -->
+      <div 
+        class="text-[9px] font-bold uppercase tracking-widest text-text-secondary font-mono select-none whitespace-nowrap"
+        style="writing-mode: vertical-rl; transform: rotate(180deg);"
+      >
+        AI Architecture Compiler
+      </div>
+
+      <!-- Pulse Status Indicator -->
+      <div class="flex items-center justify-center">
+        <span 
+          class="w-2 h-2 rounded-full" 
+          :class="isGenerating ? 'bg-warning animate-pulse' : successMessage ? 'bg-success' : 'bg-text-muted'"
+          :title="isGenerating ? 'Compiling' : successMessage ? 'Active' : 'Standby'"
+        ></span>
+      </div>
+    </template>
+
+    <!-- Expanded Full Editor Content -->
+    <template v-else>
+      <!-- Panel Header -->
+      <div class="flex items-center justify-between mb-4 shrink-0">
+        <div class="flex items-center space-x-3">
+          <div class="flex space-x-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80 dark:bg-rose-500/60"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80 dark:bg-amber-500/60"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80 dark:bg-emerald-500/60"></span>
+          </div>
+          <h2 class="text-[10px] font-bold tracking-wider uppercase text-zinc-600 dark:text-zinc-400 select-none font-mono">
+            AI Architecture Compiler
+          </h2>
+        </div>
+        <div class="flex items-center space-x-2">
+          <Badge :variant="isGenerating ? 'warning' : successMessage ? 'success' : 'neutral'" customClass="text-[9px] px-2 py-0.5">
+            <template #left>
+              <span class="w-1.5 h-1.5 rounded-full" :class="isGenerating ? 'bg-warning animate-pulse' : successMessage ? 'bg-success' : 'bg-text-muted'"></span>
+            </template>
+            {{ isGenerating ? 'Compiling' : successMessage ? 'Active' : 'Standby' }}
+          </Badge>
+          
+          <!-- Collapse Button -->
+          <button 
+            @click="$emit('toggle')"
+            class="p-1 rounded hover:bg-bg-elevated text-text-secondary cursor-pointer"
+            title="Collapse AI Compiler"
+          >
+            <ChevronRight class="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      <!-- AI Configuration Accordion Overlay -->
+      <div class="mb-4 bg-zinc-200/20 border border-zinc-300/40 dark:bg-zinc-800/10 dark:border-zinc-700/30 rounded-xl overflow-hidden shrink-0 transition-all">
+        <!-- Accordion Toggle Header -->
+        <button 
+          @click="isConfigOpen = !isConfigOpen"
+          class="w-full px-4 py-3 flex items-center justify-between bg-zinc-200/35 hover:bg-zinc-200/50 dark:bg-zinc-800/20 dark:hover:bg-zinc-800/30 transition-colors text-left"
+        >
+          <div class="flex items-center space-x-2">
+            <svg class="w-4 h-4 text-zinc-650 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span class="text-xs font-bold uppercase tracking-wider text-zinc-750 dark:text-zinc-200">AI Configuration</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <Badge variant="neutral" customClass="uppercase tracking-wider font-mono text-[9px] px-2 py-0.5">
+              {{ activeVendor === 'gemini' ? 'Gemini' : activeVendor === 'openai' ? 'OpenAI' : activeVendor === 'groq' ? 'Groq' : activeVendor === 'openrouter' ? 'OpenRouter' : 'Demo' }}
+            </Badge>
+            <svg 
+              class="w-4 h-4 text-zinc-400 transition-transform duration-200" 
+              :class="isConfigOpen ? 'rotate-180' : ''"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </button>
+
+        <!-- Accordion Content -->
+        <transition name="expand">
+          <div v-show="isConfigOpen" class="p-4 border-t border-zinc-200 dark:border-zinc-800/40 bg-zinc-100/30 dark:bg-zinc-900/40 space-y-4">
+            <!-- Vendor Selection Menu -->
+            <div class="flex flex-col space-y-1.5">
+              <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Endpoint Provider</label>
+              <div class="relative">
+                <select 
+                  v-model="activeVendor"
+                  class="w-full bg-white border border-zinc-200 dark:bg-zinc-950 dark:border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 dark:focus:border-zinc-650 dark:focus:ring-zinc-650 transition-all appearance-none cursor-pointer"
+                >
+                  <option value="gemini">Google Gemini API</option>
+                  <option value="openai">OpenAI Completion API</option>
+                  <option value="groq">Groq Cloud API (Free Tier)</option>
+                  <option value="openrouter">OpenRouter API (Free Tier)</option>
+                  <option value="demo">Local Demo (No Key Required)</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-500">
+                  <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                  </svg>
+                </div>
               </div>
+            </div>
+
+            <!-- API Key Input Field -->
+            <div v-if="activeVendor !== 'demo'" class="flex flex-col space-y-1.5">
+              <Input
+                v-if="activeVendor !== 'demo'"
+                type="password"
+                v-model="aiApiKey"
+                label="API Access Token"
+                placeholder="Enter your API key..."
+                customClass="h-9 px-3 py-1.5 text-xs text-text-primary border border-border-default rounded-interactive focus-visible:ring-interactive-accent"
+              />
+            </div>
+          </div>
+        </transition>
+      </div>
+
+      <!-- Tab Navigation Bar -->
+      <div class="flex border-b border-zinc-200 dark:border-zinc-850 mb-4 shrink-0">
+        <button 
+          @click="activeTab = 'prompt'"
+          :class="[
+            'flex-1 pb-2.5 text-xs font-bold uppercase tracking-wider transition-all border-b-2 text-center cursor-pointer select-none',
+            activeTab === 'prompt' 
+              ? 'text-zinc-850 border-zinc-800 dark:text-zinc-200 dark:border-zinc-300' 
+              : 'text-zinc-400 border-transparent hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-350'
+          ]"
+        >
+          AI Blueprint
+        </button>
+        <button 
+          @click="activeTab = 'json'"
+          :class="[
+            'flex-1 pb-2.5 text-xs font-bold uppercase tracking-wider transition-all border-b-2 text-center cursor-pointer select-none',
+            activeTab === 'json' 
+              ? 'text-zinc-850 border-zinc-800 dark:text-zinc-200 dark:border-zinc-300' 
+              : 'text-zinc-400 border-transparent hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-350'
+          ]"
+        >
+          Raw JSON Sandbox
+        </button>
+      </div>
+
+      <!-- Main Workspace Switcher -->
+      <div class="flex-1 min-h-0 flex flex-col animate-fade-in">
+        <!-- Mode: AI Prompt Blueprint Generator -->
+        <div v-if="activeTab === 'prompt'" class="flex-1 min-h-0 flex flex-col">
+          <!-- Prompt Requirement Header Info -->
+          <div class="mb-4 p-3 bg-zinc-200/40 border border-zinc-350/40 dark:bg-zinc-900/30 dark:border-zinc-800/50 rounded-xl shrink-0">
+            <p class="text-[10px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              <span class="text-zinc-800 dark:text-zinc-200 font-bold uppercase mr-1.5">Prompt Engine:</span>
+              Describe your system architecture requirements in plain text. The model will securely compile layout blocks and grid connections.
+            </p>
+          </div>
+
+          <!-- Requirement Prompt Buffer Textarea -->
+          <div class="flex-1 min-h-0 mb-4 relative group">
+            <Textarea
+              v-model="userRequirement"
+              placeholder="e.g. Create a banking system with a Customer actor and a Teller actor. The Customer can deposit money and check balance, and the Teller can process transactions, all placed inside a Core Banking system container..."
+              customClass="h-full border border-border-default rounded-interactive focus-visible:ring-interactive-accent resize-none overflow-y-auto"
+            />
+            <div class="absolute bottom-3 right-3 text-[10px] font-mono text-text-muted bg-bg-surface/80 px-1.5 py-0.5 rounded border border-border-default select-none z-10">
+              {{ userRequirement.length }} / 2000
             </div>
           </div>
 
-          <!-- API Key Input Field using primitive -->
-          <Input
-            v-if="activeVendor !== 'demo'"
-            type="password"
-            v-model="aiApiKey"
-            label="API Access Token"
-            placeholder="Enter your API key..."
-            customClass="h-9 px-3 py-1.5 text-xs text-text-primary border border-border-default rounded-interactive focus-visible:ring-interactive-accent"
-          />
-        </div>
-      </transition>
-    </div>
-
-    <!-- Tab Navigation Bar -->
-    <div class="flex border-b border-zinc-200 dark:border-zinc-850 mb-4 shrink-0">
-      <button 
-        @click="activeTab = 'prompt'"
-        :class="[
-          'flex-1 pb-2.5 text-xs font-bold uppercase tracking-wider transition-all border-b-2 text-center cursor-pointer select-none',
-          activeTab === 'prompt' 
-            ? 'text-zinc-850 border-zinc-800 dark:text-zinc-200 dark:border-zinc-300' 
-            : 'text-zinc-400 border-transparent hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-350'
-        ]"
-      >
-        AI Blueprint
-      </button>
-      <button 
-        @click="activeTab = 'json'"
-        :class="[
-          'flex-1 pb-2.5 text-xs font-bold uppercase tracking-wider transition-all border-b-2 text-center cursor-pointer select-none',
-          activeTab === 'json' 
-            ? 'text-zinc-850 border-zinc-800 dark:text-zinc-200 dark:border-zinc-300' 
-            : 'text-zinc-400 border-transparent hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-350'
-        ]"
-      >
-        Raw JSON Sandbox
-      </button>
-    </div>
-
-    <!-- Main Workspace Switcher -->
-    <div class="flex-1 min-h-0 flex flex-col">
-      <!-- Mode: AI Prompt Blueprint Generator -->
-      <div v-if="activeTab === 'prompt'" class="flex-1 min-h-0 flex flex-col">
-        <!-- Prompt Requirement Header Info -->
-        <div class="mb-4 p-3 bg-zinc-200/40 border border-zinc-350/40 dark:bg-zinc-900/30 dark:border-zinc-800/50 rounded-xl shrink-0">
-          <p class="text-[10px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
-            <span class="text-zinc-800 dark:text-zinc-200 font-bold uppercase mr-1.5">Prompt Engine:</span>
-            Describe your system architecture requirements in plain text. The model will securely compile layout blocks and grid connections.
-          </p>
-        </div>
-
-        <!-- Requirement Prompt Buffer Textarea using primitive -->
-        <div class="flex-1 min-h-0 mb-4 relative group">
-          <Textarea
-            v-model="userRequirement"
-            placeholder="e.g. Create a banking system with a Customer actor and a Teller actor. The Customer can deposit money and check balance, and the Teller can process transactions, all placed inside a Core Banking system container..."
-            customClass="h-full border border-border-default rounded-interactive focus-visible:ring-interactive-accent resize-none overflow-y-auto"
-          />
-          <div class="absolute bottom-3 right-3 text-[10px] font-mono text-text-muted bg-bg-surface/80 px-1.5 py-0.5 rounded border border-border-default select-none z-10">
-            {{ userRequirement.length }} / 2000
-          </div>
-        </div>
-
-        <!-- Action Button -->
-        <button 
-          @click="generateDiagramWithAI" 
-          :disabled="isGenerating || !userRequirement.trim()"
-          class="w-full py-2.5 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-zinc-200 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none font-semibold text-xs rounded-lg shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer group"
-        >
-          <svg 
-            v-if="isGenerating" 
-            class="animate-spin -ml-1 mr-3 h-4 w-4 text-white dark:text-zinc-950" 
-            xmlns="http://www.w3.org/2000/svg" 
-            fill="none" 
-            viewBox="0 0 24 24"
+          <!-- Action Button -->
+          <button 
+            @click="generateDiagramWithAI" 
+            :disabled="isGenerating || !userRequirement.trim()"
+            class="w-full py-2.5 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-zinc-200 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none font-semibold text-xs rounded-lg shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer group shrink-0"
           >
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <svg v-else class="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-          <span>{{ isGenerating ? 'Synthesizing Architecture...' : 'Generate Architecture Blueprint' }}</span>
-        </button>
-      </div>
-
-      <!-- Mode: Raw JSON Sandbox -->
-      <div v-else class="flex-1 min-h-0 flex flex-col">
-        <!-- Blueprint Protocol Info -->
-        <div class="mb-4 p-3 bg-zinc-200/40 border border-zinc-350/40 dark:bg-zinc-900/30 dark:border-zinc-800/50 rounded-xl shrink-0">
-          <p class="text-[10px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
-            <span class="text-zinc-800 dark:text-zinc-200 font-bold uppercase mr-1.5">Blueprint Protocol:</span>
-            Input a valid JSON payload containing <code class="text-zinc-800 dark:text-zinc-200 font-mono font-bold">elements</code> and <code class="text-zinc-800 dark:text-zinc-200 font-mono font-bold">connections</code> arrays to instantiate the vector architecture.
-          </p>
+            <svg 
+              v-if="isGenerating" 
+              class="animate-spin -ml-1 mr-3 h-4 w-4 text-white dark:text-zinc-950" 
+              xmlns="http://www.w3.org/2000/svg" 
+              fill="none" 
+              viewBox="0 0 24 24"
+            >
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <svg v-else class="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span>{{ isGenerating ? 'Synthesizing Architecture...' : 'Generate Architecture Blueprint' }}</span>
+          </button>
         </div>
 
-        <!-- Main Input Area Textarea using primitive -->
-        <div class="flex-1 min-h-0 mb-4 relative group">
-          <Textarea
-            v-model="jsonInput"
-            placeholder='{&#10;  "elements": [...],&#10;  "connections": [...]&#10;}'
-            customClass="h-full font-mono text-xs border border-border-default rounded-interactive focus-visible:ring-interactive-accent resize-none overflow-y-auto"
-          />
-        </div>
+        <!-- Mode: Raw JSON Sandbox -->
+        <div v-else class="flex-1 min-h-0 flex flex-col">
+          <!-- Blueprint Protocol Info -->
+          <div class="mb-4 p-3 bg-zinc-200/40 border border-zinc-350/40 dark:bg-zinc-900/30 dark:border-zinc-800/50 rounded-xl shrink-0">
+            <p class="text-[10px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              <span class="text-zinc-800 dark:text-zinc-200 font-bold uppercase mr-1.5">Blueprint Protocol:</span>
+              Input a valid JSON payload containing <code class="text-zinc-800 dark:text-zinc-200 font-mono font-bold">elements</code> and <code class="text-zinc-800 dark:text-zinc-200 font-mono font-bold">connections</code> arrays to instantiate the vector architecture.
+            </p>
+          </div>
 
-        <!-- Action Button -->
-        <button 
-          @click="compileDiagram" 
-          :disabled="!jsonInput.trim()"
-          class="w-full py-2.5 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-zinc-200 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none font-semibold text-xs rounded-lg shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer group"
-        >
-          <svg class="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-          <span>Compile Architecture</span>
-        </button>
+          <!-- Main Input Area Textarea -->
+          <div class="flex-1 min-h-0 mb-4 relative group">
+            <Textarea
+              v-model="jsonInput"
+              placeholder='{&#10;  "elements": [...],&#10;  "connections": [...]&#10;}'
+              customClass="h-full font-mono text-xs border border-border-default rounded-interactive focus-visible:ring-interactive-accent resize-none overflow-y-auto"
+            />
+          </div>
+
+          <!-- Action Button -->
+          <button 
+            @click="compileDiagram" 
+            :disabled="!jsonInput.trim()"
+            class="w-full py-2.5 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-zinc-200 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none font-semibold text-xs rounded-lg shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer group shrink-0"
+          >
+            <svg class="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span>Compile Architecture</span>
+          </button>
+        </div>
       </div>
-    </div>
+    </template>
   </Surface>
 </template>
 
@@ -209,6 +255,16 @@ import Surface from './ui/layout/Surface.vue'
 import Input from './ui/Input.vue'
 import Textarea from './ui/Textarea.vue'
 import Badge from './ui/Badge.vue'
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
+
+defineProps({
+  isExpanded: {
+    type: Boolean,
+    default: true
+  }
+})
+
+defineEmits(['toggle'])
 
 const diagramStore = useDiagramStore()
 
