@@ -19,7 +19,7 @@
         <!-- Selection Marquee (During Dragging) -->
         <div 
           v-if="isSelecting"
-          class="absolute border border-dashed border-accent-blue bg-accent-blue/10 pointer-events-none z-[1000]"
+          class="absolute border border-dashed border-[var(--color-interactive-accent)] bg-[var(--color-interactive-accent)]/10 pointer-events-none z-[1000]"
           :style="{
             left: boxLeft + 'px',
             top: boxTop + 'px',
@@ -125,7 +125,7 @@
               v-for="side in ['top', 'right', 'bottom', 'left']" 
               :key="side"
               :data-anchor-side="side"
-              class="absolute w-3 h-3 bg-white dark:bg-zinc-900 border-2 border-[var(--color-interactive-accent)] rounded-full opacity-0 group-hover/element:opacity-100 transition-opacity duration-150 z-30 cursor-crosshair pointer-events-auto flex items-center justify-center text-[9px] font-bold text-zinc-400 hover:text-accent-blue hover:border-accent-blue active:scale-75 transform"
+              class="absolute w-3 h-3 bg-white dark:bg-zinc-900 border-2 border-[var(--color-interactive-accent)] rounded-full opacity-0 group-hover/element:opacity-100 transition-opacity duration-150 z-30 cursor-crosshair pointer-events-auto flex items-center justify-center text-[9px] font-bold text-zinc-400 hover:text-[var(--color-interactive-hover)] hover:border-[var(--color-interactive-hover)] active:scale-75 transform"
               :class="{
                 'top-0 left-1/2 -translate-x-1/2 -translate-y-1/2': side === 'top',
                 'top-1/2 right-0 translate-x-1/2 -translate-y-1/2': side === 'right',
@@ -144,7 +144,7 @@
           <path 
             :d="draggingPath" 
             fill="none" 
-            stroke="var(--color-accent-blue)" 
+            stroke="var(--color-interactive-accent)" 
             stroke-width="1.5" 
             stroke-dasharray="4,4"
             class="drop-shadow-sm"
@@ -159,7 +159,7 @@
             y1="0" 
             :x2="alignmentGuides.vertical" 
             y2="5000" 
-            stroke="var(--color-accent-blue)" 
+            stroke="var(--color-interactive-accent)" 
             stroke-width="1" 
             stroke-dasharray="5,5" 
             class="opacity-60"
@@ -170,7 +170,7 @@
             :y1="alignmentGuides.horizontal" 
             x2="5000" 
             :y2="alignmentGuides.horizontal" 
-            stroke="var(--color-accent-blue)" 
+            stroke="var(--color-interactive-accent)" 
             stroke-width="1" 
             stroke-dasharray="5,5" 
             class="opacity-60"
@@ -197,7 +197,7 @@
           :style="getMidpointStyle(conn)"
         >
           <button 
-            class="w-3 h-3 rounded-full border border-zinc-300 bg-white hover:border-accent-blue hover:bg-accent-blue/10 shadow-xs flex items-center justify-center text-[8px] text-zinc-400 hover:text-accent-blue transition-all cursor-crosshair z-20 active:scale-90" 
+            class="w-3 h-3 rounded-full border border-zinc-300 bg-white hover:border-[var(--color-interactive-accent)] hover:bg-[var(--color-interactive-accent)]/10 shadow-xs flex items-center justify-center text-[8px] text-zinc-400 hover:text-[var(--color-interactive-accent)] transition-all cursor-crosshair z-20 active:scale-90" 
             title="Edit connection type" 
             @click.stop="selectConnection(conn.id)"
           >•</button>
