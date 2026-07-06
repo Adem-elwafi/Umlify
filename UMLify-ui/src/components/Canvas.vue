@@ -1,7 +1,7 @@
 <template>
   <div 
     id="uml-canvas" 
-    class="w-full h-full relative overflow-hidden bg-[#f8fafc] dark:bg-[#0b0f19] transition-colors duration-200 flex flex-col select-none" 
+    class="w-full h-full relative overflow-hidden bg-bg-canvas transition-colors duration-200 flex flex-col select-none" 
     @dragover.prevent="handleDragOver"
     @drop="handleDrop"
   >

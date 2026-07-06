@@ -341,7 +341,7 @@
         </Surface>
 
         <!-- Main Drawing Area Viewport -->
-        <div class="flex-1 w-full relative bg-[radial-gradient(var(--color-border-default)_1px,transparent_1px)] [background-size:16px_16px] bg-bg-base transition-all duration-300 overflow-hidden">
+        <div class="flex-1 w-full relative bg-bg-canvas transition-all duration-300 overflow-hidden">
           <Canvas :onLogout="handleSignOutFlow" />
         </div>
       </Stack>

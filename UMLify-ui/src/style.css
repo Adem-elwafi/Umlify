@@ -4,6 +4,7 @@
 
 :root {
   --color-bg-base: #ffffff;
+  --color-bg-canvas: #fafafa;
   --color-bg-surface: #f4f4f5;
   --color-bg-elevated: #e4e4e7;
   
@@ -21,6 +22,7 @@
 
 .dark {
   --color-bg-base: #09090b;
+  --color-bg-canvas: #09090b;
   --color-bg-surface: #18181b;
   --color-bg-elevated: #27272a;
   
@@ -38,6 +40,7 @@
 
 @theme {
   --color-bg-base: var(--color-bg-base);
+  --color-bg-canvas: var(--color-bg-canvas);
   --color-bg-surface: var(--color-bg-surface);
   --color-bg-elevated: var(--color-bg-elevated);
   
@@ -165,13 +168,13 @@
 
 /* Custom Blueprint Sheet Grid Engine overrides */
 .sheet-grid {
-  background-size: 20px 20px;
-  background-image: radial-gradient(circle, rgba(9, 9, 11, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-image: radial-gradient(circle, rgba(9, 9, 11, 0.15) 1.2px, transparent 1.2px);
   transition: background-color var(--animate-fast), background-image var(--animate-fast);
 }
 
 .dark .sheet-grid {
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.12) 1.2px, transparent 1.2px);
 }
 
 /* Reset baseline document styles and bind transitions */
