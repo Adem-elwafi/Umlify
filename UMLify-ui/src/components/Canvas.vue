@@ -949,22 +949,9 @@ function getMidpointStyle(conn) {
   const fromPt = getConnectionPoint(conn.from, conn.fromSide);
   const toPt = getConnectionPoint(conn.to, conn.toSide);
   
-  // Align midpoint style with orthogonal logic
-  let midX, midY;
-  const isFromHorizontal = ['left', 'right'].includes(fromPt.side);
-  const isToHorizontal = ['left', 'right'].includes(toPt.side);
-
-  if (isFromHorizontal && isToHorizontal) {
-    midX = fromPt.x + (toPt.x - fromPt.x) / 2;
-    midY = (fromPt.y + toPt.y) / 2;
-  } else if (!isFromHorizontal && !isToHorizontal) {
-    midX = (fromPt.x + toPt.x) / 2;
-    midY = fromPt.y + (toPt.y - fromPt.y) / 2;
-  } else {
-    midX = toPt.x;
-    midY = fromPt.y;
-  }
-
+  // Compute true bounding midpoints between connection centers regardless of drag directions
+  const midX = (fromPt.x + toPt.x) / 2;
+  const midY = (fromPt.y + toPt.y) / 2;
   return { left: `${midX}px`, top: `${midY}px` };
 }
 

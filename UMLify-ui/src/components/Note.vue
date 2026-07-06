@@ -30,7 +30,7 @@
       <!-- Delete button (shows when selected) -->
       <button
         v-if="selected"
-        class="w-5 h-5 flex items-center justify-center bg-primary-slate hover:bg-primary-slate/90 text-white rounded-lg text-[9px] shadow-md border border-primary-slate/20 transition-all cursor-pointer active:scale-95 absolute -top-2 -right-2 z-30"
+        class="w-5 h-5 flex items-center justify-center bg-bg-surface border border-border-default text-text-secondary hover:text-error hover:border-error/30 transition-all rounded-lg text-[9px] shadow-xs cursor-pointer active:scale-95 absolute -top-2 -right-2 z-30"
         @mousedown.stop
         @mouseup.stop
         @click.stop="emit('delete')"

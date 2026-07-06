@@ -26,12 +26,21 @@
       </svg>
       
       <textarea 
+        ref="labelInput"
         v-model="localLabel" 
         @input="updateLabel"
         @mousedown.stop
+        @dblclick="enableEditing"
+        @blur="disableEditing"
+        :readonly="!isEditing"
         rows="2"
         autocomplete="off"
-        class="text-zinc-700 dark:text-zinc-300 text-xs mt-2 font-medium px-2 py-1 rounded-lg bg-white/60 dark:bg-zinc-900/60 border border-zinc-200/50 dark:border-zinc-800/50 text-center w-full outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/60 resize-none overflow-hidden whitespace-normal text-wrap break-words h-9"
+        :class="[
+          'text-zinc-700 dark:text-zinc-300 text-xs mt-2 font-medium px-2 py-1 rounded-lg text-center w-full outline-none resize-none overflow-hidden whitespace-normal text-wrap break-words h-9 transition-all duration-200',
+          isEditing 
+            ? 'bg-bg-surface border border-border-default ring-2 ring-interactive-accent/35' 
+            : 'bg-transparent border border-transparent cursor-pointer'
+        ]"
       ></textarea>
     </div>
 
@@ -47,7 +56,7 @@
     <!-- Delete button (shows when selected) -->
     <button
       v-if="selected"
-      class="w-5 h-5 flex items-center justify-center bg-primary-slate hover:bg-primary-slate/90 text-white rounded-lg text-[9px] shadow-md border border-primary-slate/20 transition-all cursor-pointer active:scale-95 absolute -top-2 -right-2 z-30"
+      class="w-5 h-5 flex items-center justify-center bg-bg-surface border border-border-default text-text-secondary hover:text-error hover:border-error/30 transition-all rounded-lg text-[9px] shadow-xs cursor-pointer active:scale-95 absolute -top-2 -right-2 z-30"
       @mousedown.stop
       @mouseup.stop
       @click.stop="emit('delete')"
@@ -74,6 +83,19 @@ const props = defineProps({
 const emit = defineEmits(['click', 'update:label', 'delete', 'resize-start'])
 
 const localLabel = ref(props.label || 'Actor')
+const isEditing = ref(false)
+const labelInput = ref(null)
+
+function enableEditing() {
+  isEditing.value = true
+  setTimeout(() => {
+    labelInput.value?.focus()
+  }, 0)
+}
+
+function disableEditing() {
+  isEditing.value = false
+}
 
 watch(() => props.label, (newLabel) => {
   localLabel.value = newLabel

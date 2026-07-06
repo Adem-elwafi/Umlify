@@ -340,7 +340,7 @@ const labelY = computed(() => {
 
 .connector-label {
   paint-order: stroke;
-  stroke: #fafafa;
+  stroke: var(--color-bg-canvas);
   stroke-width: 4px;
   stroke-linejoin: round;
 }
