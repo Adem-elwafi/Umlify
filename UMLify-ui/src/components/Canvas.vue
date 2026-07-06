@@ -40,7 +40,7 @@
           <!-- Task 1: Premium Hairline Selection Highlight -->
           <div 
             v-if="selectedElements.includes(String(element.id))"
-            class="absolute border border-[var(--accent-violet)] shadow-[0_0_12px_var(--accent-violet-glow)] pointer-events-none z-20"
+            class="absolute border border-[var(--color-interactive-accent)] bg-[var(--color-interactive-accent)]/5 shadow-[0_0_4px_rgba(59,130,246,0.15)] pointer-events-none z-20"
             :class="element.type === 'usecase' ? 'rounded-full' : 'rounded-xl'"
             :style="{
               top: '-4px', left: '-4px',
@@ -125,7 +125,7 @@
               v-for="side in ['top', 'right', 'bottom', 'left']" 
               :key="side"
               :data-anchor-side="side"
-              class="absolute w-3 h-3 bg-white dark:bg-zinc-900 border-2 border-[var(--accent-violet)] rounded-full opacity-0 group-hover/element:opacity-100 transition-opacity duration-150 z-30 cursor-crosshair pointer-events-auto flex items-center justify-center text-[9px] font-bold text-zinc-400 hover:text-accent-blue hover:border-accent-blue active:scale-75 transform"
+              class="absolute w-3 h-3 bg-white dark:bg-zinc-900 border-2 border-[var(--color-interactive-accent)] rounded-full opacity-0 group-hover/element:opacity-100 transition-opacity duration-150 z-30 cursor-crosshair pointer-events-auto flex items-center justify-center text-[9px] font-bold text-zinc-400 hover:text-accent-blue hover:border-accent-blue active:scale-75 transform"
               :class="{
                 'top-0 left-1/2 -translate-x-1/2 -translate-y-1/2': side === 'top',
                 'top-1/2 right-0 translate-x-1/2 -translate-y-1/2': side === 'right',

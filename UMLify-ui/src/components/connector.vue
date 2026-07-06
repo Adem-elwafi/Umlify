@@ -15,14 +15,14 @@
         <path 
           v-if="type === 'association' || type === ''" 
           d="M 0 2 L 8 5 L 0 8 z" 
-          :class="isSelected ? 'fill-[var(--accent-violet)]' : 'fill-zinc-400 dark:fill-zinc-500'" 
+          :class="isSelected ? 'fill-[var(--color-interactive-accent)]' : 'fill-zinc-400 dark:fill-zinc-500'" 
           class="transition-colors duration-200"
         />
         <path 
           v-else-if="['include', 'extend', 'dependency'].includes(type)" 
           d="M 1 2 L 7 5 L 1 8" 
           fill="none" 
-          :class="isSelected ? 'stroke-[var(--accent-violet)]' : 'stroke-zinc-400 dark:stroke-zinc-500'" 
+          :class="isSelected ? 'stroke-[var(--color-interactive-accent)]' : 'stroke-zinc-400 dark:fill-none dark:stroke-zinc-500'" 
           class="transition-colors duration-200"
           stroke-width="1.5" 
           stroke-linecap="round" 
@@ -32,7 +32,7 @@
           v-else-if="type === 'generalization'" 
           d="M 1 2 L 7 5 L 1 8 z" 
           fill="white" 
-          :class="isSelected ? 'stroke-[var(--accent-violet)]' : 'stroke-zinc-400 dark:stroke-zinc-500'" 
+          :class="isSelected ? 'stroke-[var(--color-interactive-accent)]' : 'stroke-zinc-400 dark:stroke-zinc-500'" 
           class="transition-colors duration-200"
           stroke-width="1.5" 
           stroke-linejoin="round" 
@@ -59,7 +59,7 @@
       :marker-end="`url(#arrow-${props.id})`"
       class="pointer-events-none transition-colors duration-200"
       :class="[
-        isSelected ? 'stroke-[var(--accent-violet)] selected-glow' : 'stroke-zinc-400 dark:stroke-zinc-500'
+        isSelected ? 'stroke-[var(--color-interactive-accent)] selected-glow' : 'stroke-zinc-400 dark:stroke-zinc-500'
       ]"
     />
     
@@ -70,7 +70,7 @@
       font-size="11"
       font-weight="700"
       text-anchor="middle"
-      :class="isSelected ? 'fill-[var(--accent-violet)]' : 'fill-zinc-450 dark:fill-zinc-400'"
+      :class="isSelected ? 'fill-[var(--color-interactive-accent)]' : 'fill-zinc-450 dark:fill-zinc-400'"
       class="connector-label tracking-tight transition-colors duration-200"
     >
       {{ type }}
@@ -335,7 +335,7 @@ const labelY = computed(() => {
 }
 
 .selected-glow {
-  filter: drop-shadow(0 0 3px rgba(221, 174, 211, 0.6));
+  filter: drop-shadow(0 0 3px rgba(59, 130, 246, 0.4));
 }
 
 .connector-label {
