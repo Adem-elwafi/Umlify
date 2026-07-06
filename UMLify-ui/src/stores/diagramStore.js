@@ -19,6 +19,11 @@ export const useDiagramStore = defineStore('diagram', () => {
   const networkErrorMessage = ref(null);
   const globalSaveStatusMessage = ref('');
 
+  // Compiler / Telemetry states
+  const compilerStatus = ref('idle');
+  const compilerMessage = ref('Ready for telemetry transmission...');
+  const cursorCoords = ref({ x: 0, y: 0 });
+
   // Global Modal Configuration
   const globalModalConfig = ref({
     isOpen: false,
@@ -114,6 +119,9 @@ export const useDiagramStore = defineStore('diagram', () => {
     globalSaveStatusMessage.value = '';
     networkErrorMessage.value = null;
     isDirty.value = false;
+    compilerStatus.value = 'idle';
+    compilerMessage.value = 'Ready for telemetry transmission...';
+    cursorCoords.value = { x: 0, y: 0 };
   };
 
   // Helper config to fetch auth headers reactively from authStore
@@ -364,6 +372,9 @@ export const useDiagramStore = defineStore('diagram', () => {
     updateLabel,
     connectElements,
     deleteElement,
-    deleteConnection
+    deleteConnection,
+    compilerStatus,
+    compilerMessage,
+    cursorCoords
   };
 });

@@ -1,5 +1,10 @@
 <template>
-  <div class="w-full flex-1 flex flex-col bg-transparent overflow-y-auto px-3 py-4 gap-4 select-none">
+  <Surface
+    depth="1"
+    radius="none"
+    :border="false"
+    customClass="w-full h-full flex flex-col overflow-y-auto px-3 py-4 gap-4 select-none bg-bg-surface"
+  >
 
     <!-- ═══════════════════════════════════════════
          SECTION A — DRAG PALETTE
@@ -186,16 +191,13 @@
          SECTION C — SAVE (primary action zone)
     ════════════════════════════════════════════ -->
     <div class="flex flex-col gap-2">
-      <!-- Title input — minimal, feels like a property inspector -->
-      <div class="flex items-center gap-2 px-1">
-        <span class="text-[9px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-650 shrink-0">Title</span>
-        <input
-          v-model="diagramStore.currentDiagramTitle"
-          type="text"
-          placeholder="Untitled Diagram"
-          class="flex-1 bg-transparent text-[11px] font-medium text-zinc-800 dark:text-zinc-200 placeholder-zinc-350 dark:placeholder-zinc-700 focus:outline-none border-none min-w-0"
-        />
-      </div>
+      <!-- Title input using primitive -->
+      <Input
+        v-model="diagramStore.currentDiagramTitle"
+        label="Title"
+        placeholder="Untitled Diagram"
+        customClass="h-9 px-3 py-1.5 text-xs text-text-primary border border-border-default rounded-interactive focus-visible:ring-interactive-accent"
+      />
 
       <!-- Save button — the one bold element in the sidebar -->
       <button
@@ -207,20 +209,6 @@
         <Save class="w-3.5 h-3.5" />
         Save to Cloud
       </button>
-
-      <!-- Save status -->
-      <transition name="fade">
-        <div
-          v-if="diagramStore.globalSaveStatusMessage"
-          class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-medium"
-          :class="diagramStore.globalSaveStatusMessage.includes('Successful')
-            ? 'text-emerald-700 bg-emerald-50 border border-emerald-100 dark:text-emerald-400 dark:bg-emerald-950/20 dark:border-emerald-900/30'
-            : 'text-amber-700 bg-amber-50 border border-amber-100 dark:text-amber-400 dark:bg-amber-950/20 dark:border-amber-900/30'"
-        >
-          <span>{{ diagramStore.globalSaveStatusMessage.includes('Successful') ? '✓' : '⚠' }}</span>
-          {{ diagramStore.globalSaveStatusMessage }}
-        </div>
-      </transition>
     </div>
 
     <!-- ═══════════════════════════════════════════
@@ -290,7 +278,7 @@
 
     <!-- Hidden file input -->
     <input type="file" ref="fileLoader" @change="handleFileImport" class="hidden" accept=".json" />
-  </div>
+  </Surface>
 </template>
 
 <script setup>
@@ -298,6 +286,8 @@ import { ref } from 'vue';
 import html2canvas from 'html2canvas';
 import { useDiagramStore } from '../stores/diagramStore';
 import { useAuthStore } from '../stores/authStore';
+import Surface from './ui/layout/Surface.vue';
+import Input from './ui/Input.vue';
 import {
   ArrowUpRight, Type, Trash2,
   Download, Upload, Camera,

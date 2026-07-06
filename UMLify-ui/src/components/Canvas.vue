@@ -11,6 +11,7 @@
       class="flex-1 w-full relative overflow-auto bg-transparent" 
       @click.self="clearSelectedConnection" 
       @mousedown="handleCanvasMouseDown"
+      @mousemove="handleMouseMoveTelemetry"
     >
       <div 
         class="absolute top-0 left-0 w-[5000px] h-[5000px] bg-transparent overflow-visible sheet-grid" 
@@ -789,6 +790,15 @@ const getElementStyle = (element) => {
     'z-index': zIndex
   };
 };
+
+function handleMouseMoveTelemetry(e) {
+  const canvas = e.currentTarget;
+  if (!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  const x = Math.round((e.clientX - rect.left + canvas.scrollLeft) / zoomLevel.value);
+  const y = Math.round((e.clientY - rect.top + canvas.scrollTop) / zoomLevel.value);
+  diagramStore.cursorCoords = { x, y };
+}
 
 // ==========================================
 // 🔍 DRIFT-FREE MULTI-SELECTION MARQUEE MATH

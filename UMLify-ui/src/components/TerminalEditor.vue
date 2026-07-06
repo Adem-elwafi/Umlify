@@ -1,5 +1,10 @@
 <template>
-  <div class="w-full h-full bg-[#f1f5f9] text-[#0f172a] border-l border-slate-200/80 dark:bg-[#111827] dark:text-zinc-300 dark:border-zinc-800/50 flex flex-col p-4 font-sans transition-colors duration-200">
+  <Surface
+    depth="1"
+    radius="none"
+    :border="true"
+    customClass="w-full h-full flex flex-col p-4 font-sans border-l border-border-default bg-bg-surface"
+  >
     <!-- Panel Header -->
     <div class="flex items-center justify-between mb-4 shrink-0">
       <div class="flex items-center space-x-3">
@@ -13,16 +18,12 @@
         </h2>
       </div>
       <div class="flex items-center space-x-2">
-        <!-- Success State -->
-        <div v-if="successMessage" class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] animate-pulse"></div>
-        <!-- Generating / Compiling State -->
-        <div v-else-if="isGenerating" class="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)] animate-pulse"></div>
-        <!-- Standby State -->
-        <div v-else class="w-2 h-2 rounded-full bg-zinc-400 dark:bg-zinc-800"></div>
-        
-        <span class="text-[9px] font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
+        <Badge :variant="isGenerating ? 'warning' : successMessage ? 'success' : 'neutral'" customClass="text-[9px] px-2 py-0.5">
+          <template #left>
+            <span class="w-1.5 h-1.5 rounded-full" :class="isGenerating ? 'bg-warning animate-pulse' : successMessage ? 'bg-success' : 'bg-text-muted'"></span>
+          </template>
           {{ isGenerating ? 'Compiling' : successMessage ? 'Active' : 'Standby' }}
-        </span>
+        </Badge>
       </div>
     </div>
 
@@ -41,9 +42,9 @@
           <span class="text-xs font-bold uppercase tracking-wider text-zinc-750 dark:text-zinc-200">AI Configuration</span>
         </div>
         <div class="flex items-center space-x-2">
-          <span class="text-[9px] px-2 py-0.5 bg-zinc-200 border border-zinc-300/40 text-zinc-650 dark:bg-zinc-800/40 dark:border-zinc-700/30 dark:text-zinc-300 rounded-md uppercase tracking-wider font-mono">
-            {{ activeVendor === 'gemini' ? 'Gemini' : 'OpenAI' }}
-          </span>
+          <Badge variant="neutral" customClass="uppercase tracking-wider font-mono text-[9px] px-2 py-0.5">
+            {{ activeVendor === 'gemini' ? 'Gemini' : activeVendor === 'openai' ? 'OpenAI' : activeVendor === 'groq' ? 'Groq' : activeVendor === 'openrouter' ? 'OpenRouter' : 'Demo' }}
+          </Badge>
           <svg 
             class="w-4 h-4 text-zinc-400 transition-transform duration-200" 
             :class="isConfigOpen ? 'rotate-180' : ''"
@@ -79,16 +80,15 @@
             </div>
           </div>
 
-          <!-- API Key Input Field -->
-          <div v-if="activeVendor !== 'demo'" class="flex flex-col space-y-1.5">
-            <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">API Access Token</label>
-            <input 
-              type="password" 
-              v-model="aiApiKey"
-              placeholder="Enter your API key..."
-              class="w-full bg-white border border-zinc-200 dark:bg-zinc-950 dark:border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-700 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 dark:focus:border-zinc-650 dark:focus:ring-zinc-650 transition-all"
-            />
-          </div>
+          <!-- API Key Input Field using primitive -->
+          <Input
+            v-if="activeVendor !== 'demo'"
+            type="password"
+            v-model="aiApiKey"
+            label="API Access Token"
+            placeholder="Enter your API key..."
+            customClass="h-9 px-3 py-1.5 text-xs text-text-primary border border-border-default rounded-interactive focus-visible:ring-interactive-accent"
+          />
         </div>
       </transition>
     </div>
@@ -131,53 +131,16 @@
           </p>
         </div>
 
-        <!-- Requirement Prompt Buffer Textarea -->
+        <!-- Requirement Prompt Buffer Textarea using primitive -->
         <div class="flex-1 min-h-0 mb-4 relative group">
-          <textarea
+          <Textarea
             v-model="userRequirement"
             placeholder="e.g. Create a banking system with a Customer actor and a Teller actor. The Customer can deposit money and check balance, and the Teller can process transactions, all placed inside a Core Banking system container..."
-            class="w-full h-full bg-white border border-zinc-200 rounded-lg p-4 pb-10 text-xs font-sans text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 dark:bg-zinc-900/50 dark:border-zinc-800/80 dark:text-zinc-100 dark:placeholder-zinc-700 dark:focus:border-zinc-700 dark:focus:ring-zinc-800 transition-all shadow-sm resize-none overflow-y-auto leading-relaxed"
-            spellcheck="true"
-            maxlength="2000"
-          ></textarea>
-          <div class="absolute bottom-3 right-3 text-[10px] font-mono text-zinc-400 dark:text-zinc-500 bg-zinc-100/80 dark:bg-zinc-950/80 px-1.5 py-0.5 rounded border border-zinc-200/50 dark:border-zinc-800/50 select-none">
+            customClass="h-full border border-border-default rounded-interactive focus-visible:ring-interactive-accent resize-none overflow-y-auto"
+          />
+          <div class="absolute bottom-3 right-3 text-[10px] font-mono text-text-muted bg-bg-surface/80 px-1.5 py-0.5 rounded border border-border-default select-none z-10">
             {{ userRequirement.length }} / 2000
           </div>
-        </div>
-
-        <!-- Inline Warning Alert Badge -->
-        <div v-if="validationWarning" class="mb-4 shrink-0 bg-amber-950/20 border border-amber-900/30 p-3 rounded-lg flex items-start space-x-2 animate-pulse">
-          <span class="text-amber-500 text-xs mt-0.5">⚠️</span>
-          <div class="flex-1">
-            <span class="text-[10px] font-bold text-amber-500 uppercase tracking-wider block">Configuration Warning</span>
-            <p class="text-[11px] text-amber-400/80 leading-normal">{{ validationWarning }}</p>
-          </div>
-        </div>
-
-        <!-- Telemetry Status Feedback Area -->
-        <div class="mb-4 shrink-0">
-          <transition name="fade" mode="out-in">
-            <div v-if="errorLog" class="bg-rose-950/20 border border-rose-900/30 p-3 rounded-lg">
-              <div class="flex items-center space-x-2 mb-1">
-                <span class="text-rose-500 text-[10px]">●</span>
-                <span class="text-[10px] font-bold text-rose-500 uppercase tracking-wider">Compilation Error</span>
-              </div>
-              <p class="text-[11px] text-rose-400/80 font-mono leading-tight whitespace-pre-wrap">{{ errorLog }}</p>
-            </div>
-            <div v-else-if="successMessage" class="bg-emerald-950/20 border border-emerald-900/30 p-3 rounded-lg">
-              <div class="flex items-center space-x-2 mb-1">
-                <span class="text-emerald-500 text-[10px]">●</span>
-                <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Success</span>
-              </div>
-              <p class="text-[11px] text-emerald-400/80 font-mono leading-tight">{{ successMessage }}</p>
-            </div>
-            <div v-else class="flex items-center space-x-2 px-1">
-              <span class="text-zinc-800 text-[10px]">❯</span>
-              <span class="text-[10px] font-medium text-zinc-600 font-mono">
-                {{ isGenerating ? 'AI compiling and mapping vector structures...' : 'Ready for telemetry transmission...' }}
-              </span>
-            </div>
-          </transition>
         </div>
 
         <!-- Action Button -->
@@ -213,38 +176,13 @@
           </p>
         </div>
 
-        <!-- Main Input Area Textarea -->
+        <!-- Main Input Area Textarea using primitive -->
         <div class="flex-1 min-h-0 mb-4 relative group">
-          <textarea
+          <Textarea
             v-model="jsonInput"
             placeholder='{&#10;  "elements": [...],&#10;  "connections": [...]&#10;}'
-            class="w-full h-full bg-white border border-zinc-200 rounded-lg p-4 text-xs font-mono text-zinc-850 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 dark:bg-zinc-900/50 dark:border-zinc-800/80 dark:text-zinc-100 dark:placeholder-zinc-700 dark:focus:border-zinc-700 dark:focus:ring-zinc-800 transition-all shadow-sm resize-none overflow-y-auto leading-relaxed tab-size-2"
-            spellcheck="false"
-          ></textarea>
-        </div>
-
-        <!-- Feedback Area -->
-        <div class="mb-4 shrink-0">
-          <transition name="fade" mode="out-in">
-            <div v-if="errorLog" class="bg-rose-950/20 border border-rose-900/30 p-3 rounded-lg">
-              <div class="flex items-center space-x-2 mb-1">
-                <span class="text-rose-500 text-[10px]">●</span>
-                <span class="text-[10px] font-bold text-rose-500 uppercase tracking-wider">Compilation Error</span>
-              </div>
-              <p class="text-[11px] text-rose-400/80 font-mono leading-tight whitespace-pre-wrap">{{ errorLog }}</p>
-            </div>
-            <div v-else-if="successMessage" class="bg-emerald-950/20 border border-emerald-900/30 p-3 rounded-lg">
-              <div class="flex items-center space-x-2 mb-1">
-                <span class="text-emerald-500 text-[10px]">●</span>
-                <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Success</span>
-              </div>
-              <p class="text-[11px] text-emerald-400/80 font-mono leading-tight">{{ successMessage }}</p>
-            </div>
-            <div v-else class="flex items-center space-x-2 px-1">
-              <span class="text-zinc-800 text-[10px]">❯</span>
-              <span class="text-[10px] font-medium text-zinc-600 font-mono">Ready for telemetry transmission...</span>
-            </div>
-          </transition>
+            customClass="h-full font-mono text-xs border border-border-default rounded-interactive focus-visible:ring-interactive-accent resize-none overflow-y-auto"
+          />
         </div>
 
         <!-- Action Button -->
@@ -260,13 +198,17 @@
         </button>
       </div>
     </div>
-  </div>
+  </Surface>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
 import axios from 'axios'
 import { useDiagramStore } from '../stores/diagramStore'
+import Surface from './ui/layout/Surface.vue'
+import Input from './ui/Input.vue'
+import Textarea from './ui/Textarea.vue'
+import Badge from './ui/Badge.vue'
 
 const diagramStore = useDiagramStore()
 
@@ -281,6 +223,54 @@ const errorLog = ref(null)
 const successMessage = ref('')
 const validationWarning = ref('')
 const isGenerating = ref(false)
+
+// Synchronize compile state to global status bar in diagramStore
+watch(validationWarning, (newVal) => {
+  diagramStore.compilerWarning = newVal || null;
+  if (newVal) {
+    diagramStore.compilerStatus = 'warning';
+  } else if (!isGenerating.value && !errorLog.value && !successMessage.value) {
+    diagramStore.compilerStatus = 'idle';
+  }
+});
+
+watch(errorLog, (newVal) => {
+  diagramStore.compilerError = newVal || null;
+  if (newVal) {
+    diagramStore.compilerStatus = 'error';
+    diagramStore.compilerMessage = newVal;
+  } else if (!isGenerating.value && !successMessage.value && !validationWarning.value) {
+    diagramStore.compilerStatus = 'idle';
+    diagramStore.compilerMessage = 'Ready for telemetry transmission...';
+  }
+});
+
+watch(successMessage, (newVal) => {
+  if (newVal) {
+    diagramStore.compilerStatus = 'success';
+    diagramStore.compilerMessage = newVal;
+  }
+});
+
+watch(isGenerating, (newVal) => {
+  if (newVal) {
+    diagramStore.compilerStatus = 'compiling';
+    diagramStore.compilerMessage = 'AI compiling and mapping vector structures...';
+  } else {
+    if (errorLog.value) {
+      diagramStore.compilerStatus = 'error';
+      diagramStore.compilerMessage = errorLog.value;
+    } else if (successMessage.value) {
+      diagramStore.compilerStatus = 'success';
+      diagramStore.compilerMessage = successMessage.value;
+    } else if (validationWarning.value) {
+      diagramStore.compilerStatus = 'warning';
+    } else {
+      diagramStore.compilerStatus = 'idle';
+      diagramStore.compilerMessage = 'Ready for telemetry transmission...';
+    }
+  }
+});
 
 // Watcher to cache AI API key to localStorage automatically
 watch(aiApiKey, (newVal) => {
