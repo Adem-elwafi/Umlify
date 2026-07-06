@@ -593,12 +593,12 @@ const handleElementDragMove = (event) => {
 
   // Reset alignment guides for this frame
   alignmentGuides.value = { vertical: null, horizontal: null };
-  const SNAP_THRESHOLD = 8;
+  const SNAP_THRESHOLD = 10;
 
   activeTrackedElements.value.forEach(item => {
-    // Quantize absolute positions to a structured 16px grid matrix
-    let nextX = Math.round((item.baseX + deltaX) / 16) * 16;
-    let nextY = Math.round((item.baseY + deltaY) / 16) * 16;
+    // Quantize absolute positions to a structured 20px grid matrix
+    let nextX = Math.round((item.baseX + deltaX) / 20) * 20;
+    let nextY = Math.round((item.baseY + deltaY) / 20) * 20;
 
     // Smart Snapping Logic
     const staticElements = elements.value.filter(el => !selectedElements.value.includes(String(el.id)));
@@ -891,12 +891,15 @@ const handleDrop = (event) => {
   const generatedId = `${elementType.toLowerCase()}_${Date.now()}`;
   const { width: defaultWidth, height: defaultHeight } = getElementDimensions({ type: elementType });
   
+  const finalX = Math.round((droppedX - (defaultWidth / 2)) / 20) * 20;
+  const finalY = Math.round((droppedY - (defaultHeight / 2)) / 20) * 20;
+
   const elementPayload = {
     id: generatedId,
     type: elementType,
     label: elementType === 'System' ? 'System Boundary' : elementType === 'package' ? 'New Package' : elementType === 'note' ? 'New Note' : `New ${elementType}`,
-    x: droppedX - (defaultWidth / 2),
-    y: droppedY - (defaultHeight / 2),
+    x: finalX,
+    y: finalY,
     width: defaultWidth,
     height: defaultHeight
   };
@@ -1009,6 +1012,36 @@ function handleKeydown(e) {
 
   if (e.ctrlKey && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); return; }
   if (e.ctrlKey && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); return; }
+
+  if (e.ctrlKey && e.key.toLowerCase() === 'd') {
+    e.preventDefault();
+    if (selectedElements.value.length > 0) {
+      if (typeof diagramStore.saveToHistory === 'function') {
+        diagramStore.saveToHistory();
+      }
+      const newSelectedIds = [];
+      const now = Date.now();
+      
+      selectedElements.value.forEach((idStr, index) => {
+        const sourceEl = elements.value.find(el => String(el.id) === String(idStr));
+        if (sourceEl) {
+          const duplicate = JSON.parse(JSON.stringify(sourceEl));
+          const prefix = sourceEl.id.split('_')[0] || 'el';
+          duplicate.id = `${prefix}_${now}_${index}`;
+          duplicate.x = (sourceEl.x || 0) + 20;
+          duplicate.y = (sourceEl.y || 0) + 20;
+          elements.value.push(duplicate);
+          newSelectedIds.push(String(duplicate.id));
+        }
+      });
+      
+      if (newSelectedIds.length > 0) {
+        selectedElements.value = newSelectedIds;
+      }
+    }
+    return;
+  }
+
   if (e.key === 'Delete' || e.key === 'Backspace') {
     if (selectedElements.value.length > 0) {
       [...selectedElements.value].forEach(id => diagramStore.deleteElement(id));
