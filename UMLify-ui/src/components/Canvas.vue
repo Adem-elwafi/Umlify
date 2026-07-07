@@ -242,6 +242,12 @@ import System from './System.vue';
 import Package from './Package.vue';
 import Note from './Note.vue';
 import { useInteractionEngine, InteractionState } from '../engines/interaction';
+import { 
+  getElementDimensions, 
+  getConnectionPoint, 
+  getOrthogonalPathPoints, 
+  getOrthogonalPathMidpoint 
+} from '../utils/connectorRouting';
 
 const props = defineProps({ 
   onLogout: Function
@@ -269,20 +275,6 @@ const selectedConnection = computed(() => connections.value.find(c => c.id === s
 // 🎯 SMART ALIGNMENT GUIDES & SNAP SYSTEM
 // ==========================================
 const alignmentGuides = ref({ vertical: null, horizontal: null });
-
-function getElementDimensions(el) {
-  if (!el) return { width: 0, height: 0 };
-  let defaultW = 140;
-  let defaultH = 80;
-  if (el.type === 'actor') { defaultW = 80; defaultH = 120; }
-  else if (el.type === 'System') { defaultW = 300; defaultH = 400; }
-  else if (el.type === 'package') { defaultW = 200; defaultH = 150; }
-  else if (el.type === 'note') { defaultW = 120; defaultH = 120; }
-  return {
-    width: el.width || defaultW,
-    height: el.height || defaultH
-  };
-}
 
 const getElementBounds = (element) => {
   const w = Number(element.width || element.w || 200);
@@ -933,26 +925,12 @@ function changeSelectedConnectionType(newType) {
   if (selectedConnection.value) selectedConnection.value.type = newType;
 }
 
-function getConnectionPoint(element, side = 'right') {
-  if (!element) return { x: 0, y: 0 };
-  const { width, height } = getElementDimensions(element);
-  const positions = {
-    top: { x: element.x + width / 2, y: element.y, side: 'top' },
-    bottom: { x: element.x + width / 2, y: element.y + height, side: 'bottom' },
-    left: { x: element.x, y: element.y + height / 2, side: 'left' },
-    right: { x: element.x + width, y: element.y + height / 2, side: 'right' }
-  };
-  return positions[side] || { ...positions.right, side: 'right' };
-}
-
 function getMidpointStyle(conn) {
   const fromPt = getConnectionPoint(conn.from, conn.fromSide);
   const toPt = getConnectionPoint(conn.to, conn.toSide);
-  
-  // Compute true bounding midpoints between connection centers regardless of drag directions
-  const midX = (fromPt.x + toPt.x) / 2;
-  const midY = (fromPt.y + toPt.y) / 2;
-  return { left: `${midX}px`, top: `${midY}px` };
+  const points = getOrthogonalPathPoints(fromPt, conn.from, toPt, conn.to);
+  const mid = getOrthogonalPathMidpoint(points);
+  return { left: `${mid.x}px`, top: `${mid.y}px` };
 }
 
 function getEditorStyle(conn) {
@@ -1063,6 +1041,12 @@ onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeydown);
   window.removeEventListener('mousemove', handleCanvasMouseMove);
   window.removeEventListener('mouseup', handleCanvasMouseUp);
+  window.removeEventListener('mousemove', handleConnectionMouseMove);
+  window.removeEventListener('mouseup', handleConnectionMouseUp);
+  window.removeEventListener('mousemove', handleElementDragMove);
+  window.removeEventListener('mouseup', handleElementDragMouseUp);
+  window.removeEventListener('mousemove', handleResizeMouseMove);
+  window.removeEventListener('mouseup', handleResizeMouseUp);
 });
 
 </script>

@@ -10,67 +10,71 @@
          SECTION A — DRAG PALETTE
     ════════════════════════════════════════════ -->
     <div class="flex flex-col gap-2">
+      <!-- Unified Matrix Grid Shape Spawner -->
+      <Surface :border="true" depth="2" radius="sm" customClass="overflow-hidden bg-bg-base dark:bg-zinc-900/40">
+        <div class="grid grid-cols-2 gap-none">
+          <!-- Actor -->
+          <div
+            draggable="true"
+            @dragstart="handleDragStart($event, 'actor')"
+            class="group relative flex flex-col items-center justify-center gap-1.5 py-3 cursor-grab active:cursor-grabbing active:scale-95 select-none transition-all duration-150 border-r border-b border-border-default hover:bg-bg-elevated/40 dark:hover:bg-zinc-800/40"
+          >
+            <!-- Actor shape preview -->
+            <svg class="w-8 h-8 text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-650 dark:group-hover:text-zinc-350 transition-colors pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <!-- Head -->
+              <circle cx="12" cy="6" r="3" />
+              <!-- Torso -->
+              <line x1="12" y1="9" x2="12" y2="15" />
+              <!-- Arms -->
+              <line x1="8" y1="11" x2="16" y2="11" />
+              <!-- Legs -->
+              <line x1="12" y1="15" x2="9" y2="20" />
+              <line x1="12" y1="15" x2="15" y2="20" />
+            </svg>
+            <span class="text-[9px] font-bold tracking-wider text-zinc-450 dark:text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors uppercase">Actor</span>
+          </div>
 
-      <!-- Actor + UseCase row -->
-      <div class="grid grid-cols-2 gap-2">
+          <!-- Use Case -->
+          <div
+            draggable="true"
+            @dragstart="handleDragStart($event, 'usecase')"
+            class="group relative flex flex-col items-center justify-center gap-1.5 py-3 cursor-grab active:cursor-grabbing active:scale-95 select-none transition-all duration-150 border-b border-border-default hover:bg-bg-elevated/40 dark:hover:bg-zinc-800/40"
+          >
+            <!-- Ellipse shape preview -->
+            <div class="w-10 h-6 rounded-full border-2 border-zinc-400 dark:border-zinc-500 group-hover:border-zinc-550 dark:group-hover:border-zinc-350 transition-colors pointer-events-none" />
+            <span class="text-[9px] font-bold tracking-wider text-zinc-450 dark:text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors uppercase">Use Case</span>
+          </div>
 
-        <!-- Actor -->
-        <div
-          draggable="true"
-          @dragstart="handleDragStart($event, 'actor')"
-          class="group relative flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl cursor-grab active:cursor-grabbing active:scale-95 select-none transition-all duration-150
-                 bg-white border border-zinc-200/70 hover:border-zinc-300 hover:shadow-md
-                 dark:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-700 dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
-        >
-          <!-- Actor shape preview -->
-          <svg class="w-8 h-8 text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <!-- Head -->
-            <circle cx="12" cy="6" r="3" />
-            <!-- Torso -->
-            <line x1="12" y1="9" x2="12" y2="15" />
-            <!-- Arms -->
-            <line x1="8" y1="11" x2="16" y2="11" />
-            <!-- Legs -->
-            <line x1="12" y1="15" x2="9" y2="20" />
-            <line x1="12" y1="15" x2="15" y2="20" />
-          </svg>
-          <span class="text-[10px] font-semibold tracking-wide text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors uppercase">Actor</span>
-          <!-- Drag hint -->
-          <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <div class="grid grid-cols-2 gap-0.5">
-              <span class="w-0.5 h-0.5 rounded-full bg-zinc-400 dark:bg-zinc-500" />
-              <span class="w-0.5 h-0.5 rounded-full bg-zinc-400 dark:bg-zinc-500" />
-              <span class="w-0.5 h-0.5 rounded-full bg-zinc-400 dark:bg-zinc-500" />
-              <span class="w-0.5 h-0.5 rounded-full bg-zinc-400 dark:bg-zinc-500" />
-              <span class="w-0.5 h-0.5 rounded-full bg-zinc-400 dark:bg-zinc-500" />
-              <span class="w-0.5 h-0.5 rounded-full bg-zinc-400 dark:bg-zinc-500" />
+          <!-- Package -->
+          <div
+            draggable="true"
+            @dragstart="handleDragStart($event, 'package')"
+            class="group relative flex flex-col items-center justify-center gap-1.5 py-3 cursor-grab active:cursor-grabbing active:scale-95 select-none transition-all duration-150 border-r border-border-default hover:bg-bg-elevated/40 dark:hover:bg-zinc-800/40"
+          >
+            <!-- Package shape preview: tab + body -->
+            <div class="flex flex-col items-start pointer-events-none">
+              <div class="w-4 h-1.5 rounded-t border-t border-l border-r border-zinc-400 dark:border-zinc-500 group-hover:border-zinc-550 dark:group-hover:border-zinc-350 transition-colors" />
+              <div class="w-8 h-5 rounded-sm rounded-tl-none border border-zinc-400 dark:border-zinc-500 group-hover:border-zinc-550 dark:group-hover:border-zinc-350 transition-colors" />
             </div>
+            <span class="text-[9px] font-bold tracking-wider text-zinc-450 dark:text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors uppercase">Package</span>
+          </div>
+
+          <!-- Note -->
+          <div
+            draggable="true"
+            @dragstart="handleDragStart($event, 'note')"
+            class="group relative flex flex-col items-center justify-center gap-1.5 py-3 cursor-grab active:cursor-grabbing active:scale-95 select-none transition-all duration-150 hover:bg-bg-elevated/40 dark:hover:bg-zinc-800/40"
+          >
+            <!-- Dog-ear note preview -->
+            <div class="relative pointer-events-none">
+              <div class="w-8 h-6 bg-zinc-150/40 dark:bg-zinc-800 border border-zinc-400 dark:border-zinc-500 group-hover:border-zinc-550 dark:group-hover:border-zinc-350 transition-colors rounded-sm" />
+              <div class="absolute top-0 right-0 w-2 h-2 bg-white dark:bg-zinc-900 border-b border-l border-zinc-400 dark:border-zinc-500 group-hover:border-zinc-550 dark:group-hover:border-zinc-350 transition-colors" 
+                   style="clip-path: polygon(0 0, 100% 100%, 0 100%)" />
+            </div>
+            <span class="text-[9px] font-bold tracking-wider text-zinc-450 dark:text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors uppercase">Note</span>
           </div>
         </div>
-
-        <!-- Use Case -->
-        <div
-          draggable="true"
-          @dragstart="handleDragStart($event, 'usecase')"
-          class="group relative flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl cursor-grab active:cursor-grabbing active:scale-95 select-none transition-all duration-150
-                 bg-white border border-zinc-200/70 hover:border-zinc-300 hover:shadow-md
-                 dark:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-700 dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
-        >
-          <!-- Ellipse shape preview -->
-          <div class="w-10 h-6 rounded-full border-2 border-zinc-400 dark:border-zinc-500 group-hover:border-zinc-700 dark:group-hover:border-zinc-300 transition-colors pointer-events-none" />
-          <span class="text-[10px] font-semibold tracking-wide text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors uppercase">Use Case</span>
-          <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <div class="grid grid-cols-2 gap-0.5">
-              <span class="w-0.5 h-0.5 rounded-full bg-zinc-400 dark:bg-zinc-500" />
-              <span class="w-0.5 h-0.5 rounded-full bg-zinc-400 dark:bg-zinc-500" />
-              <span class="w-0.5 h-0.5 rounded-full bg-zinc-400 dark:bg-zinc-500" />
-              <span class="w-0.5 h-0.5 rounded-full bg-zinc-400 dark:bg-zinc-500" />
-              <span class="w-0.5 h-0.5 rounded-full bg-zinc-400 dark:bg-zinc-500" />
-              <span class="w-0.5 h-0.5 rounded-full bg-zinc-400 dark:bg-zinc-500" />
-            </div>
-          </div>
-        </div>
-      </div>
+      </Surface>
 
       <!-- System Boundary — full width, distinct treatment -->
       <div
@@ -95,42 +99,6 @@
             <span class="w-0.5 h-0.5 rounded-full bg-zinc-400 dark:bg-zinc-500" />
             <span class="w-0.5 h-0.5 rounded-full bg-zinc-400 dark:bg-zinc-500" />
           </div>
-        </div>
-      </div>
-
-      <!-- Package + Note row -->
-      <div class="grid grid-cols-2 gap-2">
-        <!-- Package -->
-        <div
-          draggable="true"
-          @dragstart="handleDragStart($event, 'package')"
-          class="group relative flex flex-col items-center justify-center gap-1.5 py-2 rounded-xl cursor-grab active:cursor-grabbing active:scale-95 select-none transition-all duration-150
-                 bg-white border border-zinc-200/70 hover:border-zinc-300 hover:shadow-md
-                 dark:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-700 dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
-        >
-          <!-- Package shape preview: tab + body -->
-          <div class="flex flex-col items-start pointer-events-none">
-            <div class="w-4 h-1.5 rounded-t border-t border-l border-r border-zinc-400 dark:border-zinc-500 group-hover:border-zinc-700 dark:group-hover:border-zinc-300 transition-colors" />
-            <div class="w-8 h-5 rounded-sm rounded-tl-none border border-zinc-400 dark:border-zinc-500 group-hover:border-zinc-700 dark:group-hover:border-zinc-300 transition-colors" />
-          </div>
-          <span class="text-[10px] font-semibold tracking-wide text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors uppercase">Package</span>
-        </div>
-
-        <!-- Note -->
-        <div
-          draggable="true"
-          @dragstart="handleDragStart($event, 'note')"
-          class="group relative flex flex-col items-center justify-center gap-1.5 py-2 rounded-xl cursor-grab active:cursor-grabbing active:scale-95 select-none transition-all duration-150
-                 bg-white border border-zinc-200/70 hover:border-zinc-300 hover:shadow-md
-                 dark:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-700 dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
-        >
-          <!-- Dog-ear note preview -->
-          <div class="relative pointer-events-none">
-            <div class="w-8 h-6 bg-zinc-100 dark:bg-zinc-800 border border-zinc-400 dark:border-zinc-500 group-hover:border-zinc-600 dark:group-hover:border-zinc-400 transition-colors rounded-sm" />
-            <div class="absolute top-0 right-0 w-2 h-2 bg-white dark:bg-zinc-900 border-b border-l border-zinc-400 dark:border-zinc-500 group-hover:border-zinc-600 dark:group-hover:border-zinc-400 transition-colors" 
-                 style="clip-path: polygon(0 0, 100% 100%, 0 100%)" />
-          </div>
-          <span class="text-[10px] font-semibold tracking-wide text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors uppercase">Note</span>
         </div>
       </div>
     </div>

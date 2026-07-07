@@ -2,7 +2,7 @@
   <Surface
     :border="false"
     depth="1"
-    customClass="h-7 w-full flex items-center justify-between px-md font-mono text-[10px] text-text-muted bg-bg-surface/50 border-t border-border-default shrink-0 select-none"
+    customClass="h-7 w-full flex items-center justify-between px-md font-mono text-[10px] text-zinc-400 bg-statusbar-bg border-t border-bar-border shrink-0 select-none"
   >
     <!-- Left Section: Compile Status & Message -->
     <div class="flex items-center gap-2">
@@ -15,14 +15,14 @@
     <!-- Right Section: Metrics & Telemetry -->
     <div class="flex items-center gap-4">
       <slot name="right">
-        <div class="flex items-center gap-2 text-text-muted">
+        <div class="flex items-center gap-2 text-zinc-400">
           <span>{{ diagramStore.elements.length }} Elem</span>
           <span class="opacity-50">/</span>
           <span>{{ diagramStore.connections.length }} Conn</span>
         </div>
-        <span class="w-px h-3 bg-border-default"></span>
+        <span class="w-px h-3 bg-zinc-700"></span>
         <span>Zoom: {{ Math.round(diagramStore.zoomLevel * 100) }}%</span>
-        <span class="w-px h-3 bg-border-default"></span>
+        <span class="w-px h-3 bg-zinc-700"></span>
         <span>X: {{ diagramStore.cursorCoords.x }} Y: {{ diagramStore.cursorCoords.y }}</span>
       </slot>
     </div>

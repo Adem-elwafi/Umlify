@@ -3,10 +3,10 @@
     <!-- Combined Top-Level Header Block -->
     <div class="w-full flex flex-col shrink-0 z-35">
       <!-- Master Workspace Header -->
-      <Surface as="header" depth="1" :border="false" customClass="h-14 w-full flex justify-between items-center px-6 border-b border-border-default bg-bg-surface shadow-xs">
+      <Surface as="header" depth="1" :border="false" customClass="h-14 w-full flex justify-between items-center px-6 border-b border-bar-border bg-navbar-bg shadow-xs">
         <!-- Left Branding -->
         <div class="flex items-center gap-2.5 select-none">
-          <svg class="w-6 h-6 text-zinc-800 dark:text-zinc-100 transition-colors duration-200" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg class="w-6 h-6 text-zinc-100 transition-colors duration-200" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="2" y="3" width="7" height="6" rx="1.5" class="stroke-current" stroke-width="2" stroke-linejoin="round"/>
             <rect x="15" y="3" width="7" height="6" rx="1.5" class="stroke-current" stroke-width="2" stroke-linejoin="round"/>
             <rect x="8.5" y="15" width="7" height="6" rx="1.5" class="stroke-current" stroke-width="2" stroke-linejoin="round"/>
@@ -14,17 +14,17 @@
             <path d="M18.5 9V12H15.5V15" class="stroke-current" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           
-          <span class="font-bold tracking-tight text-zinc-800 dark:text-zinc-100 text-lg">UMLify</span>
-          <span class="text-[10px] font-semibold bg-zinc-200/60 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 px-1.5 py-0.5 rounded-md border border-zinc-300/40 dark:border-zinc-700/40">v1.1</span>
+          <span class="font-bold tracking-tight text-zinc-100 text-lg">UMLify</span>
+          <span class="text-[10px] font-semibold bg-zinc-800/80 text-zinc-300 px-1.5 py-0.5 rounded-md border border-zinc-700/40">v1.1</span>
         </div>
 
         <!-- Center Enterprise Menu -->
-        <div class="hidden lg:flex items-center gap-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
-          <button class="hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer">Workspace Settings</button>
-          <div class="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
-          <button class="hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer">Collaboration Engine</button>
-          <div class="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
-          <button class="hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer">Analytics Profile</button>
+        <div class="hidden lg:flex items-center gap-4 text-[11px] font-medium text-zinc-400">
+          <button class="hover:text-zinc-100 transition-colors cursor-pointer">Workspace Settings</button>
+          <div class="w-1 h-1 rounded-full bg-zinc-700"></div>
+          <button class="hover:text-zinc-100 transition-colors cursor-pointer">Collaboration Engine</button>
+          <div class="w-1 h-1 rounded-full bg-zinc-700"></div>
+          <button class="hover:text-zinc-100 transition-colors cursor-pointer">Analytics Profile</button>
         </div>
 
         <!-- Right Controls -->
@@ -35,11 +35,11 @@
           
           <button 
             @click="toggleDarkMode" 
-            class="p-2 rounded-xl transition-all duration-200 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60 focus:outline-none focus:ring-2 focus:ring-blue-400/40"
+            class="p-2 rounded-xl transition-all duration-200 hover:bg-zinc-800/60 focus:outline-none focus:ring-2 focus:ring-blue-400/40 text-zinc-300 hover:text-zinc-100"
             title="Toggle Visual Theme"
           >
             <Sun v-if="isDarkMode" class="w-5 h-5 text-amber-400" />
-            <Moon v-else class="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
+            <Moon v-else class="w-5 h-5 text-zinc-300" />
           </button>
         </div>
       </Surface>
@@ -366,7 +366,7 @@
           <!-- Resizable Sidebar Drag Handle inside left column at the right edge -->
           <div 
             @mousedown="startResize"
-            class="absolute top-0 right-0 w-1 cursor-col-resize hover:bg-interactive-accent/40 active:bg-interactive-accent transition-colors h-full z-45 select-none"
+            class="absolute top-0 right-0 w-[2px] cursor-col-resize bg-transparent hover:bg-zinc-400/20 active:bg-zinc-450/40 transition-colors h-full z-45 select-none"
           ></div>
         </div>
       </div>
@@ -402,25 +402,25 @@
     <transition name="fade">
       <div 
         v-if="diagramStore.globalModalConfig.isOpen" 
-        class="fixed inset-0 z-[100] flex items-center justify-center"
+        class="fixed inset-0 z-[100] flex items-center justify-center p-4"
       >
         <div 
-          class="absolute inset-0 bg-[#213C51]/80 backdrop-blur-sm"
+          class="absolute inset-0 bg-zinc-950/60 backdrop-blur-sm"
           @click="diagramStore.closeGlobalModal()"
         ></div>
-        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col p-6 scale-100 transition-transform">
-          <h3 class="text-lg font-semibold text-zinc-900 mb-2">{{ diagramStore.globalModalConfig.title }}</h3>
-          <p class="text-sm text-zinc-500 mb-6">{{ diagramStore.globalModalConfig.message }}</p>
+        <div class="relative bg-bg-surface border border-border-elevated rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col p-6 scale-100 transition-transform z-10">
+          <h3 class="text-lg font-bold text-text-primary mb-2">{{ diagramStore.globalModalConfig.title }}</h3>
+          <p class="text-sm text-text-secondary mb-6 leading-relaxed">{{ diagramStore.globalModalConfig.message }}</p>
           <div class="flex justify-end gap-3 mt-auto">
             <button 
               @click="diagramStore.closeGlobalModal()"
-              class="px-4 py-2 text-xs font-semibold text-zinc-650 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition-colors cursor-pointer"
+              class="px-4 py-2 text-xs font-semibold text-text-secondary bg-bg-elevated hover:bg-bg-surface hover:text-text-primary border border-border-default rounded-lg transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
             >
               {{ diagramStore.globalModalConfig.cancelText }}
             </button>
             <button 
               @click="executeGlobalConfirm"
-              class="px-4 py-2 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition-colors shadow-sm cursor-pointer"
+              class="px-4 py-2 text-xs font-semibold text-white bg-error hover:bg-error/90 rounded-lg transition-all shadow-sm cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
             >
               {{ diagramStore.globalModalConfig.confirmText }}
             </button>
@@ -467,7 +467,7 @@ const activeSidebarTab = ref('tools');
 const swipedRowId = ref(null);
 
 // Resizable Sidebar Engine
-const sidebarWidth = ref(260);
+const sidebarWidth = ref(Number(localStorage.getItem('sidebar_width')) || 200);
 const isResizing = ref(false);
 
 const startResize = (e) => {
@@ -478,9 +478,10 @@ const startResize = (e) => {
 
 const handleResize = (e) => {
   if (!isResizing.value) return;
-  // Constrain resizing between 200px and 450px
-  if (e.clientX >= 200 && e.clientX <= 450) {
-    sidebarWidth.value = e.clientX;
+  // Constrain resizing between 200px and 450px after subtracting 48px rail width
+  const calculatedWidth = e.clientX - 48;
+  if (calculatedWidth >= 200 && calculatedWidth <= 450) {
+    sidebarWidth.value = calculatedWidth;
   }
 };
 
@@ -488,6 +489,7 @@ const stopResize = () => {
   isResizing.value = false;
   document.removeEventListener('mousemove', handleResize);
   document.removeEventListener('mouseup', stopResize);
+  localStorage.setItem('sidebar_width', sidebarWidth.value);
 };
 
 const isDarkMode = ref(document.documentElement.classList.contains('dark'));
