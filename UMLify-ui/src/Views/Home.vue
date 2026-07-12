@@ -5,8 +5,8 @@
       <!-- Master Workspace Header -->
       <Surface as="header" depth="1" :border="false" customClass="h-14 w-full flex justify-between items-center px-6 border-b border-bar-border bg-navbar-bg shadow-xs">
         <!-- Left Branding -->
-        <div class="flex items-center gap-2.5 select-none">
-          <svg class="w-6 h-6 text-zinc-100 transition-colors duration-200" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div class="flex items-center gap-2.5 select-none text-white">
+          <svg class="w-6 h-6 text-white transition-colors duration-200" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="2" y="3" width="7" height="6" rx="1.5" class="stroke-current" stroke-width="2" stroke-linejoin="round"/>
             <rect x="15" y="3" width="7" height="6" rx="1.5" class="stroke-current" stroke-width="2" stroke-linejoin="round"/>
             <rect x="8.5" y="15" width="7" height="6" rx="1.5" class="stroke-current" stroke-width="2" stroke-linejoin="round"/>
@@ -14,17 +14,17 @@
             <path d="M18.5 9V12H15.5V15" class="stroke-current" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           
-          <span class="font-bold tracking-tight text-zinc-100 text-lg">UMLify</span>
-          <span class="text-[10px] font-semibold bg-zinc-800/80 text-zinc-300 px-1.5 py-0.5 rounded-md border border-zinc-700/40">v1.1</span>
+          <span class="font-bold tracking-tight text-white text-lg">UMLify</span>
+          <span class="text-[10px] font-semibold bg-white/15 text-white px-1.5 py-0.5 rounded-md border border-white/10">v1.1</span>
         </div>
 
         <!-- Center Enterprise Menu -->
-        <div class="hidden lg:flex items-center gap-4 text-[11px] font-medium text-zinc-400">
-          <button class="hover:text-zinc-100 transition-colors cursor-pointer">Workspace Settings</button>
-          <div class="w-1 h-1 rounded-full bg-zinc-700"></div>
-          <button class="hover:text-zinc-100 transition-colors cursor-pointer">Collaboration Engine</button>
-          <div class="w-1 h-1 rounded-full bg-zinc-700"></div>
-          <button class="hover:text-zinc-100 transition-colors cursor-pointer">Analytics Profile</button>
+        <div class="hidden lg:flex items-center gap-4 text-[11px] font-medium text-white/80">
+          <button class="hover:text-white transition-colors cursor-pointer">Workspace Settings</button>
+          <div class="w-1 h-1 rounded-full bg-white/30"></div>
+          <button class="hover:text-white transition-colors cursor-pointer">Collaboration Engine</button>
+          <div class="w-1 h-1 rounded-full bg-white/30"></div>
+          <button class="hover:text-white transition-colors cursor-pointer">Analytics Profile</button>
         </div>
 
         <!-- Right Controls -->
@@ -35,11 +35,11 @@
           
           <button 
             @click="toggleDarkMode" 
-            class="p-2 rounded-xl transition-all duration-200 hover:bg-zinc-800/60 focus:outline-none focus:ring-2 focus:ring-blue-400/40 text-zinc-300 hover:text-zinc-100"
+            class="p-2 rounded-xl transition-all duration-200 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20 text-white/90 hover:text-white"
             title="Toggle Visual Theme"
           >
-            <Sun v-if="isDarkMode" class="w-5 h-5 text-amber-400" />
-            <Moon v-else class="w-5 h-5 text-zinc-300" />
+            <Sun v-if="isDarkMode" class="w-5 h-5 text-amber-300" />
+            <Moon v-else class="w-5 h-5 text-white/90" />
           </button>
         </div>
       </Surface>

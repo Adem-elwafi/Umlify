@@ -101,30 +101,30 @@
               />
             </svg>
             <!-- Mock Workspace Header (replicates Home.vue) -->
-            <div class="h-10 border-b border-border-default bg-bg-surface flex items-center justify-between px-sm select-none shrink-0">
+            <div class="h-10 border-b border-bar-border bg-navbar-bg text-zinc-100 flex items-center justify-between px-sm select-none shrink-0">
               <!-- Left Branding -->
               <div class="flex items-center gap-1.5">
-                <svg class="w-4 h-4 text-interactive-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="2" y="3" width="7" height="6" rx="1" />
                   <rect x="15" y="3" width="7" height="6" rx="1" />
                   <rect x="8.5" y="15" width="7" height="6" rx="1" />
                   <path d="M5.5 9v3h3v3" />
                   <path d="M18.5 9v3h-3v3" />
                 </svg>
-                <span class="text-xs font-bold text-text-primary tracking-tight">UMLify</span>
-                <span class="text-[8px] font-semibold bg-bg-elevated text-text-muted px-1.5 py-0.2 rounded border border-border-default">v1.1</span>
+                <span class="text-xs font-bold text-white tracking-tight">UMLify</span>
+                <span class="text-[8px] font-semibold bg-white/15 text-white px-1.5 py-0.2 rounded border border-white/10">v1.1</span>
               </div>
               <!-- Center Enterprise Menu -->
-              <div class="hidden md:flex items-center gap-3 text-[9px] font-medium text-text-muted">
+              <div class="hidden md:flex items-center gap-3 text-[9px] font-medium text-white/80">
                 <span>Workspace Settings</span>
-                <div class="w-1 h-1 rounded-full bg-border-default"></div>
+                <div class="w-1 h-1 rounded-full bg-white/30"></div>
                 <span>Collaboration Engine</span>
-                <div class="w-1 h-1 rounded-full bg-border-default"></div>
+                <div class="w-1 h-1 rounded-full bg-white/30"></div>
                 <span>Analytics Profile</span>
               </div>
               <!-- Right Controls -->
               <div class="flex items-center gap-2">
-                <span class="text-[8px] font-mono text-text-muted bg-bg-elevated px-1.5 py-0.5 border border-border-default rounded">Saved to Cloud</span>
+                <span class="text-[8px] font-mono text-white bg-white/15 px-1.5 py-0.5 border border-white/10 rounded">Saved to Cloud</span>
               </div>
             </div>
 
@@ -260,7 +260,7 @@
             </div>
 
             <!-- 3. Bottom Status Bar -->
-            <div class="h-6 border-t border-border-default bg-bg-surface flex items-center justify-between px-md text-[9px] font-mono text-text-muted select-none shrink-0 animate-fade">
+            <div class="h-6 border-t border-bar-border bg-statusbar-bg flex items-center justify-between px-md text-[9px] font-mono text-zinc-400 select-none shrink-0 animate-fade">
               <div class="flex items-center gap-xs">
                 <transition name="fade-compile" mode="out-in">
                   <div v-if="!isCompiled" key="compiling" class="flex items-center gap-xs">
