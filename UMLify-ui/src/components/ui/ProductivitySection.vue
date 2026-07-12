@@ -5,6 +5,19 @@
     spacing="xxl"
     custom-class="border-t border-border-default bg-bg-base/30 relative overflow-hidden"
   >
+    <!-- 1px Animated Border Sweep (GPU accelerated) -->
+    <svg class="absolute inset-0 w-full h-full pointer-events-none fill-none z-30" xmlns="http://www.w3.org/2000/svg">
+      <rect
+        x="0.5"
+        y="0.5"
+        width="calc(100% - 1px)"
+        height="calc(100% - 1px)"
+        rx="0"
+        pathLength="100"
+        class="stroke-transparent"
+        :class="{ 'animate-border-sweep': isVisible }"
+      />
+    </svg>
     <Container size="xl">
       <Stack gap="xl" class="w-full">
         

@@ -411,7 +411,7 @@ onMounted(() => {
 <style scoped>
 @keyframes drawLine {
   from {
-    stroke-dashoffset: 150;
+    stroke-dashoffset: 400;
   }
   to {
     stroke-dashoffset: 0;
@@ -419,9 +419,9 @@ onMounted(() => {
 }
 
 .animate-draw-line {
-  stroke-dasharray: 150;
-  stroke-dashoffset: 150;
-  animation: drawLine 1.2s ease-out forwards;
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+  animation: drawLine 1.5s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

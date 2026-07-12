@@ -107,7 +107,7 @@
               <div class="h-10 border-b border-border-default bg-bg-surface flex items-center justify-between px-md select-none shrink-0">
                 <div class="flex items-center gap-xs">
                   <span class="w-2.5 h-2.5 rounded-full bg-interactive-accent"></span>
-                  <span class="text-[10px] font-mono font-medium text-text-muted uppercase tracking-wider">Workspace / SystemModel.uml</span>
+                  <span class="text-[10px] font-mono font-medium text-text-muted uppercase tracking-wider">Workspace / UseCases.uml</span>
                 </div>
                 <div class="flex items-center gap-sm">
                   <span class="text-[10px] font-mono text-text-muted bg-bg-elevated px-xs py-xxs border border-border-default rounded">⌘K Actions</span>
@@ -190,134 +190,155 @@
                       class="relative w-[520px] h-[340px] scale-[0.7] xs:scale-[0.8] sm:scale-90 md:scale-95 lg:scale-100 xl:scale-105 2xl:scale-115 origin-center shrink-0 transition-transform duration-350"
                     >
                       
-                      <!-- Canvas Elements for Step 1: Create Classes -->
+                      <!-- Canvas Elements for Step 1: Create Use Cases -->
                       <template v-if="activeStep === 1">
-                        <!-- Node 2: Order Class (Highlighted Selection) -->
-                        <div class="absolute top-[100px] left-[175px] w-[140px] bg-bg-surface border-2 border-interactive-accent rounded-[4px] shadow-lg flex flex-col font-mono text-[9px] select-none text-left">
-                          <div class="px-xs py-xxs text-center font-sans font-bold border-b border-border-default text-text-primary bg-bg-base/40">
-                            Order
+                        <!-- Left Actor: Customer -->
+                        <div class="absolute top-[110px] left-[35px] flex flex-col items-center select-none">
+                          <div class="w-10 h-10 flex items-center justify-center text-text-primary bg-bg-surface border border-border-default rounded-full shadow-sm">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <circle cx="12" cy="5" r="3" />
+                              <line x1="12" y1="8" x2="12" y2="14" />
+                              <line x1="8" y1="10" x2="16" y2="10" />
+                              <line x1="12" y1="14" x2="9" y2="19" />
+                              <line x1="12" y1="14" x2="15" y2="19" />
+                            </svg>
                           </div>
-                          <div class="p-xxs flex flex-col text-text-secondary border-b border-border-default leading-tight">
-                            <span>- orderId: String</span>
-                            <span>- total: Float</span>
-                            <span>- status: Enum</span>
-                          </div>
-                          <div class="p-xxs flex flex-col text-text-secondary leading-tight font-semibold text-interactive-accent">
-                            <span>+ calculateTax()</span>
-                          </div>
+                          <span class="text-[9px] font-bold text-text-primary uppercase tracking-wider mt-1">Customer</span>
+                        </div>
+
+                        <!-- System Boundary Box -->
+                        <div class="absolute top-[20px] left-[170px] w-[200px] h-[280px] border border-border-default/60 bg-bg-surface/10 rounded flex flex-col items-center p-xs shadow-sm">
+                          <span class="text-[8px] font-bold text-text-muted uppercase tracking-widest mt-1">Web Store System</span>
+                        </div>
+
+                        <!-- Use Case 1: Search Items -->
+                        <div class="absolute top-[60px] left-[200px] w-[140px] h-[56px] bg-bg-surface border border-border-default rounded-full shadow-sm flex items-center justify-center font-sans text-[10px] font-semibold text-text-primary select-none">
+                          Search Items
+                        </div>
+
+                        <!-- Use Case 2: Checkout (Highlighted Selection) -->
+                        <div class="absolute top-[170px] left-[200px] w-[140px] h-[56px] bg-bg-surface border-2 border-interactive-accent rounded-full shadow-lg flex items-center justify-center font-sans text-[10px] font-bold text-text-primary select-none">
+                          Checkout
                           <!-- Selection anchors indicators -->
-                          <div class="absolute -top-1.5 -left-1.5 w-3 h-3 rounded-full bg-interactive-accent border-2 border-bg-surface"></div>
-                          <div class="absolute -top-1.5 -right-1.5 w-3 h-3 rounded-full bg-interactive-accent border-2 border-bg-surface"></div>
-                          <div class="absolute -bottom-1.5 -left-1.5 w-3 h-3 rounded-full bg-interactive-accent border-2 border-bg-surface"></div>
-                          <div class="absolute -bottom-1.5 -right-1.5 w-3 h-3 rounded-full bg-interactive-accent border-2 border-bg-surface"></div>
+                          <div class="absolute -top-1 -left-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border-2 border-bg-surface"></div>
+                          <div class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border-2 border-bg-surface"></div>
+                          <div class="absolute -bottom-1 -left-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border-2 border-bg-surface"></div>
+                          <div class="absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border-2 border-bg-surface"></div>
                         </div>
                       </template>
 
                       <!-- Canvas Elements for Step 2: Connect Relationships -->
                       <template v-if="activeStep === 2">
                         <svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-                          <defs>
-                            <marker id="composition-accent" viewBox="0 0 12 10" refX="0" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                              <path d="M 0 5 L 6 0 L 12 5 L 6 10 z" fill="var(--color-interactive-accent)" stroke="var(--color-interactive-accent)" stroke-width="1.5" />
-                            </marker>
-                          </defs>
                           <!-- Dynamic Connection drawing preview line -->
-                          <path d="M 120 145 L 120 85" fill="none" stroke="var(--color-interactive-accent)" stroke-width="2.5" stroke-dasharray="4,2" marker-start="url(#composition-accent)" />
+                          <line
+                            x1="75" y1="140"
+                            x2="200" y2="88"
+                            fill="none"
+                            stroke="var(--color-interactive-accent)"
+                            stroke-width="2.5"
+                            stroke-dasharray="4,2"
+                          />
                         </svg>
 
-                        <!-- Node 1: Customer Class (Top) -->
-                        <div class="absolute top-[10px] left-[50px] w-[140px] bg-bg-surface border border-border-default rounded-[4px] shadow-sm flex flex-col font-mono text-[9px] select-none text-left">
-                          <div class="px-xs py-xxs text-center font-sans font-semibold border-b border-border-default text-text-primary bg-bg-base/40">
-                            Customer
+                        <!-- Left Actor: Customer -->
+                        <div class="absolute top-[110px] left-[35px] flex flex-col items-center select-none">
+                          <div class="w-10 h-10 flex items-center justify-center text-text-primary bg-bg-surface border border-border-default rounded-full shadow-sm relative">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <circle cx="12" cy="5" r="3" />
+                              <line x1="12" y1="8" x2="12" y2="14" />
+                              <line x1="8" y1="10" x2="16" y2="10" />
+                              <line x1="12" y1="14" x2="9" y2="19" />
+                              <line x1="12" y1="14" x2="15" y2="19" />
+                            </svg>
+                            <!-- Blue connector socket hover state -->
+                            <div class="absolute -right-1 top-[50%] -translate-y-[50%] w-2 h-2 rounded-full bg-interactive-accent ring-4 ring-interactive-accent/30 animate-pulse"></div>
                           </div>
-                          <div class="p-xxs flex flex-col text-text-secondary leading-tight">
-                            <span>- id: String</span>
-                            <span>- name: String</span>
-                          </div>
-                          <!-- Blue connector socket hover state -->
-                          <div class="absolute bottom-[-4px] left-[50%] -translate-x-[50%] w-2 h-2 rounded-full bg-interactive-accent ring-4 ring-interactive-accent/30 animate-pulse"></div>
+                          <span class="text-[9px] font-bold text-text-primary uppercase tracking-wider mt-1">Customer</span>
                         </div>
 
-                        <!-- Node 2: Order Class (Bottom) -->
-                        <div class="absolute top-[145px] left-[50px] w-[140px] bg-bg-surface border border-border-default rounded-[4px] shadow-sm flex flex-col font-mono text-[9px] select-none text-left">
-                          <div class="px-xs py-xxs text-center font-sans font-semibold border-b border-border-default text-text-primary bg-bg-base/40">
-                            Order
-                          </div>
-                          <div class="p-xxs flex flex-col text-text-secondary leading-tight">
-                            <span>- orderId: String</span>
-                            <span>- total: Float</span>
-                          </div>
+                        <!-- System Boundary Box -->
+                        <div class="absolute top-[20px] left-[170px] w-[200px] h-[280px] border border-border-default/60 bg-bg-surface/10 rounded flex flex-col items-center p-xs shadow-sm">
+                          <span class="text-[8px] font-bold text-text-muted uppercase tracking-widest mt-1">Web Store System</span>
+                        </div>
+
+                        <!-- Use Case 1: Search Items -->
+                        <div class="absolute top-[60px] left-[200px] w-[140px] h-[56px] bg-bg-surface border border-border-default rounded-full shadow-sm flex items-center justify-center font-sans text-[10px] font-semibold text-text-primary select-none relative">
                           <!-- Blue connector socket hover state -->
-                          <div class="absolute top-[-4px] left-[50%] -translate-x-[50%] w-2 h-2 rounded-full bg-interactive-accent ring-4 ring-interactive-accent/30"></div>
+                          <div class="absolute -left-1 top-[50%] -translate-y-[50%] w-2 h-2 rounded-full bg-interactive-accent ring-4 ring-interactive-accent/30"></div>
+                          Search Items
+                        </div>
+
+                        <!-- Use Case 2: Checkout -->
+                        <div class="absolute top-[170px] left-[200px] w-[140px] h-[56px] bg-bg-surface border border-border-default rounded-full shadow-sm flex items-center justify-center font-sans text-[10px] font-semibold text-text-primary select-none">
+                          Checkout
                         </div>
                       </template>
 
                       <!-- Canvas Elements for Step 3: Organize Automatically -->
                       <template v-if="activeStep === 3">
                         <svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-                          <defs>
-                            <marker id="generalization-step" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                              <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--color-bg-surface)" stroke="var(--color-text-secondary)" stroke-width="1.5" />
-                            </marker>
-                            <marker id="composition-step" viewBox="0 0 12 10" refX="0" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                              <path d="M 0 5 L 6 0 L 12 5 L 6 10 z" fill="var(--color-text-secondary)" stroke="var(--color-text-secondary)" stroke-width="1.5" />
-                            </marker>
-                            <marker id="association-step" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                              <path d="M 0 1.5 L 10 5 L 0 8.5" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                            </marker>
-                          </defs>
-                          <path d="M 90 130 L 90 70" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" marker-start="url(#composition-step)" />
-                          <path d="M 90 220 L 90 190" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" marker-end="url(#association-step)" />
-                          <path d="M 230 150 L 175 150" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" marker-end="url(#association-step)" />
-                          <path d="M 405 220 L 405 160" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#generalization-step)" />
+                          <!-- Customer to Search Items -->
+                          <line
+                            x1="75" y1="140"
+                            x2="200" y2="88"
+                            class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] transition-all duration-350"
+                          />
+                          <!-- Customer to Checkout -->
+                          <line
+                            x1="75" y1="140"
+                            x2="200" y2="198"
+                            class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] transition-all duration-350"
+                          />
+                          <!-- Checkout to PayPal -->
+                          <line
+                            x1="340" y1="198"
+                            x2="435" y2="170"
+                            class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] transition-all duration-350"
+                          />
                         </svg>
 
-                        <!-- Aligned nodes -->
-                        <div class="absolute top-[0px] left-[20px] w-[140px] bg-bg-surface border border-border-default rounded-[4px] shadow-sm flex flex-col font-mono text-[9px] select-none text-left">
-                          <div class="px-xs py-xxs text-center font-sans font-semibold border-b border-border-default text-text-primary bg-bg-base/40">Customer</div>
-                          <div class="p-xxs flex flex-col text-text-secondary leading-tight">
-                            <span>- id: String</span>
-                            <span>- name: String</span>
+                        <!-- Left Actor: Customer -->
+                        <div class="absolute top-[110px] left-[35px] flex flex-col items-center select-none">
+                          <div class="w-10 h-10 flex items-center justify-center text-text-primary bg-bg-surface border border-border-default rounded-full shadow-sm">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <circle cx="12" cy="5" r="3" />
+                              <line x1="12" y1="8" x2="12" y2="14" />
+                              <line x1="8" y1="10" x2="16" y2="10" />
+                              <line x1="12" y1="14" x2="9" y2="19" />
+                              <line x1="12" y1="14" x2="15" y2="19" />
+                            </svg>
                           </div>
+                          <span class="text-[9px] font-bold text-text-primary uppercase tracking-wider mt-1">Customer</span>
                         </div>
 
-                        <div class="absolute top-[100px] left-[35px] w-[110px] bg-bg-surface border border-border-default rounded-[4px] shadow-sm flex flex-col font-mono text-[9px] select-none text-left">
-                          <div class="px-xs py-xxs text-center font-sans font-semibold border-b border-border-default text-text-primary bg-bg-base/40">Order</div>
-                          <div class="p-xxs flex flex-col text-text-secondary leading-tight">
-                            <span>- orderId: String</span>
-                            <span>- total: Float</span>
-                          </div>
+                        <!-- System Boundary Box -->
+                        <div class="absolute top-[20px] left-[170px] w-[200px] h-[280px] border border-border-default/60 bg-bg-surface/10 rounded flex flex-col items-center p-xs shadow-sm">
+                          <span class="text-[8px] font-bold text-text-muted uppercase tracking-widest mt-1">Web Store System</span>
                         </div>
 
-                        <div class="absolute top-[220px] left-[25px] w-[130px] bg-bg-surface border border-border-default rounded-[4px] shadow-sm flex flex-col font-mono text-[9px] select-none text-left">
-                          <div class="px-xs py-xxs text-center font-sans font-semibold border-b border-border-default text-text-primary bg-bg-base/40">OrderController</div>
-                          <div class="p-xxs flex flex-col text-text-secondary leading-tight">
-                            <span>+ createOrder()</span>
-                          </div>
+                        <!-- Use Case 1: Search Items -->
+                        <div class="absolute top-[60px] left-[200px] w-[140px] h-[56px] bg-bg-surface border border-border-default rounded-full shadow-sm flex items-center justify-center font-sans text-[10px] font-semibold text-text-primary select-none">
+                          Search Items
                         </div>
 
-                        <div class="absolute top-[115px] left-[230px] w-[110px] bg-bg-surface border border-border-default rounded-[4px] shadow-sm flex flex-col font-mono text-[9px] select-none text-left">
-                          <div class="px-xs py-xxs text-center font-sans font-semibold border-b border-border-default text-text-primary bg-bg-base/40">PaymentService</div>
-                          <div class="p-xxs flex flex-col text-text-secondary leading-tight">
-                            <span>+ process(pay: Float)</span>
-                          </div>
+                        <!-- Use Case 2: Checkout -->
+                        <div class="absolute top-[170px] left-[200px] w-[140px] h-[56px] bg-bg-surface border border-border-default rounded-full shadow-sm flex items-center justify-center font-sans text-[10px] font-semibold text-text-primary select-none">
+                          Checkout
                         </div>
 
-                        <div class="absolute top-[10px] right-[25px] w-[130px] bg-bg-surface border border-border-default rounded-[4px] shadow-sm flex flex-col font-mono text-[9px] select-none text-left">
-                          <div class="px-xs py-xxs text-center border-b border-border-default bg-bg-base/40">
-                            <span class="text-[8px] text-text-muted block">«interface»</span>
-                            <span class="font-sans font-semibold text-text-primary">Repository</span>
+                        <!-- Right Actor: PayPal -->
+                        <div class="absolute top-[140px] right-[35px] flex flex-col items-center select-none">
+                          <div class="w-10 h-10 flex items-center justify-center text-text-primary bg-bg-surface border border-border-default rounded-full shadow-sm">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <circle cx="12" cy="5" r="3" />
+                              <line x1="12" y1="8" x2="12" y2="14" />
+                              <line x1="8" y1="10" x2="16" y2="10" />
+                              <line x1="12" y1="14" x2="9" y2="19" />
+                              <line x1="12" y1="14" x2="9" y2="19" />
+                            </svg>
                           </div>
-                          <div class="p-xxs flex flex-col text-text-secondary leading-tight">
-                            <span>+ save(entity: T)</span>
-                          </div>
-                        </div>
-
-                        <div class="absolute top-[220px] right-[25px] w-[130px] bg-bg-surface border border-border-default rounded-[4px] shadow-sm flex flex-col font-mono text-[9px] select-none text-left">
-                          <div class="px-xs py-xxs text-center font-sans font-semibold border-b border-border-default text-text-primary bg-bg-base/40">OrderRepository</div>
-                          <div class="p-xxs flex flex-col text-text-secondary leading-tight">
-                            <span>+ save(order: Order)</span>
-                          </div>
+                          <span class="text-[9px] font-bold text-text-primary uppercase tracking-wider mt-1">PayPal</span>
                         </div>
                       </template>
 
@@ -326,14 +347,21 @@
                         <!-- Background diagram is shown blurred -->
                         <div class="absolute inset-0 blur-[2px] opacity-40">
                           <svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M 90 130 L 90 70" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" />
-                            <path d="M 230 150 L 175 150" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" />
+                            <line x1="75" y1="140" x2="200" y2="88" stroke="var(--color-text-secondary)" stroke-width="1.5" />
+                            <line x1="75" y1="140" x2="200" y2="198" stroke="var(--color-text-secondary)" stroke-width="1.5" />
+                            <line x1="340" y1="198" x2="435" y2="170" stroke="var(--color-text-secondary)" stroke-width="1.5" />
                           </svg>
-                          <div class="absolute top-[20px] left-[20px] w-[130px] bg-bg-surface border border-border-default rounded-[4px] p-xxs text-[9px] font-mono">
-                            Customer
+                          <div class="absolute top-[110px] left-[35px] flex flex-col items-center select-none scale-75 opacity-75">
+                            <div class="w-10 h-10 flex items-center justify-center text-text-primary bg-bg-surface border border-border-default rounded-full shadow-sm">
+                              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3" /><line x1="12" y1="8" x2="12" y2="14" /></svg>
+                            </div>
+                            <span class="text-[9px] font-bold text-text-primary mt-1">Customer</span>
                           </div>
-                          <div class="absolute top-[100px] left-[35px] w-[110px] bg-bg-surface border border-border-default rounded-[4px] p-xxs text-[9px] font-mono">
-                            Order
+                          <div class="absolute top-[60px] left-[200px] w-[140px] h-[56px] bg-bg-surface border border-border-default rounded-full shadow-sm flex items-center justify-center font-sans text-[10px] text-text-primary select-none opacity-75">
+                            Search Items
+                          </div>
+                          <div class="absolute top-[170px] left-[200px] w-[140px] h-[56px] bg-bg-surface border border-border-default rounded-full shadow-sm flex items-center justify-center font-sans text-[10px] text-text-primary select-none opacity-75">
+                            Checkout
                           </div>
                         </div>
 

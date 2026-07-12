@@ -55,23 +55,21 @@
 
             <!-- Trust Row -->
             <div
-              class="pt-md w-full border-t border-border-default/50 text-left transition-all duration-350 ease-tactile transform flex"
+              class="pt-md w-full border-t border-border-default/50 text-left transition-all duration-350 ease-tactile transform"
               :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
               style="transition-delay: 500ms;"
             >
-              <div class="inline-flex flex-col gap-xs px-md py-sm bg-bg-surface/60 backdrop-blur-md border border-border-default/40 rounded-full shadow-sm max-w-full">
-                <span class="text-xxs font-mono uppercase tracking-widest text-text-secondary block">
-                  Engineered for speed, compliance, and workflow integration
-                </span>
-                <div class="flex flex-wrap items-center gap-x-sm gap-y-xxs text-text-secondary text-xs font-semibold">
-                  <span>✓ UML 2.5 Compliance</span>
-                  <span class="text-border-default/85">•</span>
-                  <span>✓ Auto-Layout Snapping</span>
-                  <span class="text-border-default/85">•</span>
-                  <span>✓ Instant SVG Export</span>
-                  <span class="text-border-default/85">•</span>
-                  <span>✓ Keyboard Shortcuts</span>
-                </div>
+              <span class="text-xxs font-mono uppercase tracking-widest text-zinc-800 dark:text-zinc-300 font-medium block mb-xs">
+                Engineered for speed, compliance, and workflow integration
+              </span>
+              <div class="flex flex-wrap items-center gap-sm text-zinc-800 dark:text-zinc-300 text-xs font-medium">
+                <span>✓ UML 2.5 Compliance</span>
+                <span class="text-border-default/85">•</span>
+                <span>✓ Auto-Layout Snapping</span>
+                <span class="text-border-default/85">•</span>
+                <span>✓ Instant SVG Export</span>
+                <span class="text-border-default/85">•</span>
+                <span>✓ Keyboard Shortcuts</span>
               </div>
             </div>
             
@@ -107,7 +105,7 @@
               <div class="flex items-center gap-xs">
                 <!-- Project file label -->
                 <span class="w-2.5 h-2.5 rounded-full bg-interactive-accent"></span>
-                <span class="text-[10px] font-mono font-medium text-text-muted uppercase tracking-wider">Workspace / SystemModel.uml</span>
+                <span class="text-[10px] font-mono font-medium text-text-muted uppercase tracking-wider">Workspace / UseCases.uml</span>
               </div>
               <!-- Controls -->
               <div class="flex items-center gap-sm">
@@ -175,137 +173,80 @@
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <!-- Main Canvas area with dot grid and UML diagrams -->
-              <div class="flex-1 sheet-grid relative overflow-hidden flex items-center justify-center p-sm">
+                    <!-- Main Canvas area with dot grid and UML diagrams -->
+              <div class="flex-grow sheet-grid relative overflow-hidden flex items-center justify-center p-sm">
                 <!-- Wrapper scaled down for responsiveness to fit all viewports without clipping -->
                 <div class="relative w-[520px] h-[340px] scale-[0.7] xs:scale-[0.8] sm:scale-90 md:scale-95 lg:scale-100 xl:scale-105 2xl:scale-115 origin-center shrink-0">
                   
                   <!-- SVG Connector Paths (UML lines) -->
                   <svg class="absolute inset-0 w-full h-full pointer-events-none overflow-visible z-10" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                      <!-- Generalization (Hollow triangle) -->
-                      <marker id="hero-generalization" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                        <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--color-bg-surface)" stroke="#a1a1aa" class="dark:stroke-[#71717a]" stroke-width="1.5" />
-                      </marker>
-                      <!-- Composition (Filled diamond) -->
-                      <marker id="hero-composition" viewBox="0 0 12 10" refX="11" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                        <path d="M 0 5 L 6 0 L 12 5 L 6 10 z" fill="#a1a1aa" class="dark:fill-[#71717a]" stroke="none" />
-                      </marker>
-                      <!-- Association (Simple arrowhead) -->
-                      <marker id="hero-association" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                        <path d="M 0 1.5 L 10 5 L 0 8.5" fill="none" stroke="#a1a1aa" class="dark:stroke-[#71717a]" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                      </marker>
-                    </defs>
-
-                    <!-- Lines -->
-                    <!-- Customer to Order (Composition) -->
-                    <path
-                      d="M 90 130 L 90 70"
-                      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] transition-all duration-300"
-                      marker-start="url(#hero-composition)"
+                    <!-- Customer to Search Items -->
+                    <line
+                      x1="75" y1="140"
+                      x2="200" y2="88"
+                      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] transition-all duration-350"
                     />
-                    <!-- OrderController to Order (Association) -->
-                    <path
-                      d="M 90 220 L 90 190"
-                      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] transition-all duration-300"
-                      marker-end="url(#hero-association)"
+                    <!-- Customer to Checkout -->
+                    <line
+                      x1="75" y1="140"
+                      x2="200" y2="198"
+                      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] transition-all duration-350"
                     />
-                    <!-- PaymentService to Order (Association) -->
-                    <path
-                      d="M 230 150 L 175 150"
-                      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] transition-all duration-300"
-                      marker-end="url(#hero-association)"
-                    />
-                    <!-- Repository to OrderRepository (Realization - dashed) -->
-                    <path
-                      d="M 405 220 L 405 160"
-                      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] transition-all duration-300"
-                      stroke-dasharray="4 3"
-                      marker-end="url(#hero-generalization)"
+                    <!-- Checkout to PayPal -->
+                    <line
+                      x1="340" y1="198"
+                      x2="435" y2="170"
+                      class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] transition-all duration-350"
                     />
                   </svg>
 
-                  <!-- HTML UML Nodes -->
+                  <!-- HTML UML Use Cases & Actors -->
                   
-                  <!-- Node 1: Customer Class (Top Left-Center) -->
-                  <div class="absolute top-[0px] left-[20px] w-[140px] bg-bg-surface border border-border-default rounded-[4px] shadow-sm flex flex-col font-mono text-[9px] select-none text-left">
-                    <div class="px-xs py-xxs text-center font-sans font-semibold border-b border-border-default text-text-primary bg-bg-base/40">
-                      Customer
+                  <!-- Left Actor: Customer -->
+                  <div class="absolute top-[110px] left-[35px] flex flex-col items-center select-none">
+                    <div class="w-10 h-10 flex items-center justify-center text-text-primary bg-bg-surface border border-border-default rounded-full shadow-sm">
+                      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="5" r="3" />
+                        <line x1="12" y1="8" x2="12" y2="14" />
+                        <line x1="8" y1="10" x2="16" y2="10" />
+                        <line x1="12" y1="14" x2="9" y2="19" />
+                        <line x1="12" y1="14" x2="15" y2="19" />
+                      </svg>
                     </div>
-                    <div class="p-xxs flex flex-col text-text-secondary border-b border-border-default leading-tight">
-                      <span>- id: String</span>
-                      <span>- name: String</span>
-                      <span>- email: String</span>
-                    </div>
-                    <div class="p-xxs flex flex-col text-text-secondary leading-tight">
-                      <span>+ getProfile(): Object</span>
-                    </div>
+                    <span class="text-[9px] font-bold text-text-primary uppercase tracking-wider mt-1">Customer</span>
                   </div>
 
-                  <!-- Node 2: Order Class (Center Left-Center) -->
-                  <div class="absolute top-[100px] left-[35px] w-[110px] bg-bg-surface border border-border-default rounded-[4px] shadow-sm flex flex-col font-mono text-[9px] select-none text-left">
-                    <div class="px-xs py-xxs text-center font-sans font-semibold border-b border-border-default text-text-primary bg-bg-base/40">
-                      Order
-                    </div>
-                    <div class="p-xxs flex flex-col text-text-secondary border-b border-border-default leading-tight">
-                      <span>- orderId: String</span>
-                      <span>- total: Float</span>
-                      <span>- status: Enum</span>
-                    </div>
-                    <div class="p-xxs flex flex-col text-text-secondary leading-tight font-semibold text-interactive-accent">
-                      <span>+ calculateTax()</span>
-                    </div>
+                  <!-- System Boundary Box -->
+                  <div class="absolute top-[20px] left-[170px] w-[200px] h-[280px] border border-border-default/60 bg-bg-surface/10 rounded flex flex-col items-center p-xs shadow-sm">
+                    <span class="text-[8px] font-bold text-text-muted uppercase tracking-widest mt-1">Web Store System</span>
                   </div>
 
-                  <!-- Node 3: OrderController (Bottom Left-Center) -->
-                  <div class="absolute top-[220px] left-[25px] w-[130px] bg-bg-surface border border-border-default rounded-[4px] shadow-sm flex flex-col font-mono text-[9px] select-none text-left">
-                    <div class="px-xs py-xxs text-center font-sans font-semibold border-b border-border-default text-text-primary bg-bg-base/40">
-                      OrderController
-                    </div>
-                    <div class="p-xxs flex flex-col text-text-secondary leading-tight">
-                      <span>+ createOrder(): Void</span>
-                      <span>+ cancelOrder(): Void</span>
-                    </div>
+                  <!-- Use Case 1: Search Items -->
+                  <div class="absolute top-[60px] left-[200px] w-[140px] h-[56px] bg-bg-surface border border-border-default rounded-full shadow-sm flex items-center justify-center font-sans text-[10px] font-semibold text-text-primary select-none hover:border-interactive-accent transition-colors">
+                    Search Items
                   </div>
 
-                  <!-- Node 4: PaymentService (Center Right-Center) -->
-                  <div class="absolute top-[115px] left-[230px] w-[110px] bg-bg-surface border border-border-default rounded-[4px] shadow-sm flex flex-col font-mono text-[9px] select-none text-left">
-                    <div class="px-xs py-xxs text-center font-sans font-semibold border-b border-border-default text-text-primary bg-bg-base/40">
-                      PaymentService
-                    </div>
-                    <div class="p-xxs flex flex-col text-text-secondary leading-tight">
-                      <span>+ process(pay: Float)</span>
-                      <span>+ refund(id: String)</span>
-                    </div>
+                  <!-- Use Case 2: Checkout -->
+                  <div class="absolute top-[170px] left-[200px] w-[140px] h-[56px] bg-bg-surface border border-border-default rounded-full shadow-sm flex items-center justify-center font-sans text-[10px] font-semibold text-text-primary select-none hover:border-interactive-accent transition-colors">
+                    Checkout
                   </div>
 
-                  <!-- Node 5: Repository Interface (Top Right) -->
-                  <div class="absolute top-[10px] right-[25px] w-[130px] bg-bg-surface border border-border-default rounded-[4px] shadow-md flex flex-col font-mono text-[9px] select-none text-left">
-                    <div class="px-xs py-xxs text-center border-b border-border-default bg-bg-base/40">
-                      <span class="text-[8px] text-text-muted block leading-none">«interface»</span>
-                      <span class="font-sans font-semibold text-text-primary">Repository</span>
+                  <!-- Right Actor: PayPal -->
+                  <div class="absolute top-[140px] right-[35px] flex flex-col items-center select-none">
+                    <div class="w-10 h-10 flex items-center justify-center text-text-primary bg-bg-surface border border-border-default rounded-full shadow-sm">
+                      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="5" r="3" />
+                        <line x1="12" y1="8" x2="12" y2="14" />
+                        <line x1="8" y1="10" x2="16" y2="10" />
+                        <line x1="12" y1="14" x2="9" y2="19" />
+                        <line x1="12" y1="14" x2="9" y2="19" />
+                      </svg>
                     </div>
-                    <div class="p-xxs flex flex-col text-text-secondary leading-tight">
-                      <span>+ save(entity: T)</span>
-                      <span>+ findById(id: ID): T</span>
-                    </div>
-                  </div>
-
-                  <!-- Node 6: OrderRepository (Bottom Right) -->
-                  <div class="absolute top-[220px] right-[25px] w-[130px] bg-bg-surface border border-border-default rounded-[4px] shadow-sm flex flex-col font-mono text-[9px] select-none text-left">
-                    <div class="px-xs py-xxs text-center font-sans font-semibold border-b border-border-default text-text-primary bg-bg-base/40">
-                      OrderRepository
-                    </div>
-                    <div class="p-xxs flex flex-col text-text-secondary leading-tight">
-                      <span>+ save(order: Order)</span>
-                      <span>+ findById(id: String)</span>
-                    </div>
+                    <span class="text-[9px] font-bold text-text-primary uppercase tracking-wider mt-1">PayPal</span>
                   </div>
 
                 </div>
-              </div>
+              </div>            </div>
 
               <!-- Right Sidebar: Collapsed AI Dock Rail (hidden on mobile/tablet) -->
               <div class="hidden lg:flex w-10 border-l border-border-default bg-bg-surface/60 flex-col items-center py-4 justify-between shrink-0 select-none text-left">
@@ -334,11 +275,11 @@
                 <transition name="fade-compile" mode="out-in">
                   <div v-if="!isCompiled" key="compiling" class="flex items-center gap-xs">
                     <span class="text-warning animate-pulse">●</span>
-                    <span>Compiling class structures...</span>
+                    <span>Compiling Use Cases...</span>
                   </div>
                   <div v-else key="compiled" class="flex items-center gap-xs">
                     <span class="text-success">●</span>
-                    <span>Compiled: 6 Classes, 4 Connectors</span>
+                    <span>Compiled: 2 Actors, 2 Use Cases, 3 Connectors</span>
                   </div>
                 </transition>
               </div>

@@ -13,8 +13,8 @@
   --color-text-muted: #a1a1aa;
   
   --color-interactive-primary: #09090b;
-  --color-interactive-accent: #2563eb;
-  --color-interactive-hover: #1d4ed8;
+  --color-interactive-accent: var(--color-accent-aura);
+  --color-interactive-hover: #7c3aed;
   
   --color-border-default: rgba(0, 0, 0, 0.08);
   --color-border-elevated: rgba(0, 0, 0, 0.12);
@@ -37,8 +37,8 @@
   --color-text-muted: #71717a;
   
   --color-interactive-primary: #ffffff;
-  --color-interactive-accent: #3b82f6;
-  --color-interactive-hover: #60a5fa;
+  --color-interactive-accent: var(--color-accent-aura);
+  --color-interactive-hover: #8b5cf6;
   
   --color-border-default: rgba(255, 255, 255, 0.08);
   --color-border-elevated: rgba(255, 255, 255, 0.12);
