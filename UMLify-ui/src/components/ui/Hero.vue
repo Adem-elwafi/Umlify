@@ -100,23 +100,62 @@
                 :class="{ 'animate-border-sweep': isVisible }"
               />
             </svg>
-            <!-- 1. Workspace Top Toolbar -->
-            <div class="h-10 border-b border-border-default bg-bg-surface flex items-center justify-between px-md select-none shrink-0">
-              <div class="flex items-center gap-xs">
-                <!-- Project file label -->
-                <span class="w-2.5 h-2.5 rounded-full bg-interactive-accent"></span>
-                <span class="text-[10px] font-mono font-medium text-text-muted uppercase tracking-wider">WORKSPACE / USECASES.UML</span>
+            <!-- Mock Workspace Header (replicates Home.vue) -->
+            <div class="h-10 border-b border-border-default bg-bg-surface flex items-center justify-between px-sm select-none shrink-0">
+              <!-- Left Branding -->
+              <div class="flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-interactive-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="3" width="7" height="6" rx="1" />
+                  <rect x="15" y="3" width="7" height="6" rx="1" />
+                  <rect x="8.5" y="15" width="7" height="6" rx="1" />
+                  <path d="M5.5 9v3h3v3" />
+                  <path d="M18.5 9v3h-3v3" />
+                </svg>
+                <span class="text-xs font-bold text-text-primary tracking-tight">UMLify</span>
+                <span class="text-[8px] font-semibold bg-bg-elevated text-text-muted px-1.5 py-0.2 rounded border border-border-default">v1.1</span>
               </div>
-              <!-- Controls -->
-              <div class="flex items-center gap-sm">
-                <span class="text-[10px] font-mono text-text-muted bg-bg-elevated px-xs py-xxs border border-border-default rounded">⌘K Actions</span>
+              <!-- Center Enterprise Menu -->
+              <div class="hidden md:flex items-center gap-3 text-[9px] font-medium text-text-muted">
+                <span>Workspace Settings</span>
+                <div class="w-1 h-1 rounded-full bg-border-default"></div>
+                <span>Collaboration Engine</span>
+                <div class="w-1 h-1 rounded-full bg-border-default"></div>
+                <span>Analytics Profile</span>
+              </div>
+              <!-- Right Controls -->
+              <div class="flex items-center gap-2">
+                <span class="text-[8px] font-mono text-text-muted bg-bg-elevated px-1.5 py-0.5 border border-border-default rounded">Saved to Cloud</span>
               </div>
             </div>
 
-            <!-- 2. Workspace Body (Explorer + Canvas + Inspector) -->
+            <!-- Telemetry / Property Control Strip -->
+            <div class="h-8 border-b border-border-default bg-bg-surface/30 flex items-center justify-between px-sm select-none shrink-0 text-[8px]">
+              <!-- Left side: Undo/Redo -->
+              <div class="flex items-center gap-1 bg-bg-surface border border-border-default rounded px-1 py-0.5">
+                <svg class="w-3 h-3 text-text-secondary cursor-pointer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+                <div class="w-px h-2.5 bg-border-default mx-0.5"></div>
+                <svg class="w-3 h-3 text-text-secondary cursor-pointer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
+              </div>
+              <!-- Center: Property controls mock -->
+              <div class="flex items-center gap-3 text-text-secondary">
+                <div class="flex items-center gap-1">
+                  <span class="font-mono text-text-muted font-bold">NAME:</span>
+                  <span class="bg-bg-surface border border-border-default px-1 py-0.2 rounded font-medium">Checkout</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="font-mono text-text-muted font-bold">X:</span>
+                  <span class="bg-bg-surface border border-border-default px-1 py-0.2 rounded font-mono">480</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="font-mono text-text-muted font-bold">Y:</span>
+                  <span class="bg-bg-surface border border-border-default px-1 py-0.2 rounded font-mono">400</span>
+                </div>
+              </div>
+            </div>
+                <!-- 2. Workspace Body -->
             <div class="flex-1 flex min-h-0 relative bg-bg-base/20">
-              
-              <!-- Left Sidebar: Persistent Utility Rail & Shape Grid (hidden on mobile) -->
+
+              <!-- Left Sidebar: Collapsed State (show utility rail only) -->
               <div class="hidden sm:flex shrink-0 select-none">
                 <!-- Miniature Persistent Utility Rail -->
                 <div class="w-8 h-full bg-bg-surface/40 border-r border-border-default flex flex-col items-center py-2 justify-between shrink-0">
@@ -135,134 +174,69 @@
                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
                   </div>
                 </div>
+              </div>
 
-                <!-- Miniature Shape Spawner Matrix Grid (2x2) -->
-                <div class="w-24 border-r border-border-default bg-bg-surface/60 flex flex-col p-xs text-left">
-                  <span class="text-[8px] font-mono uppercase tracking-wider text-text-muted mb-xxs px-xxs">Toolbench</span>
-                  <div class="grid grid-cols-2 gap-xs p-xxs">
-                    <!-- Actor Icon -->
-                    <div class="flex flex-col items-center justify-center p-xxs border border-border-default/50 rounded bg-bg-base/40">
-                      <svg class="w-3.5 h-3.5 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="5" r="3" />
-                        <line x1="12" y1="8" x2="12" y2="14" />
-                        <line x1="8" y1="10" x2="16" y2="10" />
-                        <line x1="12" y1="14" x2="9" y2="19" />
-                        <line x1="12" y1="14" x2="15" y2="19" />
-                      </svg>
-                      <span class="text-[7px] text-text-muted uppercase font-bold mt-0.5 tracking-tighter">Actor</span>
-                    </div>
-                    <!-- Use Case Icon -->
-                    <div class="flex flex-col items-center justify-center p-xxs border border-border-default/50 rounded bg-bg-base/40">
-                      <div class="w-4 h-2.5 rounded-full border border-text-muted border-2" />
-                      <span class="text-[7px] text-text-muted uppercase font-bold mt-1 tracking-tighter">Use Case</span>
-                    </div>
-                    <!-- Package Icon -->
-                    <div class="flex flex-col items-center justify-center p-xxs border border-border-default/50 rounded bg-bg-base/40">
-                      <div class="flex flex-col items-start scale-75 origin-center">
-                        <div class="w-2.5 h-1 border-t border-l border-r border-text-muted rounded-t" />
-                        <div class="w-4 h-2.5 border border-text-muted rounded" />
-                      </div>
-                      <span class="text-[7px] text-text-muted uppercase font-bold tracking-tighter">Package</span>
-                    </div>
-                    <!-- Note Icon -->
-                    <div class="flex flex-col items-center justify-center p-xxs border border-border-default/50 rounded bg-bg-base/40">
-                      <div class="relative scale-75 origin-center">
-                        <div class="w-4 h-3 bg-text-muted/10 border border-text-muted rounded-sm" />
-                      </div>
-                      <span class="text-[7px] text-text-muted uppercase font-bold tracking-tighter">Note</span>
-                    </div>
-                  </div>
-                </div>
-                    <!-- Main Canvas area with dot grid and UML diagrams -->
+              <!-- Main Canvas area with dot grid and UML diagrams -->
               <div class="flex-grow sheet-grid relative overflow-hidden flex items-center justify-center p-sm">
                 <!-- Wrapper scaled down for responsiveness to fit all viewports without clipping -->
-                <div class="relative w-[520px] h-[340px] scale-[0.7] xs:scale-[0.8] sm:scale-90 md:scale-95 lg:scale-100 xl:scale-105 2xl:scale-115 origin-center shrink-0">
+                <div class="relative w-[640px] h-[480px] scale-[0.55] xs:scale-[0.6] sm:scale-[0.7] md:scale-[0.8] lg:scale-[0.85] xl:scale-[0.95] 2xl:scale-[1.05] origin-center shrink-0">
                   
                   <!-- Real Connector lines -->
                   <Connector
-                    id="hero-conn-1"
-                    :from="getConnectionPoint(customerEl, 'right')"
-                    :to="getConnectionPoint(searchItemsEl, 'left')"
-                    :fromElement="customerEl"
-                    :toElement="searchItemsEl"
-                    type="association"
-                  />
-                  <Connector
-                    id="hero-conn-2"
-                    :from="getConnectionPoint(customerEl, 'right')"
-                    :to="getConnectionPoint(checkoutEl, 'left')"
-                    :fromElement="customerEl"
-                    :toElement="checkoutEl"
-                    type="association"
-                  />
-                  <Connector
-                    id="hero-conn-3"
-                    :from="getConnectionPoint(checkoutEl, 'right')"
-                    :to="getConnectionPoint(paypalEl, 'left')"
-                    :fromElement="checkoutEl"
-                    :toElement="paypalEl"
-                    type="association"
+                    v-for="c in connectionsList"
+                    :key="c.id"
+                    :id="c.id"
+                    :from="getConnectionPoint(getElement(c.from), c.fromSide)"
+                    :to="getConnectionPoint(getElement(c.to), c.toSide)"
+                    :fromElement="getElement(c.from)"
+                    :toElement="getElement(c.to)"
+                    :type="c.type"
                   />
 
-                  <!-- Left Actor: Customer -->
-                  <div 
-                    class="absolute select-none"
-                    :style="{
-                      left: customerEl.x + 'px',
-                      top: customerEl.y + 'px',
-                      width: customerEl.width + 'px',
-                      height: customerEl.height + 'px'
-                    }"
-                  >
-                    <Actor label="CUSTOMER" />
-                  </div>
+                  <!-- Render Elements -->
+                  <template v-for="el in elements" :key="el.id">
+                    <div
+                      v-if="el.type === 'system'"
+                      class="absolute border-2 border-border-default/60 bg-bg-surface/10 rounded flex flex-col items-center p-xs shadow-sm"
+                      :style="{
+                        left: el.x + 'px',
+                        top: el.y + 'px',
+                        width: el.width + 'px',
+                        height: el.height + 'px'
+                      }"
+                    >
+                      <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest mt-2">{{ el.label }}</span>
+                    </div>
 
-                  <!-- System Boundary Box -->
-                  <div class="absolute top-[20px] left-[170px] w-[200px] h-[280px] border border-border-default/60 bg-bg-surface/10 rounded flex flex-col items-center p-xs shadow-sm">
-                    <span class="text-[8px] font-bold text-text-muted uppercase tracking-widest mt-1">Web Store System</span>
-                  </div>
+                    <div 
+                      v-else-if="el.type === 'actor'"
+                      class="absolute select-none"
+                      :style="{
+                        left: el.x + 'px',
+                        top: el.y + 'px',
+                        width: el.width + 'px',
+                        height: el.height + 'px'
+                      }"
+                    >
+                      <Actor :label="el.label" />
+                    </div>
 
-                  <!-- Use Case 1: Search Items -->
-                  <div 
-                    class="absolute select-none"
-                    :style="{
-                      left: searchItemsEl.x + 'px',
-                      top: searchItemsEl.y + 'px',
-                      width: searchItemsEl.width + 'px',
-                      height: searchItemsEl.height + 'px'
-                    }"
-                  >
-                    <UseCase label="Search Items" />
-                  </div>
-
-                  <!-- Use Case 2: Checkout -->
-                  <div 
-                    class="absolute select-none"
-                    :style="{
-                      left: checkoutEl.x + 'px',
-                      top: checkoutEl.y + 'px',
-                      width: checkoutEl.width + 'px',
-                      height: checkoutEl.height + 'px'
-                    }"
-                  >
-                    <UseCase label="Checkout" />
-                  </div>
-
-                  <!-- Right Actor: PayPal -->
-                  <div 
-                    class="absolute select-none"
-                    :style="{
-                      left: paypalEl.x + 'px',
-                      top: paypalEl.y + 'px',
-                      width: paypalEl.width + 'px',
-                      height: paypalEl.height + 'px'
-                    }"
-                  >
-                    <Actor label="PAYPAL" />
-                  </div>
+                    <div 
+                      v-else-if="el.type === 'usecase'"
+                      class="absolute select-none"
+                      :style="{
+                        left: el.x + 'px',
+                        top: el.y + 'px',
+                        width: el.width + 'px',
+                        height: el.height + 'px'
+                      }"
+                    >
+                      <UseCase :label="el.label" />
+                    </div>
+                  </template>
 
                 </div>
-              </div>            </div>
+              </div>
 
               <!-- Right Sidebar: Collapsed AI Dock Rail (hidden on mobile/tablet) -->
               <div class="hidden lg:flex w-10 border-l border-border-default bg-bg-surface flex-col items-center py-4 justify-between shrink-0 select-none text-left">
@@ -295,7 +269,7 @@
                   </div>
                   <div v-else key="compiled" class="flex items-center gap-xs">
                     <span class="text-success">●</span>
-                    <span>Compiled: 2 Actors, 2 Use Cases, 3 Connectors</span>
+                    <span>Compiled: 2 Actors, 3 Use Cases, 5 Connectors</span>
                   </div>
                 </transition>
               </div>
@@ -328,41 +302,32 @@ import UseCase from '../UseCase.vue'
 import Connector from '../connector.vue'
 import { getConnectionPoint } from '../../utils/connectorRouting'
 
-const customerEl = {
-  id: 'customer',
-  type: 'actor',
-  x: 35,
-  y: 110,
-  width: 80,
-  height: 120
-}
+const elements = [
+  // System Boundary
+  { id: 'app-boundary', type: 'system', label: 'local legends App', x: 180, y: 40, width: 280, height: 380 },
 
-const searchItemsEl = {
-  id: 'search-items',
-  type: 'usecase',
-  x: 200,
-  y: 60,
-  width: 140,
-  height: 56
-}
+  // Actors (External/Internal)
+  { id: 'consumer', type: 'actor', label: 'Content Consumer', x: 40, y: 170, width: 80, height: 120 },
+  { id: 'mongodb', type: 'actor', label: 'MongoDB Atlas', x: 520, y: 170, width: 80, height: 120 },
 
-const checkoutEl = {
-  id: 'checkout',
-  type: 'usecase',
-  x: 200,
-  y: 170,
-  width: 140,
-  height: 56
-}
+  // Use Cases (Functional)
+  { id: 'geolocate', type: 'usecase', label: 'GeoLocate User', x: 230, y: 80, width: 180, height: 60 },
+  { id: 'read-story', type: 'usecase', label: 'Read A Story', x: 230, y: 200, width: 180, height: 60 },
+  { id: 'query-data', type: 'usecase', label: 'Query Story Data', x: 230, y: 320, width: 180, height: 60 }
+]
 
-const paypalEl = {
-  id: 'paypal',
-  type: 'actor',
-  x: 405,
-  y: 140,
-  width: 80,
-  height: 120
-}
+const connectionsList = [
+  // 3 Associations (Actors to Use Cases)
+  { id: 'conn-1', from: 'consumer', to: 'geolocate', fromSide: 'right', toSide: 'left', type: 'association' },
+  { id: 'conn-2', from: 'consumer', to: 'read-story', fromSide: 'right', toSide: 'left', type: 'association' },
+  { id: 'conn-3', from: 'mongodb', to: 'query-data', fromSide: 'left', toSide: 'right', type: 'association' },
+
+  // 2 Includes
+  { id: 'conn-4', from: 'read-story', to: 'geolocate', fromSide: 'top', toSide: 'bottom', type: 'include' },
+  { id: 'conn-5', from: 'read-story', to: 'query-data', fromSide: 'bottom', toSide: 'top', type: 'include' }
+]
+
+const getElement = (id) => elements.find(e => e.id === id)
 
 const router = useRouter()
 const isMounted = ref(false)

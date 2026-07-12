@@ -103,21 +103,60 @@
               class="w-full h-full flex flex-col overflow-hidden border border-border-default bg-bg-surface/40 shadow-2xl relative"
             >
               
-              <!-- 1. Workspace Top Toolbar -->
-              <div class="h-10 border-b border-border-default bg-bg-surface flex items-center justify-between px-md select-none shrink-0">
-                <div class="flex items-center gap-xs">
-                  <span class="w-2.5 h-2.5 rounded-full bg-interactive-accent"></span>
-                  <span class="text-[10px] font-mono font-medium text-text-muted uppercase tracking-wider">WORKSPACE / USECASES.UML</span>
+              <!-- Mock Workspace Header (replicates Home.vue) -->
+              <div class="h-10 border-b border-border-default bg-bg-surface flex items-center justify-between px-sm select-none shrink-0">
+                <!-- Left Branding -->
+                <div class="flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-interactive-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="3" width="7" height="6" rx="1" />
+                    <rect x="15" y="3" width="7" height="6" rx="1" />
+                    <rect x="8.5" y="15" width="7" height="6" rx="1" />
+                    <path d="M5.5 9v3h3v3" />
+                    <path d="M18.5 9v3h-3v3" />
+                  </svg>
+                  <span class="text-xs font-bold text-text-primary tracking-tight">UMLify</span>
+                  <span class="text-[8px] font-semibold bg-bg-elevated text-text-muted px-1.5 py-0.2 rounded border border-border-default">v1.1</span>
                 </div>
-                <div class="flex items-center gap-sm">
-                  <span class="text-[10px] font-mono text-text-muted bg-bg-elevated px-xs py-xxs border border-border-default rounded">⌘K Actions</span>
+                <!-- Center Enterprise Menu -->
+                <div class="hidden md:flex items-center gap-3 text-[9px] font-medium text-text-muted">
+                  <span>Workspace Settings</span>
+                  <div class="w-1 h-1 rounded-full bg-border-default"></div>
+                  <span>Collaboration Engine</span>
+                  <div class="w-1 h-1 rounded-full bg-border-default"></div>
+                  <span>Analytics Profile</span>
+                </div>
+                <!-- Right Controls -->
+                <div class="flex items-center gap-2">
+                  <span class="text-[8px] font-mono text-text-muted bg-bg-elevated px-1.5 py-0.5 border border-border-default rounded">Saved to Cloud</span>
                 </div>
               </div>
 
-              <!-- 2. Workspace Body (Explorer + Dynamic Canvas + Inspector) -->
+              <!-- Telemetry / Property Control Strip -->
+              <div class="h-8 border-b border-border-default bg-bg-surface/30 flex items-center justify-between px-sm select-none shrink-0 text-[8px]">
+                <!-- Left side: Undo/Redo -->
+                <div class="flex items-center gap-1 bg-bg-surface border border-border-default rounded px-1 py-0.5">
+                  <svg class="w-3 h-3 text-text-secondary cursor-pointer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+                  <div class="w-px h-2.5 bg-border-default mx-0.5"></div>
+                  <svg class="w-3 h-3 text-text-secondary cursor-pointer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
+                </div>
+                <!-- Center: Property controls mock -->
+                <div class="flex items-center gap-3 text-text-secondary">
+                  <div class="flex items-center gap-1">
+                    <span class="font-mono text-text-muted font-bold">NAME:</span>
+                    <span class="bg-bg-surface border border-border-default px-1 py-0.2 rounded font-medium">Checkout</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-mono text-text-muted font-bold">X:</span>
+                    <span class="bg-bg-surface border border-border-default px-1 py-0.2 rounded font-mono">480</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-mono text-text-muted font-bold">Y:</span>
+                    <span class="bg-bg-surface border border-border-default px-1 py-0.2 rounded font-mono">400</span>
+                  </div>
+                </div>
+              </div>              <!-- 2. Workspace Body -->
               <div class="flex-1 flex min-h-0 relative bg-bg-base/20">
-                
-                <!-- Left Sidebar: Persistent Utility Rail & Shape Grid (hidden on mobile) -->
+                <!-- Left Sidebar: Collapsed State (show utility rail only) -->
                 <div class="hidden sm:flex shrink-0 select-none">
                   <!-- Miniature Persistent Utility Rail -->
                   <div class="w-8 h-full bg-bg-surface/40 border-r border-border-default flex flex-col items-center py-2 justify-between shrink-0">
@@ -136,44 +175,6 @@
                       <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
                     </div>
                   </div>
-
-                  <!-- Miniature Shape Spawner Matrix Grid (2x2) -->
-                  <div class="w-24 border-r border-border-default bg-bg-surface/60 flex flex-col p-xs text-left">
-                    <span class="text-[8px] font-mono uppercase tracking-wider text-text-muted mb-xxs px-xxs">Toolbench</span>
-                    <div class="grid grid-cols-2 gap-xs p-xxs">
-                      <!-- Actor Icon -->
-                      <div class="flex flex-col items-center justify-center p-xxs border border-border-default/50 rounded bg-bg-base/40">
-                        <svg class="w-3.5 h-3.5 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <circle cx="12" cy="5" r="3" />
-                          <line x1="12" y1="8" x2="12" y2="14" />
-                          <line x1="8" y1="10" x2="16" y2="10" />
-                          <line x1="12" y1="14" x2="9" y2="19" />
-                          <line x1="12" y1="14" x2="15" y2="19" />
-                        </svg>
-                        <span class="text-[7px] text-text-muted uppercase font-bold mt-0.5 tracking-tighter">Actor</span>
-                      </div>
-                      <!-- Use Case Icon -->
-                      <div class="flex flex-col items-center justify-center p-xxs border border-border-default/50 rounded bg-bg-base/40">
-                        <div class="w-4 h-2.5 rounded-full border border-text-muted border-2" />
-                        <span class="text-[7px] text-text-muted uppercase font-bold mt-1 tracking-tighter">Use Case</span>
-                      </div>
-                      <!-- Package Icon -->
-                      <div class="flex flex-col items-center justify-center p-xxs border border-border-default/50 rounded bg-bg-base/40">
-                        <div class="flex flex-col items-start scale-75 origin-center">
-                          <div class="w-2.5 h-1 border-t border-l border-r border-text-muted rounded-t" />
-                          <div class="w-4 h-2.5 border border-text-muted rounded" />
-                        </div>
-                        <span class="text-[7px] text-text-muted uppercase font-bold tracking-tighter">Package</span>
-                      </div>
-                      <!-- Note Icon -->
-                      <div class="flex flex-col items-center justify-center p-xxs border border-border-default/50 rounded bg-bg-base/40">
-                        <div class="relative scale-75 origin-center">
-                          <div class="w-4 h-3 bg-text-muted/10 border border-text-muted rounded-sm" />
-                        </div>
-                        <span class="text-[7px] text-text-muted uppercase font-bold tracking-tighter">Note</span>
-                      </div>
-                    </div>
-                  </div>
                 </div>
 
                 <!-- Center Canvas (Dynamic rendering dependent on activeStep) -->
@@ -183,303 +184,109 @@
                   role="tabpanel"
                 >
                   <transition name="fade-workspace" mode="out-in">
-                    
                     <!-- Wrapper scaled down for responsiveness -->
                     <div 
                       :key="activeStep"
-                      class="relative w-[520px] h-[340px] scale-[0.7] xs:scale-[0.8] sm:scale-90 md:scale-95 lg:scale-100 xl:scale-105 2xl:scale-115 origin-center shrink-0 transition-transform duration-350"
+                      class="relative w-[640px] h-[480px] scale-[0.5] xs:scale-[0.55] sm:scale-[0.65] md:scale-[0.75] lg:scale-[0.8] xl:scale-[0.9] 2xl:scale-[1.0] origin-center shrink-0 transition-transform duration-350"
                     >
-                                           <!-- Canvas Elements for Step 1: Create Use Cases -->
-                      <template v-if="activeStep === 1">
-                        <!-- Left Actor: Customer -->
-                        <div 
-                          class="absolute select-none"
-                          :style="{
-                            left: customerEl.x + 'px',
-                            top: customerEl.y + 'px',
-                            width: customerEl.width + 'px',
-                            height: customerEl.height + 'px'
-                          }"
-                        >
-                          <Actor label="CUSTOMER" />
-                        </div>
-
-                        <!-- System Boundary Box -->
-                        <div class="absolute top-[20px] left-[170px] w-[200px] h-[280px] border border-border-default/60 bg-bg-surface/10 rounded flex flex-col items-center p-xs shadow-sm">
-                          <span class="text-[8px] font-bold text-text-muted uppercase tracking-widest mt-1">Web Store System</span>
-                        </div>
-
-                        <!-- Use Case 1: Search Items -->
-                        <div 
-                          class="absolute select-none"
-                          :style="{
-                            left: searchItemsEl.x + 'px',
-                            top: searchItemsEl.y + 'px',
-                            width: searchItemsEl.width + 'px',
-                            height: searchItemsEl.height + 'px'
-                          }"
-                        >
-                          <UseCase label="Search Items" />
-                        </div>
-
-                        <!-- Use Case 2: Checkout (Highlighted Selection) -->
-                        <div 
-                          class="absolute select-none"
-                          :style="{
-                            left: checkoutEl.x + 'px',
-                            top: checkoutEl.y + 'px',
-                            width: checkoutEl.width + 'px',
-                            height: checkoutEl.height + 'px'
-                          }"
-                        >
-                          <UseCase label="Checkout" :selected="true" />
-                          <!-- Selection anchors indicators -->
-                          <div class="absolute -top-1 -left-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border border-bg-surface z-30"></div>
-                          <div class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border border-bg-surface z-30"></div>
-                          <div class="absolute -bottom-1 -left-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border border-bg-surface z-30"></div>
-                          <div class="absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border border-bg-surface z-30"></div>
-                        </div>
-                      </template>
-
-                      <!-- Canvas Elements for Step 2: Connect Relationships -->
-                      <template v-if="activeStep === 2">
-                        <!-- Real Connector line in progress -->
+                      <div :class="{ 'blur-[2px] opacity-40': activeStep === 4 }" class="absolute inset-0">
+                        
+                        <!-- Render Connectors -->
                         <Connector
-                          id="showcase-conn-1-step2"
-                          :from="getConnectionPoint(customerEl, 'right')"
-                          :to="getConnectionPoint(searchItemsEl, 'left')"
-                          :fromElement="customerEl"
-                          :toElement="searchItemsEl"
-                          type="dependency"
+                          v-for="c in activeConnections"
+                          :key="c.id"
+                          :id="c.id"
+                          :from="getConnectionPoint(getElement(c.from), c.fromSide)"
+                          :to="getConnectionPoint(getElement(c.to), c.toSide)"
+                          :fromElement="getElement(c.from)"
+                          :toElement="getElement(c.to)"
+                          :type="c.type"
                         />
 
-                        <!-- Left Actor: Customer -->
-                        <div 
-                          class="absolute select-none"
-                          :style="{
-                            left: customerEl.x + 'px',
-                            top: customerEl.y + 'px',
-                            width: customerEl.width + 'px',
-                            height: customerEl.height + 'px'
-                          }"
-                        >
-                          <Actor label="CUSTOMER" />
-                          <!-- Blue connector socket hover state -->
-                          <div class="absolute -right-1 top-[50%] -translate-y-[50%] w-2.5 h-2.5 rounded-full bg-interactive-accent ring-4 ring-interactive-accent/30 animate-pulse z-30"></div>
-                        </div>
+                        <!-- Render Elements -->
+                        <template v-for="el in activeElements" :key="el.id">
+                          <div
+                            v-if="el.type === 'system'"
+                            class="absolute border-2 border-border-default/60 bg-bg-surface/10 rounded flex flex-col items-center p-xs shadow-sm"
+                            :style="{
+                              left: el.x + 'px',
+                              top: el.y + 'px',
+                              width: el.width + 'px',
+                              height: el.height + 'px'
+                            }"
+                          >
+                            <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest mt-2">{{ el.label }}</span>
+                          </div>
 
-                        <!-- System Boundary Box -->
-                        <div class="absolute top-[20px] left-[170px] w-[200px] h-[280px] border border-border-default/60 bg-bg-surface/10 rounded flex flex-col items-center p-xs shadow-sm">
-                          <span class="text-[8px] font-bold text-text-muted uppercase tracking-widest mt-1">Web Store System</span>
-                        </div>
+                          <div 
+                            v-else-if="el.type === 'actor'"
+                            class="absolute select-none"
+                            :style="{
+                              left: el.x + 'px',
+                              top: el.y + 'px',
+                              width: el.width + 'px',
+                              height: el.height + 'px'
+                            }"
+                          >
+                            <Actor :label="el.label" />
+                          </div>
 
-                        <!-- Use Case 1: Search Items -->
-                        <div 
-                          class="absolute select-none"
-                          :style="{
-                            left: searchItemsEl.x + 'px',
-                            top: searchItemsEl.y + 'px',
-                            width: searchItemsEl.width + 'px',
-                            height: searchItemsEl.height + 'px'
-                          }"
-                        >
-                          <UseCase label="Search Items" />
-                          <!-- Blue connector socket hover state -->
-                          <div class="absolute -left-1 top-[50%] -translate-y-[50%] w-2.5 h-2.5 rounded-full bg-interactive-accent ring-4 ring-interactive-accent/30 z-30"></div>
-                        </div>
+                          <div 
+                            v-else-if="el.type === 'usecase'"
+                            class="absolute select-none"
+                            :style="{
+                              left: el.x + 'px',
+                              top: el.y + 'px',
+                              width: el.width + 'px',
+                              height: el.height + 'px'
+                            }"
+                          >
+                            <UseCase :label="el.label" :selected="activeStep === 1 && el.id === 'read-story'" />
+                            
+                            <template v-if="activeStep === 1 && el.id === 'read-story'">
+                              <div class="absolute -top-1 -left-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border border-bg-surface z-30"></div>
+                              <div class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border border-bg-surface z-30"></div>
+                              <div class="absolute -bottom-1 -left-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border border-bg-surface z-30"></div>
+                              <div class="absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border border-bg-surface z-30"></div>
+                            </template>
+                          </div>
+                        </template>
 
-                        <!-- Use Case 2: Checkout -->
-                        <div 
-                          class="absolute select-none"
-                          :style="{
-                            left: checkoutEl.x + 'px',
-                            top: checkoutEl.y + 'px',
-                            width: checkoutEl.width + 'px',
-                            height: checkoutEl.height + 'px'
-                          }"
-                        >
-                          <UseCase label="Checkout" />
-                        </div>
-                      </template>
+                        <!-- Sockets pulse overlay for Step 2 -->
+                        <template v-if="activeStep === 2">
+                          <div 
+                            class="absolute select-none pointer-events-none z-30"
+                            :style="{
+                              left: (customerEl.x + customerEl.width - 4) + 'px',
+                              top: (customerEl.y + customerEl.height / 2 - 5) + 'px',
+                              width: '10px',
+                              height: '10px'
+                            }"
+                          >
+                            <div class="w-2.5 h-2.5 rounded-full bg-interactive-accent ring-4 ring-interactive-accent/30 animate-pulse"></div>
+                          </div>
+                          <div 
+                            class="absolute select-none pointer-events-none z-30"
+                            :style="{
+                              left: (readStoryEl.x - 6) + 'px',
+                              top: (readStoryEl.y + readStoryEl.height / 2 - 5) + 'px',
+                              width: '10px',
+                              height: '10px'
+                            }"
+                          >
+                            <div class="w-2.5 h-2.5 rounded-full bg-interactive-accent ring-4 ring-interactive-accent/30"></div>
+                          </div>
+                        </template>
 
-                      <!-- Canvas Elements for Step 3: Organize Automatically -->
-                      <template v-if="activeStep === 3">
-                        <Connector
-                          id="showcase-conn-1-step3"
-                          :from="getConnectionPoint(customerEl, 'right')"
-                          :to="getConnectionPoint(searchItemsEl, 'left')"
-                          :fromElement="customerEl"
-                          :toElement="searchItemsEl"
-                          type="association"
-                        />
-                        <Connector
-                          id="showcase-conn-2-step3"
-                          :from="getConnectionPoint(customerEl, 'right')"
-                          :to="getConnectionPoint(checkoutEl, 'left')"
-                          :fromElement="customerEl"
-                          :toElement="checkoutEl"
-                          type="association"
-                        />
-                        <Connector
-                          id="showcase-conn-3-step3"
-                          :from="getConnectionPoint(checkoutEl, 'right')"
-                          :to="getConnectionPoint(paypalEl, 'left')"
-                          :fromElement="checkoutEl"
-                          :toElement="paypalEl"
-                          type="association"
-                        />
+                      </div>
 
-                        <!-- Left Actor: Customer -->
-                        <div 
-                          class="absolute select-none"
-                          :style="{
-                            left: customerEl.x + 'px',
-                            top: customerEl.y + 'px',
-                            width: customerEl.width + 'px',
-                            height: customerEl.height + 'px'
-                          }"
-                        >
-                          <Actor label="CUSTOMER" />
-                        </div>
-
-                        <!-- System Boundary Box -->
-                        <div class="absolute top-[20px] left-[170px] w-[200px] h-[280px] border border-border-default/60 bg-bg-surface/10 rounded flex flex-col items-center p-xs shadow-sm">
-                          <span class="text-[8px] font-bold text-text-muted uppercase tracking-widest mt-1">Web Store System</span>
-                        </div>
-
-                        <!-- Use Case 1: Search Items -->
-                        <div 
-                          class="absolute select-none"
-                          :style="{
-                            left: searchItemsEl.x + 'px',
-                            top: searchItemsEl.y + 'px',
-                            width: searchItemsEl.width + 'px',
-                            height: searchItemsEl.height + 'px'
-                          }"
-                        >
-                          <UseCase label="Search Items" />
-                        </div>
-
-                        <!-- Use Case 2: Checkout -->
-                        <div 
-                          class="absolute select-none"
-                          :style="{
-                            left: checkoutEl.x + 'px',
-                            top: checkoutEl.y + 'px',
-                            width: checkoutEl.width + 'px',
-                            height: checkoutEl.height + 'px'
-                          }"
-                        >
-                          <UseCase label="Checkout" />
-                        </div>
-
-                        <!-- Right Actor: PayPal -->
-                        <div 
-                          class="absolute select-none"
-                          :style="{
-                            left: paypalEl.x + 'px',
-                            top: paypalEl.y + 'px',
-                            width: paypalEl.width + 'px',
-                            height: paypalEl.height + 'px'
-                          }"
-                        >
-                          <Actor label="PAYPAL" />
-                        </div>
-                      </template>
-
-                      <!-- Canvas Elements for Step 4: Export Anywhere -->
+                      <!-- Export Modal Overlay for Step 4 -->
                       <template v-if="activeStep === 4">
-                        <!-- Background diagram is shown blurred -->
-                        <div class="absolute inset-0 blur-[2px] opacity-40">
-                          <Connector
-                            id="showcase-conn-1-step4"
-                            :from="getConnectionPoint(customerEl, 'right')"
-                            :to="getConnectionPoint(searchItemsEl, 'left')"
-                            :fromElement="customerEl"
-                            :toElement="searchItemsEl"
-                            type="association"
-                          />
-                          <Connector
-                            id="showcase-conn-2-step4"
-                            :from="getConnectionPoint(customerEl, 'right')"
-                            :to="getConnectionPoint(checkoutEl, 'left')"
-                            :fromElement="customerEl"
-                            :toElement="checkoutEl"
-                            type="association"
-                          />
-                          <Connector
-                            id="showcase-conn-3-step4"
-                            :from="getConnectionPoint(checkoutEl, 'right')"
-                            :to="getConnectionPoint(paypalEl, 'left')"
-                            :fromElement="checkoutEl"
-                            :toElement="paypalEl"
-                            type="association"
-                          />
-
-                          <!-- Left Actor: Customer -->
-                          <div 
-                            class="absolute select-none"
-                            :style="{
-                              left: customerEl.x + 'px',
-                              top: customerEl.y + 'px',
-                              width: customerEl.width + 'px',
-                              height: customerEl.height + 'px'
-                            }"
-                          >
-                            <Actor label="CUSTOMER" />
-                          </div>
-
-                          <!-- System Boundary Box -->
-                          <div class="absolute top-[20px] left-[170px] w-[200px] h-[280px] border border-border-default/60 bg-bg-surface/10 rounded flex flex-col items-center p-xs shadow-sm">
-                            <span class="text-[8px] font-bold text-text-muted uppercase tracking-widest mt-1">Web Store System</span>
-                          </div>
-
-                          <!-- Use Case 1: Search Items -->
-                          <div 
-                            class="absolute select-none"
-                            :style="{
-                              left: searchItemsEl.x + 'px',
-                              top: searchItemsEl.y + 'px',
-                              width: searchItemsEl.width + 'px',
-                              height: searchItemsEl.height + 'px'
-                            }"
-                          >
-                            <UseCase label="Search Items" />
-                          </div>
-
-                          <!-- Use Case 2: Checkout -->
-                          <div 
-                            class="absolute select-none"
-                            :style="{
-                              left: checkoutEl.x + 'px',
-                              top: checkoutEl.y + 'px',
-                              width: checkoutEl.width + 'px',
-                              height: checkoutEl.height + 'px'
-                            }"
-                          >
-                            <UseCase label="Checkout" />
-                          </div>
-
-                          <!-- Right Actor: PayPal -->
-                          <div 
-                            class="absolute select-none"
-                            :style="{
-                              left: paypalEl.x + 'px',
-                              top: paypalEl.y + 'px',
-                              width: paypalEl.width + 'px',
-                              height: paypalEl.height + 'px'
-                            }"
-                          >
-                            <Actor label="PAYPAL" />
-                          </div>
-                        </div>
-
-                        <!-- Absolute Modal Dialog Overlay for Export Settings -->
-                        <div class="absolute inset-0 flex items-center justify-center p-md">
+                        <div class="absolute inset-0 flex items-center justify-center p-md z-40">
                           <Surface 
                             depth="3" 
                             radius="panel" 
-                            class="w-[280px] p-md border border-border-elevated bg-bg-surface shadow-2xl flex flex-col gap-sm"
+                            class="w-[280px] p-md border border-border-elevated bg-bg-surface shadow-2xl flex flex-col gap-sm relative"
                           >
                             <div class="flex items-center justify-between border-b border-border-default/60 pb-xs">
                               <span class="text-xs font-semibold text-text-primary">Export Diagram</span>
@@ -507,7 +314,7 @@
                           </Surface>
                         </div>
                       </template>
-                      
+
                     </div>
                   </transition>
                 </div>
@@ -556,7 +363,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
 import Section from './layout/Section.vue'
 import Container from './layout/Container.vue'
 import Grid from './layout/Grid.vue'
@@ -570,41 +377,56 @@ import UseCase from '../UseCase.vue'
 import Connector from '../connector.vue'
 import { getConnectionPoint } from '../../utils/connectorRouting'
 
-const customerEl = {
-  id: 'customer',
-  type: 'actor',
-  x: 35,
-  y: 110,
-  width: 80,
-  height: 120
-}
+const elements = [
+  // System Boundary
+  { id: 'app-boundary', type: 'system', label: 'local legends App', x: 180, y: 40, width: 280, height: 380 },
 
-const searchItemsEl = {
-  id: 'search-items',
-  type: 'usecase',
-  x: 200,
-  y: 60,
-  width: 140,
-  height: 56
-}
+  // Actors (External/Internal)
+  { id: 'consumer', type: 'actor', label: 'Content Consumer', x: 40, y: 170, width: 80, height: 120 },
+  { id: 'mongodb', type: 'actor', label: 'MongoDB Atlas', x: 520, y: 170, width: 80, height: 120 },
 
-const checkoutEl = {
-  id: 'checkout',
-  type: 'usecase',
-  x: 200,
-  y: 170,
-  width: 140,
-  height: 56
-}
+  // Use Cases (Functional)
+  { id: 'geolocate', type: 'usecase', label: 'GeoLocate User', x: 230, y: 80, width: 180, height: 60 },
+  { id: 'read-story', type: 'usecase', label: 'Read A Story', x: 230, y: 200, width: 180, height: 60 },
+  { id: 'query-data', type: 'usecase', label: 'Query Story Data', x: 230, y: 320, width: 180, height: 60 }
+]
 
-const paypalEl = {
-  id: 'paypal',
-  type: 'actor',
-  x: 405,
-  y: 140,
-  width: 80,
-  height: 120
-}
+const connectionsList = [
+  // 3 Associations (Actors to Use Cases)
+  { id: 'conn-1', from: 'consumer', to: 'geolocate', fromSide: 'right', toSide: 'left', type: 'association' },
+  { id: 'conn-2', from: 'consumer', to: 'read-story', fromSide: 'right', toSide: 'left', type: 'association' },
+  { id: 'conn-3', from: 'mongodb', to: 'query-data', fromSide: 'left', toSide: 'right', type: 'association' },
+
+  // 2 Includes
+  { id: 'conn-4', from: 'read-story', to: 'geolocate', fromSide: 'top', toSide: 'bottom', type: 'include' },
+  { id: 'conn-5', from: 'read-story', to: 'query-data', fromSide: 'bottom', toSide: 'top', type: 'include' }
+]
+
+const getElement = (id) => elements.find(e => e.id === id)
+const customerEl = getElement('consumer')
+const readStoryEl = getElement('read-story')
+
+const activeElements = computed(() => {
+  if (activeStep.value === 1) {
+    return elements.filter(e => e.type === 'usecase' || e.type === 'system')
+  }
+  if (activeStep.value === 2) {
+    return elements.filter(e => e.type === 'usecase' || e.type === 'system' || e.id === 'consumer')
+  }
+  return elements
+})
+
+const activeConnections = computed(() => {
+  if (activeStep.value === 1) {
+    return []
+  }
+  if (activeStep.value === 2) {
+    return [
+      { id: 'conn-2', from: 'consumer', to: 'read-story', fromSide: 'right', toSide: 'left', type: 'dependency' }
+    ]
+  }
+  return connectionsList
+})
 
 const activeStep = ref(1)
 const rotationInterval = ref(null)
@@ -617,14 +439,14 @@ const steps = [
   {
     id: 1,
     num: '01',
-    title: 'Create Classes',
-    sentence: 'Define entities, attributes, and methods instantly in our semantic inspector or syntax editor.'
+    title: 'Create Use Cases',
+    sentence: 'Define actors, system boundaries, and functional system use cases instantly in our semantic inspector.'
   },
   {
     id: 2,
     num: '02',
     title: 'Connect Relationships',
-    sentence: 'Link nodes with compliant UML connectors. Choose composition, generalization, or association arrows.'
+    sentence: 'Link nodes with compliant UML connectors. Choose association, include, or extend arrows.'
   },
   {
     id: 3,
