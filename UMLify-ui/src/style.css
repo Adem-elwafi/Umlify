@@ -23,6 +23,7 @@
   --color-statusbar-bg: #0e1224;
   --color-bar-border: rgba(255, 255, 255, 0.08);
   --color-grid-line: rgba(0, 0, 0, 0.04);
+  --color-accent-aura: #63e;
 }
 
 .dark {
@@ -46,6 +47,7 @@
   --color-statusbar-bg: #0e1224;
   --color-bar-border: rgba(255, 255, 255, 0.08);
   --color-grid-line: rgba(255, 255, 255, 0.04);
+  --color-accent-aura: #63e;
 }
 
 @theme {
@@ -69,6 +71,7 @@
   --color-statusbar-bg: var(--color-statusbar-bg);
   --color-bar-border: var(--color-bar-border);
   --color-grid-line: var(--color-grid-line);
+  --color-accent-aura: var(--color-accent-aura);
 
   --color-success: #10b981;
   --color-warning: #f59e0b;
@@ -222,5 +225,26 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(156, 163, 175, 0.4);
+}
+
+/* Hardware-accelerated 1px Single-Pass Border Sweep Animation */
+@keyframes border-sweep {
+  0% {
+    stroke-dashoffset: 100;
+    stroke: var(--color-accent-aura);
+  }
+  90% {
+    stroke: var(--color-accent-aura);
+  }
+  100% {
+    stroke-dashoffset: 0;
+    stroke: transparent;
+  }
+}
+
+.animate-border-sweep {
+  stroke-width: 1.5px;
+  stroke-dasharray: 30 70;
+  animation: border-sweep 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 

@@ -88,6 +88,7 @@ Text Color    [ Primary: #FAFAFA ───── Secondary: #A1A1AA ────
 *   `color-interactive-primary`: `#FFFFFF` (Dark) / `#09090B` (Light) — Core CTA button fill.
 *   `color-interactive-accent`: `#3B82F6` (Dark) / `#2563EB` (Light) — Active focus, brand accents.
 *   `color-interactive-hover`: `#60A5FA` (Dark) / `#1D4ED8` (Light) — Focus hover outlines.
+*   `color-accent-aura`: `#63E` — Used exclusively for landing page ambient radial background highlights and elite single-pass scroll-shimmer borders.
 *   `color-success`: `#10B981` (Green) — Clean execution states.
 *   `color-warning`: `#F59E0B` (Amber) — Validating edits.
 *   `color-error`: `#EF4444` (Red) — Invalid layouts.

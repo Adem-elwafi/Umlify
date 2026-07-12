@@ -1,5 +1,5 @@
 <template>
-  <Section id="features" spacing="xxl" custom-class="border-t border-border-default bg-bg-base/30 relative overflow-hidden">
+  <Section ref="sectionRef" id="features" spacing="xxl" custom-class="border-t border-border-default bg-bg-base/30 relative overflow-hidden">
     <Container size="xl">
       <Stack gap="xl">
         
@@ -36,7 +36,7 @@
                 :aria-selected="activeStep === step.id"
                 :aria-controls="'showcase-panel-' + step.id"
                 :tabindex="activeStep === step.id ? 0 : -1"
-                class="group text-left p-md border rounded-card transition-all duration-350 ease-tactile cursor-pointer select-none outline-none focus-visible:ring-2 focus-visible:ring-interactive-accent"
+                class="group text-left p-md border rounded-card transition-all duration-350 ease-tactile cursor-pointer select-none outline-none focus-visible:ring-2 focus-visible:ring-interactive-accent relative overflow-hidden"
                 :class="[
                   activeStep === step.id
                     ? 'bg-bg-surface border-border-elevated shadow-sm'
@@ -46,7 +46,20 @@
                 @mouseenter="pauseRotation"
                 @mouseleave="resumeRotation"
               >
-                <div class="flex gap-md">
+                <!-- 1px Animated Border Sweep (GPU accelerated) -->
+                <svg class="absolute inset-0 w-full h-full pointer-events-none fill-none z-30" xmlns="http://www.w3.org/2000/svg">
+                  <rect
+                    x="0.5"
+                    y="0.5"
+                    width="calc(100% - 1px)"
+                    height="calc(100% - 1px)"
+                    rx="12"
+                    pathLength="100"
+                    class="stroke-transparent"
+                    :class="{ 'animate-border-sweep': isVisible }"
+                  />
+                </svg>
+                <div class="flex gap-md relative z-10">
                   <!-- Active Indicator / Step Number -->
                   <div class="flex flex-col items-center">
                     <span 
@@ -104,18 +117,61 @@
               <!-- 2. Workspace Body (Explorer + Dynamic Canvas + Inspector) -->
               <div class="flex-1 flex min-h-0 relative bg-bg-base/20">
                 
-                <!-- Left Sidebar: Explorer (hidden on mobile) -->
-                <div class="hidden sm:flex w-40 border-r border-border-default bg-bg-surface/60 flex-col p-xs select-none shrink-0 text-left">
-                  <span class="text-[9px] font-mono uppercase tracking-widest text-text-muted mb-xs px-xs">Explorer</span>
-                  <div class="flex flex-col gap-xxs text-[11px] font-medium">
-                    <div class="flex items-center gap-xs px-xs py-xxs bg-bg-elevated/60 rounded text-text-primary">
-                      <span class="text-interactive-accent">❖</span> SystemModel.uml
+                <!-- Left Sidebar: Persistent Utility Rail & Shape Grid (hidden on mobile) -->
+                <div class="hidden sm:flex shrink-0 select-none">
+                  <!-- Miniature Persistent Utility Rail -->
+                  <div class="w-8 h-full bg-bg-surface/40 border-r border-border-default flex flex-col items-center py-2 justify-between shrink-0">
+                    <div class="flex flex-col items-center gap-2">
+                      <div class="p-1 rounded bg-bg-elevated border border-border-elevated text-text-primary">
+                        <!-- Folder Icon -->
+                        <svg class="w-3.5 h-3.5 text-text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                      </div>
+                      <div class="p-1 text-text-muted hover:text-text-primary">
+                        <!-- Save Icon -->
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                      </div>
                     </div>
-                    <div class="flex items-center gap-xs px-xs py-xxs text-text-secondary hover:bg-bg-elevated/35 rounded cursor-pointer">
-                      <span>◇</span> OrderController.java
+                    <div class="p-1 text-success">
+                      <!-- Cloud Icon -->
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
                     </div>
-                    <div class="flex items-center gap-xs px-xs py-xxs text-text-secondary hover:bg-bg-elevated/35 rounded cursor-pointer">
-                      <span>◇</span> PaymentService.java
+                  </div>
+
+                  <!-- Miniature Shape Spawner Matrix Grid (2x2) -->
+                  <div class="w-24 border-r border-border-default bg-bg-surface/60 flex flex-col p-xs text-left">
+                    <span class="text-[8px] font-mono uppercase tracking-wider text-text-muted mb-xxs px-xxs">Toolbench</span>
+                    <div class="grid grid-cols-2 gap-xs p-xxs">
+                      <!-- Actor Icon -->
+                      <div class="flex flex-col items-center justify-center p-xxs border border-border-default/50 rounded bg-bg-base/40">
+                        <svg class="w-3.5 h-3.5 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="12" cy="5" r="3" />
+                          <line x1="12" y1="8" x2="12" y2="14" />
+                          <line x1="8" y1="10" x2="16" y2="10" />
+                          <line x1="12" y1="14" x2="9" y2="19" />
+                          <line x1="12" y1="14" x2="15" y2="19" />
+                        </svg>
+                        <span class="text-[7px] text-text-muted uppercase font-bold mt-0.5 tracking-tighter">Actor</span>
+                      </div>
+                      <!-- Use Case Icon -->
+                      <div class="flex flex-col items-center justify-center p-xxs border border-border-default/50 rounded bg-bg-base/40">
+                        <div class="w-4 h-2.5 rounded-full border border-text-muted border-2" />
+                        <span class="text-[7px] text-text-muted uppercase font-bold mt-1 tracking-tighter">Use Case</span>
+                      </div>
+                      <!-- Package Icon -->
+                      <div class="flex flex-col items-center justify-center p-xxs border border-border-default/50 rounded bg-bg-base/40">
+                        <div class="flex flex-col items-start scale-75 origin-center">
+                          <div class="w-2.5 h-1 border-t border-l border-r border-text-muted rounded-t" />
+                          <div class="w-4 h-2.5 border border-text-muted rounded" />
+                        </div>
+                        <span class="text-[7px] text-text-muted uppercase font-bold tracking-tighter">Package</span>
+                      </div>
+                      <!-- Note Icon -->
+                      <div class="flex flex-col items-center justify-center p-xxs border border-border-default/50 rounded bg-bg-base/40">
+                        <div class="relative scale-75 origin-center">
+                          <div class="w-4 h-3 bg-text-muted/10 border border-text-muted rounded-sm" />
+                        </div>
+                        <span class="text-[7px] text-text-muted uppercase font-bold tracking-tighter">Note</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -319,53 +375,22 @@
                   </transition>
                 </div>
 
-                <!-- Right Sidebar: Inspector (hidden on mobile/tablet) -->
-                <div class="hidden lg:flex w-44 border-l border-border-default bg-bg-surface/60 flex-col p-xs select-none shrink-0 text-left">
-                  <span class="text-[9px] font-mono uppercase tracking-widest text-text-muted mb-xs px-xs">Inspector</span>
-                  <div class="flex flex-col gap-sm text-[11px] p-xs">
-                    
-                    <!-- Inspector View for Step 1 -->
-                    <template v-if="activeStep === 1">
-                      <div>
-                        <span class="text-[9px] font-mono text-text-muted block mb-xxs">Entity Type</span>
-                        <span class="font-medium text-text-primary">Class Node</span>
-                      </div>
-                      <div>
-                        <span class="text-[9px] font-mono text-text-muted block mb-xxs">Class Name</span>
-                        <div class="font-mono text-xs text-text-primary bg-bg-elevated px-xs py-xxs rounded flex items-center gap-[2px] w-full border border-border-default select-none">
-                          <span>Order</span>
-                          <span class="w-[1.5px] h-3 bg-interactive-accent cursor-blink"></span>
-                        </div>
-                      </div>
-                      <div>
-                        <span class="text-[9px] font-mono text-text-muted block mb-xxs">Visibility</span>
-                        <span class="font-medium text-text-primary">Public (+)</span>
-                      </div>
-                    </template>
-
-                    <!-- Inspector View for Step 2 -->
-                    <template v-if="activeStep === 2">
-                      <div>
-                        <span class="text-[9px] font-mono text-text-muted block mb-xxs">Relationship Type</span>
-                        <span class="font-medium text-text-primary">Composition</span>
-                      </div>
-                      <div>
-                        <span class="text-[9px] font-mono text-text-muted block mb-xxs">Source Entity</span>
-                        <span class="font-mono text-text-secondary bg-bg-elevated/40 px-xs py-xxs rounded border border-border-default block">Customer</span>
-                      </div>
-                      <div>
-                        <span class="text-[9px] font-mono text-text-muted block mb-xxs">Target Entity</span>
-                        <span class="font-mono text-text-secondary bg-bg-elevated/40 px-xs py-xxs rounded border border-border-default block">Order</span>
-                      </div>
-                    </template>
-
-                    <!-- Inspector View for Steps 3 & 4 -->
-                    <template v-else-if="activeStep === 3 || activeStep === 4">
-                      <div class="h-full flex items-center justify-center text-center py-xl">
-                        <span class="text-[10px] text-text-muted italic font-mono">Select node to inspect parameters...</span>
-                      </div>
-                    </template>
-
+                <!-- Right Sidebar: Collapsed AI Dock Rail (hidden on mobile/tablet) -->
+                <div class="hidden lg:flex w-10 border-l border-border-default bg-bg-surface/60 flex-col items-center py-4 justify-between shrink-0 select-none text-left">
+                  <!-- Upper toggle chevron button -->
+                  <div class="p-1 rounded text-text-secondary hover:bg-bg-elevated cursor-pointer">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                  </div>
+                  <!-- Rotated Text Label -->
+                  <div 
+                    class="text-[8px] font-bold uppercase tracking-widest text-text-muted font-mono whitespace-nowrap"
+                    style="writing-mode: vertical-rl; transform: rotate(180deg);"
+                  >
+                    AI Compiler
+                  </div>
+                  <!-- Pulse Status Indicator -->
+                  <div class="flex items-center justify-center">
+                    <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
                   </div>
                 </div>
 
@@ -407,6 +432,8 @@ const activeStep = ref(1)
 const rotationInterval = ref(null)
 const isPaused = ref(false)
 const stepRefs = ref([])
+const isVisible = ref(false)
+const sectionRef = ref(null)
 
 const steps = [
   {
@@ -494,6 +521,30 @@ const resumeRotation = () => {
 
 onMounted(() => {
   startRotation()
+
+  if (!('IntersectionObserver' in window)) {
+    isVisible.value = true
+    return
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          isVisible.value = true
+          observer.unobserve(entry.target)
+        }
+      })
+    },
+    {
+      threshold: 0.1
+    }
+  )
+
+  const el = sectionRef.value?.$el || sectionRef.value
+  if (el) {
+    observer.observe(el)
+  }
 })
 
 onUnmounted(() => {

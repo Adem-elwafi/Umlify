@@ -46,6 +46,7 @@ Umlify configures design tokens inside `UMLify-ui/src/style.css` using custom CS
     *   `--color-interactive-hover`: `#1d4ed8`
     *   `--color-border-default`: `rgba(0, 0, 0, 0.08)`
     *   `--color-border-elevated`: `rgba(0, 0, 0, 0.12)`
+    *   `--color-accent-aura`: `#63e`
 *   **Dark Theme Variables (`.dark`):**
     *   `--color-bg-base`: `#09090b`
     *   `--color-bg-surface`: `#18181b`
@@ -58,6 +59,7 @@ Umlify configures design tokens inside `UMLify-ui/src/style.css` using custom CS
     *   `--color-interactive-hover`: `#60a5fa`
     *   `--color-border-default`: `rgba(255, 255, 255, 0.08)`
     *   `--color-border-elevated`: `rgba(255, 255, 255, 0.12)`
+    *   `--color-accent-aura`: `#63e`
 
 ### Tailwind v4 Integration (`@theme`)
 These CSS variables are bound directly inside Tailwind v4's `@theme` directive, which compiles them into reusable utility classes (e.g., `bg-bg-base`, `text-text-primary`, `border-border-default`, `p-md`, `rounded-interactive`, etc.).
