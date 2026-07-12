@@ -107,7 +107,7 @@
               <div class="h-10 border-b border-border-default bg-bg-surface flex items-center justify-between px-md select-none shrink-0">
                 <div class="flex items-center gap-xs">
                   <span class="w-2.5 h-2.5 rounded-full bg-interactive-accent"></span>
-                  <span class="text-[10px] font-mono font-medium text-text-muted uppercase tracking-wider">Workspace / UseCases.uml</span>
+                  <span class="text-[10px] font-mono font-medium text-text-muted uppercase tracking-wider">WORKSPACE / USECASES.UML</span>
                 </div>
                 <div class="flex items-center gap-sm">
                   <span class="text-[10px] font-mono text-text-muted bg-bg-elevated px-xs py-xxs border border-border-default rounded">⌘K Actions</span>
@@ -189,21 +189,19 @@
                       :key="activeStep"
                       class="relative w-[520px] h-[340px] scale-[0.7] xs:scale-[0.8] sm:scale-90 md:scale-95 lg:scale-100 xl:scale-105 2xl:scale-115 origin-center shrink-0 transition-transform duration-350"
                     >
-                      
-                      <!-- Canvas Elements for Step 1: Create Use Cases -->
+                                           <!-- Canvas Elements for Step 1: Create Use Cases -->
                       <template v-if="activeStep === 1">
                         <!-- Left Actor: Customer -->
-                        <div class="absolute top-[110px] left-[35px] flex flex-col items-center select-none">
-                          <div class="w-10 h-10 flex items-center justify-center text-text-primary bg-bg-surface border border-border-default rounded-full shadow-sm">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                              <circle cx="12" cy="5" r="3" />
-                              <line x1="12" y1="8" x2="12" y2="14" />
-                              <line x1="8" y1="10" x2="16" y2="10" />
-                              <line x1="12" y1="14" x2="9" y2="19" />
-                              <line x1="12" y1="14" x2="15" y2="19" />
-                            </svg>
-                          </div>
-                          <span class="text-[9px] font-bold text-text-primary uppercase tracking-wider mt-1">Customer</span>
+                        <div 
+                          class="absolute select-none"
+                          :style="{
+                            left: customerEl.x + 'px',
+                            top: customerEl.y + 'px',
+                            width: customerEl.width + 'px',
+                            height: customerEl.height + 'px'
+                          }"
+                        >
+                          <Actor label="CUSTOMER" />
                         </div>
 
                         <!-- System Boundary Box -->
@@ -212,49 +210,62 @@
                         </div>
 
                         <!-- Use Case 1: Search Items -->
-                        <div class="absolute top-[60px] left-[200px] w-[140px] h-[56px] bg-bg-surface border border-border-default rounded-full shadow-sm flex items-center justify-center font-sans text-[10px] font-semibold text-text-primary select-none">
-                          Search Items
+                        <div 
+                          class="absolute select-none"
+                          :style="{
+                            left: searchItemsEl.x + 'px',
+                            top: searchItemsEl.y + 'px',
+                            width: searchItemsEl.width + 'px',
+                            height: searchItemsEl.height + 'px'
+                          }"
+                        >
+                          <UseCase label="Search Items" />
                         </div>
 
                         <!-- Use Case 2: Checkout (Highlighted Selection) -->
-                        <div class="absolute top-[170px] left-[200px] w-[140px] h-[56px] bg-bg-surface border-2 border-interactive-accent rounded-full shadow-lg flex items-center justify-center font-sans text-[10px] font-bold text-text-primary select-none">
-                          Checkout
+                        <div 
+                          class="absolute select-none"
+                          :style="{
+                            left: checkoutEl.x + 'px',
+                            top: checkoutEl.y + 'px',
+                            width: checkoutEl.width + 'px',
+                            height: checkoutEl.height + 'px'
+                          }"
+                        >
+                          <UseCase label="Checkout" :selected="true" />
                           <!-- Selection anchors indicators -->
-                          <div class="absolute -top-1 -left-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border-2 border-bg-surface"></div>
-                          <div class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border-2 border-bg-surface"></div>
-                          <div class="absolute -bottom-1 -left-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border-2 border-bg-surface"></div>
-                          <div class="absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border-2 border-bg-surface"></div>
+                          <div class="absolute -top-1 -left-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border border-bg-surface z-30"></div>
+                          <div class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border border-bg-surface z-30"></div>
+                          <div class="absolute -bottom-1 -left-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border border-bg-surface z-30"></div>
+                          <div class="absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border border-bg-surface z-30"></div>
                         </div>
                       </template>
 
                       <!-- Canvas Elements for Step 2: Connect Relationships -->
                       <template v-if="activeStep === 2">
-                        <svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-                          <!-- Dynamic Connection drawing preview line -->
-                          <line
-                            x1="75" y1="140"
-                            x2="200" y2="88"
-                            fill="none"
-                            stroke="var(--color-interactive-accent)"
-                            stroke-width="2.5"
-                            stroke-dasharray="4,2"
-                          />
-                        </svg>
+                        <!-- Real Connector line in progress -->
+                        <Connector
+                          id="showcase-conn-1-step2"
+                          :from="getConnectionPoint(customerEl, 'right')"
+                          :to="getConnectionPoint(searchItemsEl, 'left')"
+                          :fromElement="customerEl"
+                          :toElement="searchItemsEl"
+                          type="dependency"
+                        />
 
                         <!-- Left Actor: Customer -->
-                        <div class="absolute top-[110px] left-[35px] flex flex-col items-center select-none">
-                          <div class="w-10 h-10 flex items-center justify-center text-text-primary bg-bg-surface border border-border-default rounded-full shadow-sm relative">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                              <circle cx="12" cy="5" r="3" />
-                              <line x1="12" y1="8" x2="12" y2="14" />
-                              <line x1="8" y1="10" x2="16" y2="10" />
-                              <line x1="12" y1="14" x2="9" y2="19" />
-                              <line x1="12" y1="14" x2="15" y2="19" />
-                            </svg>
-                            <!-- Blue connector socket hover state -->
-                            <div class="absolute -right-1 top-[50%] -translate-y-[50%] w-2 h-2 rounded-full bg-interactive-accent ring-4 ring-interactive-accent/30 animate-pulse"></div>
-                          </div>
-                          <span class="text-[9px] font-bold text-text-primary uppercase tracking-wider mt-1">Customer</span>
+                        <div 
+                          class="absolute select-none"
+                          :style="{
+                            left: customerEl.x + 'px',
+                            top: customerEl.y + 'px',
+                            width: customerEl.width + 'px',
+                            height: customerEl.height + 'px'
+                          }"
+                        >
+                          <Actor label="CUSTOMER" />
+                          <!-- Blue connector socket hover state -->
+                          <div class="absolute -right-1 top-[50%] -translate-y-[50%] w-2.5 h-2.5 rounded-full bg-interactive-accent ring-4 ring-interactive-accent/30 animate-pulse z-30"></div>
                         </div>
 
                         <!-- System Boundary Box -->
@@ -263,53 +274,72 @@
                         </div>
 
                         <!-- Use Case 1: Search Items -->
-                        <div class="absolute top-[60px] left-[200px] w-[140px] h-[56px] bg-bg-surface border border-border-default rounded-full shadow-sm flex items-center justify-center font-sans text-[10px] font-semibold text-text-primary select-none relative">
+                        <div 
+                          class="absolute select-none"
+                          :style="{
+                            left: searchItemsEl.x + 'px',
+                            top: searchItemsEl.y + 'px',
+                            width: searchItemsEl.width + 'px',
+                            height: searchItemsEl.height + 'px'
+                          }"
+                        >
+                          <UseCase label="Search Items" />
                           <!-- Blue connector socket hover state -->
-                          <div class="absolute -left-1 top-[50%] -translate-y-[50%] w-2 h-2 rounded-full bg-interactive-accent ring-4 ring-interactive-accent/30"></div>
-                          Search Items
+                          <div class="absolute -left-1 top-[50%] -translate-y-[50%] w-2.5 h-2.5 rounded-full bg-interactive-accent ring-4 ring-interactive-accent/30 z-30"></div>
                         </div>
 
                         <!-- Use Case 2: Checkout -->
-                        <div class="absolute top-[170px] left-[200px] w-[140px] h-[56px] bg-bg-surface border border-border-default rounded-full shadow-sm flex items-center justify-center font-sans text-[10px] font-semibold text-text-primary select-none">
-                          Checkout
+                        <div 
+                          class="absolute select-none"
+                          :style="{
+                            left: checkoutEl.x + 'px',
+                            top: checkoutEl.y + 'px',
+                            width: checkoutEl.width + 'px',
+                            height: checkoutEl.height + 'px'
+                          }"
+                        >
+                          <UseCase label="Checkout" />
                         </div>
                       </template>
 
                       <!-- Canvas Elements for Step 3: Organize Automatically -->
                       <template v-if="activeStep === 3">
-                        <svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-                          <!-- Customer to Search Items -->
-                          <line
-                            x1="75" y1="140"
-                            x2="200" y2="88"
-                            class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] transition-all duration-350"
-                          />
-                          <!-- Customer to Checkout -->
-                          <line
-                            x1="75" y1="140"
-                            x2="200" y2="198"
-                            class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] transition-all duration-350"
-                          />
-                          <!-- Checkout to PayPal -->
-                          <line
-                            x1="340" y1="198"
-                            x2="435" y2="170"
-                            class="stroke-zinc-400 dark:stroke-zinc-500 fill-none stroke-[1.5px] transition-all duration-350"
-                          />
-                        </svg>
+                        <Connector
+                          id="showcase-conn-1-step3"
+                          :from="getConnectionPoint(customerEl, 'right')"
+                          :to="getConnectionPoint(searchItemsEl, 'left')"
+                          :fromElement="customerEl"
+                          :toElement="searchItemsEl"
+                          type="association"
+                        />
+                        <Connector
+                          id="showcase-conn-2-step3"
+                          :from="getConnectionPoint(customerEl, 'right')"
+                          :to="getConnectionPoint(checkoutEl, 'left')"
+                          :fromElement="customerEl"
+                          :toElement="checkoutEl"
+                          type="association"
+                        />
+                        <Connector
+                          id="showcase-conn-3-step3"
+                          :from="getConnectionPoint(checkoutEl, 'right')"
+                          :to="getConnectionPoint(paypalEl, 'left')"
+                          :fromElement="checkoutEl"
+                          :toElement="paypalEl"
+                          type="association"
+                        />
 
                         <!-- Left Actor: Customer -->
-                        <div class="absolute top-[110px] left-[35px] flex flex-col items-center select-none">
-                          <div class="w-10 h-10 flex items-center justify-center text-text-primary bg-bg-surface border border-border-default rounded-full shadow-sm">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                              <circle cx="12" cy="5" r="3" />
-                              <line x1="12" y1="8" x2="12" y2="14" />
-                              <line x1="8" y1="10" x2="16" y2="10" />
-                              <line x1="12" y1="14" x2="9" y2="19" />
-                              <line x1="12" y1="14" x2="15" y2="19" />
-                            </svg>
-                          </div>
-                          <span class="text-[9px] font-bold text-text-primary uppercase tracking-wider mt-1">Customer</span>
+                        <div 
+                          class="absolute select-none"
+                          :style="{
+                            left: customerEl.x + 'px',
+                            top: customerEl.y + 'px',
+                            width: customerEl.width + 'px',
+                            height: customerEl.height + 'px'
+                          }"
+                        >
+                          <Actor label="CUSTOMER" />
                         </div>
 
                         <!-- System Boundary Box -->
@@ -318,27 +348,42 @@
                         </div>
 
                         <!-- Use Case 1: Search Items -->
-                        <div class="absolute top-[60px] left-[200px] w-[140px] h-[56px] bg-bg-surface border border-border-default rounded-full shadow-sm flex items-center justify-center font-sans text-[10px] font-semibold text-text-primary select-none">
-                          Search Items
+                        <div 
+                          class="absolute select-none"
+                          :style="{
+                            left: searchItemsEl.x + 'px',
+                            top: searchItemsEl.y + 'px',
+                            width: searchItemsEl.width + 'px',
+                            height: searchItemsEl.height + 'px'
+                          }"
+                        >
+                          <UseCase label="Search Items" />
                         </div>
 
                         <!-- Use Case 2: Checkout -->
-                        <div class="absolute top-[170px] left-[200px] w-[140px] h-[56px] bg-bg-surface border border-border-default rounded-full shadow-sm flex items-center justify-center font-sans text-[10px] font-semibold text-text-primary select-none">
-                          Checkout
+                        <div 
+                          class="absolute select-none"
+                          :style="{
+                            left: checkoutEl.x + 'px',
+                            top: checkoutEl.y + 'px',
+                            width: checkoutEl.width + 'px',
+                            height: checkoutEl.height + 'px'
+                          }"
+                        >
+                          <UseCase label="Checkout" />
                         </div>
 
                         <!-- Right Actor: PayPal -->
-                        <div class="absolute top-[140px] right-[35px] flex flex-col items-center select-none">
-                          <div class="w-10 h-10 flex items-center justify-center text-text-primary bg-bg-surface border border-border-default rounded-full shadow-sm">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                              <circle cx="12" cy="5" r="3" />
-                              <line x1="12" y1="8" x2="12" y2="14" />
-                              <line x1="8" y1="10" x2="16" y2="10" />
-                              <line x1="12" y1="14" x2="9" y2="19" />
-                              <line x1="12" y1="14" x2="9" y2="19" />
-                            </svg>
-                          </div>
-                          <span class="text-[9px] font-bold text-text-primary uppercase tracking-wider mt-1">PayPal</span>
+                        <div 
+                          class="absolute select-none"
+                          :style="{
+                            left: paypalEl.x + 'px',
+                            top: paypalEl.y + 'px',
+                            width: paypalEl.width + 'px',
+                            height: paypalEl.height + 'px'
+                          }"
+                        >
+                          <Actor label="PAYPAL" />
                         </div>
                       </template>
 
@@ -346,22 +391,86 @@
                       <template v-if="activeStep === 4">
                         <!-- Background diagram is shown blurred -->
                         <div class="absolute inset-0 blur-[2px] opacity-40">
-                          <svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-                            <line x1="75" y1="140" x2="200" y2="88" stroke="var(--color-text-secondary)" stroke-width="1.5" />
-                            <line x1="75" y1="140" x2="200" y2="198" stroke="var(--color-text-secondary)" stroke-width="1.5" />
-                            <line x1="340" y1="198" x2="435" y2="170" stroke="var(--color-text-secondary)" stroke-width="1.5" />
-                          </svg>
-                          <div class="absolute top-[110px] left-[35px] flex flex-col items-center select-none scale-75 opacity-75">
-                            <div class="w-10 h-10 flex items-center justify-center text-text-primary bg-bg-surface border border-border-default rounded-full shadow-sm">
-                              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3" /><line x1="12" y1="8" x2="12" y2="14" /></svg>
-                            </div>
-                            <span class="text-[9px] font-bold text-text-primary mt-1">Customer</span>
+                          <Connector
+                            id="showcase-conn-1-step4"
+                            :from="getConnectionPoint(customerEl, 'right')"
+                            :to="getConnectionPoint(searchItemsEl, 'left')"
+                            :fromElement="customerEl"
+                            :toElement="searchItemsEl"
+                            type="association"
+                          />
+                          <Connector
+                            id="showcase-conn-2-step4"
+                            :from="getConnectionPoint(customerEl, 'right')"
+                            :to="getConnectionPoint(checkoutEl, 'left')"
+                            :fromElement="customerEl"
+                            :toElement="checkoutEl"
+                            type="association"
+                          />
+                          <Connector
+                            id="showcase-conn-3-step4"
+                            :from="getConnectionPoint(checkoutEl, 'right')"
+                            :to="getConnectionPoint(paypalEl, 'left')"
+                            :fromElement="checkoutEl"
+                            :toElement="paypalEl"
+                            type="association"
+                          />
+
+                          <!-- Left Actor: Customer -->
+                          <div 
+                            class="absolute select-none"
+                            :style="{
+                              left: customerEl.x + 'px',
+                              top: customerEl.y + 'px',
+                              width: customerEl.width + 'px',
+                              height: customerEl.height + 'px'
+                            }"
+                          >
+                            <Actor label="CUSTOMER" />
                           </div>
-                          <div class="absolute top-[60px] left-[200px] w-[140px] h-[56px] bg-bg-surface border border-border-default rounded-full shadow-sm flex items-center justify-center font-sans text-[10px] text-text-primary select-none opacity-75">
-                            Search Items
+
+                          <!-- System Boundary Box -->
+                          <div class="absolute top-[20px] left-[170px] w-[200px] h-[280px] border border-border-default/60 bg-bg-surface/10 rounded flex flex-col items-center p-xs shadow-sm">
+                            <span class="text-[8px] font-bold text-text-muted uppercase tracking-widest mt-1">Web Store System</span>
                           </div>
-                          <div class="absolute top-[170px] left-[200px] w-[140px] h-[56px] bg-bg-surface border border-border-default rounded-full shadow-sm flex items-center justify-center font-sans text-[10px] text-text-primary select-none opacity-75">
-                            Checkout
+
+                          <!-- Use Case 1: Search Items -->
+                          <div 
+                            class="absolute select-none"
+                            :style="{
+                              left: searchItemsEl.x + 'px',
+                              top: searchItemsEl.y + 'px',
+                              width: searchItemsEl.width + 'px',
+                              height: searchItemsEl.height + 'px'
+                            }"
+                          >
+                            <UseCase label="Search Items" />
+                          </div>
+
+                          <!-- Use Case 2: Checkout -->
+                          <div 
+                            class="absolute select-none"
+                            :style="{
+                              left: checkoutEl.x + 'px',
+                              top: checkoutEl.y + 'px',
+                              width: checkoutEl.width + 'px',
+                              height: checkoutEl.height + 'px'
+                            }"
+                          >
+                            <UseCase label="Checkout" />
+                          </div>
+
+                          <!-- Right Actor: PayPal -->
+                          <div 
+                            class="absolute select-none"
+                            :style="{
+                              left: paypalEl.x + 'px',
+                              top: paypalEl.y + 'px',
+                              width: paypalEl.width + 'px',
+                              height: paypalEl.height + 'px'
+                            }"
+                          >
+                            <Actor label="PAYPAL" />
                           </div>
                         </div>
 
@@ -404,7 +513,7 @@
                 </div>
 
                 <!-- Right Sidebar: Collapsed AI Dock Rail (hidden on mobile/tablet) -->
-                <div class="hidden lg:flex w-10 border-l border-border-default bg-bg-surface/60 flex-col items-center py-4 justify-between shrink-0 select-none text-left">
+                <div class="hidden lg:flex w-10 border-l border-border-default bg-bg-surface flex-col items-center py-4 justify-between shrink-0 select-none text-left">
                   <!-- Upper toggle chevron button -->
                   <div class="p-1 rounded text-text-secondary hover:bg-bg-elevated cursor-pointer">
                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -455,6 +564,47 @@ import Stack from './layout/Stack.vue'
 import Surface from './layout/Surface.vue'
 import Button from './Button.vue'
 import Badge from './Badge.vue'
+
+import Actor from '../Actor.vue'
+import UseCase from '../UseCase.vue'
+import Connector from '../connector.vue'
+import { getConnectionPoint } from '../../utils/connectorRouting'
+
+const customerEl = {
+  id: 'customer',
+  type: 'actor',
+  x: 35,
+  y: 110,
+  width: 80,
+  height: 120
+}
+
+const searchItemsEl = {
+  id: 'search-items',
+  type: 'usecase',
+  x: 200,
+  y: 60,
+  width: 140,
+  height: 56
+}
+
+const checkoutEl = {
+  id: 'checkout',
+  type: 'usecase',
+  x: 200,
+  y: 170,
+  width: 140,
+  height: 56
+}
+
+const paypalEl = {
+  id: 'paypal',
+  type: 'actor',
+  x: 405,
+  y: 140,
+  width: 80,
+  height: 120
+}
 
 const activeStep = ref(1)
 const rotationInterval = ref(null)

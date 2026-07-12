@@ -1,7 +1,7 @@
 <template>
   <div class="h-screen overflow-y-auto w-screen bg-transparent text-text-primary select-none scroll-smooth relative z-0">
     <!-- Ambient Gradient Background Layer -->
-    <div class="fixed inset-0 -z-10 h-full w-full bg-white [background:radial-gradient(175%_125%_at_50%_10%,#fff_50%,var(--color-accent-aura)_100%)] dark:[background:radial-gradient(175%_125%_at_50%_10%,#000_50%,var(--color-accent-aura)_100%)]"></div>
+    <div class="fixed inset-0 -z-10 h-full w-full bg-white [background:radial-gradient(160%_140%_at_50%_0%,#fff_30%,var(--color-accent-aura)_100%)] dark:[background:radial-gradient(160%_140%_at_50%_0%,#000_30%,var(--color-accent-aura)_100%)]"></div>
 
     <!-- Sticky Glassmorphic Navbar -->
     <Navbar />
