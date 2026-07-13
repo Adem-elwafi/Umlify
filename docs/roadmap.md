@@ -2,7 +2,7 @@
 ✅ Foundation
 
 # Phase 2
-🟨 Landing Page
+🟨 Landing Page (nearly complete — Features, Diagram Types, Export & Integrations, Keyboard Productivity, FAQ, Footer still open)
 
 - [x] Navbar
 - [x] Hero
@@ -15,15 +15,15 @@
 - [ ] Footer
 
 # Phase 3
-⬜ Workspace Refactor
+🟨 Workspace Refactor (ACTIVE — current engineering phase)
 
-- Toolbar
-- Sidebar
-- Canvas
-- Inspector
-- Status Bar
-- Command Palette
-- Minimap
+- [x] Toolbar
+- [x] Sidebar
+- [x] Canvas
+- [x] Status Bar
+- [x] Command Palette
+- [x] Minimap
+- [ ] Inspector
 
 # Phase 4
 ⬜ UML Engine

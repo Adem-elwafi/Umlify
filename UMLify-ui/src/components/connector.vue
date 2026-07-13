@@ -47,7 +47,7 @@
       stroke="transparent" 
       stroke-width="12" 
       class="interaction-target cursor-pointer"
-      @click.stop="diagramStore.selectedConnectionId = props.id"
+      @click.stop="diagramStore.setSelectedConnection(props.id)"
     />
     
     <!-- Path B: Visual relationship line vector -->

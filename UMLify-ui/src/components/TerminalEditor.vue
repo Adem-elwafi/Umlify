@@ -282,48 +282,43 @@ const isGenerating = ref(false)
 
 // Synchronize compile state to global status bar in diagramStore
 watch(validationWarning, (newVal) => {
-  diagramStore.compilerWarning = newVal || null;
   if (newVal) {
-    diagramStore.compilerStatus = 'warning';
+    diagramStore.setCompilerState({ warning: newVal, status: 'warning' });
   } else if (!isGenerating.value && !errorLog.value && !successMessage.value) {
-    diagramStore.compilerStatus = 'idle';
+    diagramStore.setCompilerState({ warning: null, status: 'idle' });
+  } else {
+    diagramStore.setCompilerState({ warning: null });
   }
 });
 
 watch(errorLog, (newVal) => {
-  diagramStore.compilerError = newVal || null;
   if (newVal) {
-    diagramStore.compilerStatus = 'error';
-    diagramStore.compilerMessage = newVal;
+    diagramStore.setCompilerState({ error: newVal, status: 'error', message: newVal });
   } else if (!isGenerating.value && !successMessage.value && !validationWarning.value) {
-    diagramStore.compilerStatus = 'idle';
-    diagramStore.compilerMessage = 'Ready for telemetry transmission...';
+    diagramStore.setCompilerState({ error: null, status: 'idle', message: 'Ready for telemetry transmission...' });
+  } else {
+    diagramStore.setCompilerState({ error: null });
   }
 });
 
 watch(successMessage, (newVal) => {
   if (newVal) {
-    diagramStore.compilerStatus = 'success';
-    diagramStore.compilerMessage = newVal;
+    diagramStore.setCompilerState({ status: 'success', message: newVal });
   }
 });
 
 watch(isGenerating, (newVal) => {
   if (newVal) {
-    diagramStore.compilerStatus = 'compiling';
-    diagramStore.compilerMessage = 'AI compiling and mapping vector structures...';
+    diagramStore.setCompilerState({ status: 'compiling', message: 'AI compiling and mapping vector structures...' });
   } else {
     if (errorLog.value) {
-      diagramStore.compilerStatus = 'error';
-      diagramStore.compilerMessage = errorLog.value;
+      diagramStore.setCompilerState({ status: 'error', message: errorLog.value });
     } else if (successMessage.value) {
-      diagramStore.compilerStatus = 'success';
-      diagramStore.compilerMessage = successMessage.value;
+      diagramStore.setCompilerState({ status: 'success', message: successMessage.value });
     } else if (validationWarning.value) {
-      diagramStore.compilerStatus = 'warning';
+      diagramStore.setCompilerState({ status: 'warning' });
     } else {
-      diagramStore.compilerStatus = 'idle';
-      diagramStore.compilerMessage = 'Ready for telemetry transmission...';
+      diagramStore.setCompilerState({ status: 'idle', message: 'Ready for telemetry transmission...' });
     }
   }
 });
@@ -689,7 +684,7 @@ const applyPayload = (payload) => {
       height: Number(el.height) || (normalizedType === 'actor' ? 120 : normalizedType === 'System' ? 400 : 80)
     }
     
-    diagramStore.elements.push(nodePayload)
+    diagramStore.addElement(nodePayload)
   })
 
   // 3. CONNECTIONS RESOLUTION VIA STORE ACTIONS

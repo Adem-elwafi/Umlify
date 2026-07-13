@@ -115,7 +115,7 @@
                     <path d="M18.5 9v3h-3v3" />
                   </svg>
                   <span class="text-xs font-bold text-white tracking-tight">UMLify</span>
-                  <span class="text-[8px] font-semibold bg-white/15 text-white px-1.5 py-0.2 rounded border border-white/10">v1.1</span>
+                  <span class="text-[8px] font-semibold bg-white/15 text-white px-1.5 py-0.2 rounded border border-white/10">v0.2.0-alpha</span>
                 </div>
                 <!-- Center Enterprise Menu -->
                 <div class="hidden md:flex items-center gap-3 text-[9px] font-medium text-white/80">

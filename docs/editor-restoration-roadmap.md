@@ -6,16 +6,18 @@ This document serves as the master engineering audit and restoration roadmap for
 
 ## 1. Complete Editor Deficit Inventory
 
-| Issue ID | Feature / System Affected | Severity | Refactor Origin |
+| Issue ID | Feature / System Affected | Status (as of 2026-07-13) | Refactor Origin |
 | :--- | :--- | :--- | :--- |
-| **REG-01** | Selection Highlight Outline & Perimeter Anchors | **Broken** | Tailwind CSS v4 migration |
-| **REG-02** | Marquee Selection Box & Link Drag Preview | **Broken** | Tailwind CSS v4 migration |
-| **REG-03** | Element Drag-and-Drop and Resize Controls | **Broken & Technical Debt** | Multiple event listener refactors |
-| **REG-04** | Alignment Snap Coordinates Mismatch | **Partially Implemented** | Grid spacing adjustments |
-| **REG-05** | Dark Mode Connector Label Aura | **Visually Degraded** | Dark theme variables update |
-| **REG-06** | Productive Key Shortcuts (⌘K, Duplication) | **Partially Implemented** | Key binding migrations |
-| **REG-07** | MiniMap (Thumbnail Viewport) | **Placeholder Logic** | Core shell layout refactor |
-| **REG-08** | Legacy Sidebar & Toolbar Containers | **Technical Debt** | Layer 2 primitives adoption |
+| **REG-01** | Selection Highlight Outline & Perimeter Anchors | **✅ Fixed** | Tailwind CSS v4 migration |
+| **REG-02** | Marquee Selection Box & Link Drag Preview | **✅ Fixed** | Tailwind CSS v4 migration |
+| **REG-03** | Element Drag-and-Drop and Resize Controls | **✅ Fixed** | Multiple event listener refactors |
+| **REG-04** | Alignment Snap Coordinates Mismatch | **✅ Fixed** | Grid spacing adjustments |
+| **REG-05** | Dark Mode Connector Label Aura | **✅ Fixed** | Dark theme variables update |
+| **REG-06** | Productive Key Shortcuts (⌘K, Duplication, Tab) | **✅ Fixed** | Key binding migrations |
+| **REG-07** | MiniMap (Thumbnail Viewport) | **✅ Fixed** | Core shell layout refactor |
+| **REG-08** | Legacy Sidebar & Toolbar Containers | **⚠️ Partial** | Layer 2 primitives adoption |
+
+> **Status legend:** ✅ = restored in the July 2026 remediation pass (Phases A–C). ⚠️ = partially addressed (see §4).
 
 ---
 
@@ -123,3 +125,30 @@ To restore editor functionality safely, we will execute the refactor in three pr
 8.  **Step 8: Vector Arrowheads & Clearance Routing**
     - *Action*: Standardize relationship arrow markers (`▷`, `◇`, `◆`) and refine clearance routing margins to prevent lines overlapping node corners.
     - *Goal*: Complete academic UML representation compliance.
+
+---
+
+## 4. Resolution Status (July 2026 Remediation Pass — Phases A–C)
+
+All regressions except REG-08 were fully restored in the July 2026 pass. Summary of what actually landed:
+
+- **REG-01 / REG-02 / REG-03 / REG-04 / REG-05** — Fixed across the earlier editor work and Phase B. The original `accent-violet` / `accent-blue` tokens were eliminated entirely (grep returns zero references). The 20px snap grid already matched the design system.
+  - *REG-02 caveat:* the marquee box and link-drag preview were fixed, but the **resize-handle dot** in every node component (`Actor.vue`, `UseCase.vue`, `System.vue`, `Package.vue`, `Note.vue`) still referenced the undefined `border-accent-blue` token. This was missed by the original fix and corrected in **Phase B** (rebound to `interactive-accent`).
+- **REG-06** — Fixed in **Phase C**. `Ctrl+D` duplicate was already present; the **⌘K / Ctrl+K command palette** (`CommandPalette.vue`) was built and wired through the `COMMAND_PALETTE_OPEN` FSM state, and **Tab / Shift+Tab** now cycles the active selection (canvas-focused only, never hijacks input/control focus).
+- **REG-07** — Fixed in **Phase B**. `MiniMap.vue` was already complete but never imported; it is now mounted in `Home.vue` and reflects live `elements` state.
+- **REG-08** — **Partial.** Only the editor-shell spots enumerated in the plan were rebind:
+  - Cloud-delete rows `bg-rose-600` → `bg-error`.
+  - Sidebar resizer `bg-zinc-*` → `bg-bg-elevated` / `bg-border-elevated`.
+  - `Toolbar.vue` "System Boundary" card `bg-white`/`border-zinc-*` → `bg-bg-surface`/`border-border-default`.
+  - **Not done:** the `bg-navbar-bg` / `border-bar-border` header was intentionally left as-is — those are already mapped semantic tokens (not raw hex), and rebinding to `bg-bg-surface` would break the white-on-dark branding. Also **out of scope:** the pervasive hardcoded `zinc`/`white` classes across the UML node components, `Canvas.vue` anchors, `TerminalEditor.vue`, and the auth views (`Login.vue` / `Signup.vue`). A full REG-08 sweep of those is a separate, larger effort.
+
+### Retired planning artifact: `UMLify-Editor-Engine-Refactor.json`
+
+This file was referenced in planning chats as the source of "Phase 4A–8" (centralizing drag/resize *geometry ownership* into the `InteractionEngine`), but **it was never committed to the repo** — it exists only as a chat artifact and has been retired. Its intent is folded here:
+
+- The `InteractionEngine` (`engines/interaction/`) remains a **permission gate + cursor side-effect** (FSM `transitionTo` / `is` / `canTransition` + cursor styling). It does **not** own pointer-move math.
+- Drag, resize, and connection-drag geometry still live in `Canvas.vue`. The earlier "Phase 4A/4B" goal of moving that math **into the engine layer** has **not** been started. If that architectural move is still desired, it is a future item, not a regression.
+
+### Version
+
+Current tracked version is **`v0.2.0-alpha`** (see `project-status.md` and the `Home.vue` workspace header badge, which were reconciled to match).

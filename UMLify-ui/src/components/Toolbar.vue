@@ -81,8 +81,8 @@
         draggable="true"
         @dragstart="handleDragStart($event, 'System')"
         class="group relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl cursor-grab active:cursor-grabbing active:scale-[0.98] select-none transition-all duration-150
-               bg-white border border-zinc-200/70 hover:border-zinc-300 hover:shadow-md
-               dark:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-700 dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
+               bg-bg-surface border border-border-default hover:border-border-elevated hover:shadow-md
+               dark:bg-bg-surface dark:border-border-default dark:hover:border-border-elevated dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
       >
         <!-- Rect preview -->
         <div class="w-8 h-7 rounded border-2 border-dashed border-zinc-400 dark:border-zinc-500 group-hover:border-zinc-700 dark:group-hover:border-zinc-300 transition-colors pointer-events-none shrink-0" />
@@ -161,7 +161,8 @@
     <div class="flex flex-col gap-2">
       <!-- Title input using primitive -->
       <Input
-        v-model="diagramStore.currentDiagramTitle"
+        :model-value="diagramStore.currentDiagramTitle"
+        @update:model-value="diagramStore.setDiagramTitle($event)"
         label="Title"
         placeholder="Untitled Diagram"
         customClass="h-9 px-3 py-1.5 text-xs text-text-primary border border-border-default rounded-interactive focus-visible:ring-interactive-accent"
@@ -285,7 +286,7 @@ const handleFileImport = (e) => {
     try {
       const data = JSON.parse(event.target.result);
       if (typeof diagramStore.saveToHistory === 'function') diagramStore.saveToHistory();
-      diagramStore.elements = data.elements.map(el => ({
+      diagramStore.replaceElements(data.elements.map(el => ({
         id:     el.id,
         type:   el.type,
         label:  el.label,
@@ -293,12 +294,12 @@ const handleFileImport = (e) => {
         y:      Number(el.y)      || 100,
         width:  Number(el.width)  || (el.type === 'actor' ? 80 : el.type === 'System' ? 300 : 140),
         height: Number(el.height) || (el.type === 'actor' ? 120 : el.type === 'System' ? 400 : 80),
-      }));
-      diagramStore.connections = data.connections.map(c => {
+      })));
+      diagramStore.replaceConnections(data.connections.map(c => {
         const from = diagramStore.elements.find(el => String(el.id) === String(c.from));
         const to   = diagramStore.elements.find(el => String(el.id) === String(c.to));
         return { id: c.id, from, to, fromSide: c.fromSide, toSide: c.toSide, type: c.type || 'association' };
-      }).filter(c => c.from && c.to);
+      }).filter(c => c.from && c.to));
     } catch {
       alert('Invalid JSON file.');
     }
@@ -336,8 +337,8 @@ const handleLinkSpawnerClick = () => {
 };
 
 const handleTextAnnotationClick = () => {
-  diagramStore.saveToHistory();
-  diagramStore.elements.push({ id: `note-${Date.now()}`, type: 'note', label: 'Note', x: 300, y: 200, width: 140, height: 80 });
+    diagramStore.saveToHistory();
+  diagramStore.addElement({ id: `note-${Date.now()}`, type: 'note', label: 'Note', x: 300, y: 200, width: 140, height: 80 });
 };
 
 const handleClearCanvas = () => { diagramStore.resetDiagram(); };

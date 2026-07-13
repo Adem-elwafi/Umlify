@@ -547,9 +547,9 @@ const initiateElementsDrag = (event, element) => {
   const idStr = String(element.id);
   if (!selectedElements.value.includes(idStr)) {
     if (event.ctrlKey) {
-      selectedElements.value.push(idStr);
+      diagramStore.setSelectedElements([...selectedElements.value, idStr]);
     } else {
-      selectedElements.value = [idStr];
+      diagramStore.setSelectedElements([idStr]);
     }
   }
 
@@ -646,11 +646,7 @@ const handleElementDragMove = (event) => {
         }
 
         // REACTIVE PATCH: Synchronize store state for real-time connector re-calculation
-        const el = elements.value.find(e => String(e.id) === String(item.id));
-        if (el) {
-          el.x = item.currentX;
-          el.y = item.currentY;
-        }
+        diagramStore.updateElementPosition(String(item.id), item.currentX, item.currentY);
       });
       animationFrameId = null;
     });
@@ -727,11 +723,7 @@ const handleResizeMouseMove = (event) => {
   const newHeight = Math.max(minHeight, resizeStartHeight + deltaY);
 
   // REACTIVE PATCH: Update coordinates for dynamic connector arrows update in real-time
-  const el = elements.value.find(e => String(e.id) === String(activeResizingElement.value.id));
-  if (el) {
-    el.width = newWidth;
-    el.height = newHeight;
-  }
+  diagramStore.updateElementSize(String(activeResizingElement.value.id), newWidth, newHeight);
 };
 
 const handleResizeMouseUp = () => {
@@ -789,7 +781,7 @@ function handleMouseMoveTelemetry(e) {
   const rect = canvas.getBoundingClientRect();
   const x = Math.round((e.clientX - rect.left + canvas.scrollLeft) / zoomLevel.value);
   const y = Math.round((e.clientY - rect.top + canvas.scrollTop) / zoomLevel.value);
-  diagramStore.cursorCoords = { x, y };
+  diagramStore.setCursorCoords(x, y);
 }
 
 // ==========================================
@@ -820,7 +812,7 @@ function handleCanvasMouseDown(e) {
   });
   
   if (!e.ctrlKey) {
-    selectedElements.value = [];
+    diagramStore.setSelectedElements([]);
   }
 }
 function handleCanvasMouseMove(e) {
@@ -866,8 +858,8 @@ function updateSelectionFromBox() {
       newSelection.push(String(el.id));
     }
   });
-  
-  selectedElements.value = newSelection;
+
+  diagramStore.setSelectedElements(newSelection);
 }
 
 const handleDragOver = (event) => {
@@ -906,15 +898,15 @@ const handleDrop = (event) => {
     height: defaultHeight
   };
 
-  elements.value.push(elementPayload);
+  diagramStore.addElement(elementPayload);
 };
 
 function selectConnection(id) { 
-  selectedConnectionId.value = id; 
+  diagramStore.setSelectedConnection(id); 
   interaction.transitionTo(InteractionState.CONTEXT_MENU_OPEN, { connectionId: id });
 }
 function clearSelectedConnection() { 
-  selectedConnectionId.value = null; 
+  diagramStore.setSelectedConnection(null); 
   if (interaction.is(InteractionState.CONTEXT_MENU_OPEN)) {
     interaction.reset();
   }
@@ -922,7 +914,7 @@ function clearSelectedConnection() {
 
 
 function changeSelectedConnectionType(newType) {
-  if (selectedConnection.value) selectedConnection.value.type = newType;
+  if (selectedConnection.value) diagramStore.updateConnectionType(selectedConnection.value.id, newType);
 }
 
 function getMidpointStyle(conn) {
@@ -946,12 +938,12 @@ const selectElement = (id, event) => {
 
   if (isCtrlClick) {
     if (selectedElements.value.includes(idStr)) {
-      selectedElements.value = selectedElements.value.filter(eid => eid !== idStr);
+      diagramStore.setSelectedElements(selectedElements.value.filter(eid => eid !== idStr));
     } else {
-      selectedElements.value.push(idStr);
+      diagramStore.setSelectedElements([...selectedElements.value, idStr]);
     }
   } else {
-    selectedElements.value = [idStr];
+    diagramStore.setSelectedElements([idStr]);
   }
 };
 
@@ -979,11 +971,41 @@ const handleBlur = (event) => {
 };
 
 function handleKeydown(e) {
+  // Global ⌘K / Ctrl+K toggles the command palette (works even while typing)
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    if (interaction.is(InteractionState.COMMAND_PALETTE_OPEN)) {
+      interaction.reset();
+    } else if (interaction.is(InteractionState.IDLE)) {
+      interaction.transitionTo(InteractionState.COMMAND_PALETTE_OPEN);
+    }
+    return;
+  }
+
   const active = document.activeElement;
   const isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
   
   // Keyboard protection: do not execute canvas shortcuts if editing a label
   if (isTyping || interaction.is(InteractionState.EDITING_LABEL)) return;
+
+  // Tab cycles the active selection through elements (only when the canvas surface, not a control/input, holds focus)
+  if (e.key === 'Tab') {
+    const tag = active ? active.tagName : '';
+    if (tag === 'BUTTON' || tag === 'A' || tag === 'SELECT') return; // let native focus move on controls
+    e.preventDefault();
+    const els = diagramStore.elements;
+    if (!els.length) return;
+    const sel = diagramStore.selectedElements;
+    let idx = 0;
+    if (sel.length) {
+      const cur = els.findIndex(el => String(el.id) === String(sel[0]));
+      idx = cur < 0 ? 0 : (e.shiftKey
+        ? (cur - 1 + els.length) % els.length
+        : (cur + 1) % els.length);
+    }
+    diagramStore.setSelectedElements([String(els[idx].id)]);
+    return;
+  }
 
   if (e.ctrlKey && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); return; }
   if (e.ctrlKey && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); return; }
@@ -1005,13 +1027,13 @@ function handleKeydown(e) {
           duplicate.id = `${prefix}_${now}_${index}`;
           duplicate.x = (sourceEl.x || 0) + 20;
           duplicate.y = (sourceEl.y || 0) + 20;
-          elements.value.push(duplicate);
+          diagramStore.addElement(duplicate);
           newSelectedIds.push(String(duplicate.id));
         }
       });
       
       if (newSelectedIds.length > 0) {
-        selectedElements.value = newSelectedIds;
+        diagramStore.setSelectedElements(newSelectedIds);
       }
     }
     return;
@@ -1020,7 +1042,7 @@ function handleKeydown(e) {
   if (e.key === 'Delete' || e.key === 'Backspace') {
     if (selectedElements.value.length > 0) {
       [...selectedElements.value].forEach(id => diagramStore.deleteElement(id));
-      selectedElements.value = [];
+      diagramStore.setSelectedElements([]);
     } else if (selectedConnectionId.value) {
       diagramStore.deleteConnection(selectedConnectionId.value);
       selectedConnectionId.value = null;

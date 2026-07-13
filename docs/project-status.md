@@ -41,7 +41,8 @@ This document tracks the current progress, completed milestones, active work, an
 
 ## In Progress
 
-- `[/]` Landing Page Content Assembly (Phase 7: Features Section)
+- `[/]` Landing Page content assembly — Navbar, Hero, and Interactive Showcase complete; Features, Diagram Types, Export & Integrations, Keyboard Productivity, FAQ, and Footer still open.
+- `[/]` Workspace Refactor / Editor Restoration (ACTIVE) — REG-01–07 restored, REG-08 partially; ⌘K command palette and Tab selection added; MiniMap mounted.
 
 ---
 
@@ -79,7 +80,7 @@ The following components are marked as production-ready and locked against redes
 
 ## Next Immediate Goal
 
-**Build the Features / Product Showcase Section:** A high-impact, grid-driven display presenting Umlify's workspace capabilities (auto-layout rendering, keyboard shortcuts, exports) using our `Section`, `Grid`, and `Card` components.
+**Finish the Landing Page sections** (Features / Product Showcase, Diagram Types, Export & Integrations, Keyboard Productivity, FAQ, Footer) using `Section`, `Grid`, and `Card`, then complete the `Inspector` panel and any remaining `REG-08` shell cleanup to reach a consistent v1.0.
 
 ---
 

@@ -22,6 +22,8 @@ export const useDiagramStore = defineStore('diagram', () => {
   // Compiler / Telemetry states
   const compilerStatus = ref('idle');
   const compilerMessage = ref('Ready for telemetry transmission...');
+  const compilerWarning = ref(null);
+  const compilerError = ref(null);
   const cursorCoords = ref({ x: 0, y: 0 });
 
   // Global Modal Configuration
@@ -337,6 +339,76 @@ export const useDiagramStore = defineStore('diagram', () => {
     isDirty.value = true;
   };
 
+  // ==========================================
+  // 🔒 STATE-INTEGRITY ACTIONS (Phase A)
+  // All store-owned mutations below go through explicit actions so that
+  // Pinia devtools, time-travel, and undo/redo history can track them.
+  // =========================================
+
+  const updateConnectionType = (id, type) => {
+    const conn = connections.value.find(c => String(c.id) === String(id));
+    if (conn) conn.type = type;
+  };
+
+  const setSelectedConnection = (id) => {
+    selectedConnectionId.value = id || null;
+  };
+
+  const setSelectedElements = (ids) => {
+    selectedElements.value = Array.isArray(ids) ? ids.map(String) : [];
+  };
+
+  const updateElementPosition = (id, x, y) => {
+    const el = elements.value.find(e => String(e.id) === String(id));
+    if (el) { el.x = x; el.y = y; }
+  };
+
+  const updateElementSize = (id, width, height) => {
+    const el = elements.value.find(e => String(e.id) === String(id));
+    if (el) { el.width = width; el.height = height; }
+  };
+
+  const updateElementLabel = (id, label) => {
+    const el = elements.value.find(e => String(e.id) === String(id));
+    if (el) el.label = label;
+  };
+
+  const updateElementZIndex = (id, zIndex) => {
+    const el = elements.value.find(e => String(e.id) === String(id));
+    if (el) el.zIndex = zIndex;
+  };
+
+  const setCursorCoords = (x, y) => {
+    cursorCoords.value = { x, y };
+  };
+
+  const addElement = (el) => {
+    elements.value.push(el);
+  };
+
+  const setDiagramTitle = (title) => {
+    currentDiagramTitle.value = title;
+  };
+
+  const replaceElements = (newElements) => {
+    elements.value = newElements;
+  };
+
+  const replaceConnections = (newConnections) => {
+    connections.value = newConnections;
+  };
+
+  const setCompilerState = ({ status, message, warning, error } = {}) => {
+    if (status !== undefined) compilerStatus.value = status;
+    if (message !== undefined) compilerMessage.value = message;
+    if (warning !== undefined) compilerWarning.value = warning;
+    if (error !== undefined) compilerError.value = error;
+  };
+
+  const setZoomLevel = (level) => {
+    zoomLevel.value = level;
+  };
+
   return {
     elements,
     connections,
@@ -375,6 +447,22 @@ export const useDiagramStore = defineStore('diagram', () => {
     deleteConnection,
     compilerStatus,
     compilerMessage,
-    cursorCoords
+    compilerWarning,
+    compilerError,
+    cursorCoords,
+    updateConnectionType,
+    setSelectedConnection,
+    setSelectedElements,
+    updateElementPosition,
+    updateElementSize,
+    updateElementLabel,
+    updateElementZIndex,
+    setCursorCoords,
+    addElement,
+    setDiagramTitle,
+    replaceElements,
+    replaceConnections,
+    setCompilerState,
+    setZoomLevel
   };
 });

@@ -15,7 +15,7 @@
           </svg>
           
           <span class="font-bold tracking-tight text-white text-lg">UMLify</span>
-          <span class="text-[10px] font-semibold bg-white/15 text-white px-1.5 py-0.5 rounded-md border border-white/10">v1.1</span>
+          <span class="text-[10px] font-semibold bg-white/15 text-white px-1.5 py-0.5 rounded-md border border-white/10">v0.2.0-alpha</span>
         </div>
 
         <!-- Center Enterprise Menu -->
@@ -75,7 +75,8 @@
             <div class="flex items-center gap-2">
               <span class="font-bold text-[10px] text-text-muted uppercase font-mono tracking-wider">Name:</span>
               <input 
-                v-model="inspectorElement.label" 
+                :value="inspectorElement.label" 
+                @input="diagramStore.updateElementLabel(inspectorElement.id, $event.target.value)"
                 type="text" 
                 class="px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-interactive-accent/45 bg-bg-base border-border-default text-text-primary w-48 shadow-xs"
                 placeholder="Element Name"
@@ -90,7 +91,8 @@
               <div class="flex items-center gap-1.5">
                 <span class="font-bold text-[10px] text-text-muted uppercase font-mono tracking-wider">X:</span>
                 <input 
-                  v-model.number="inspectorElement.x" 
+                  :value="inspectorElement.x" 
+                  @input="diagramStore.updateElementPosition(inspectorElement.id, Number($event.target.value), inspectorElement.y)"
                   type="number" 
                   class="w-16 px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-interactive-accent/45 bg-bg-base border-border-default text-text-primary shadow-xs"
                 />
@@ -98,7 +100,8 @@
               <div class="flex items-center gap-1.5">
                 <span class="font-bold text-[10px] text-text-muted uppercase font-mono tracking-wider">Y:</span>
                 <input 
-                  v-model.number="inspectorElement.y" 
+                  :value="inspectorElement.y" 
+                  @input="diagramStore.updateElementPosition(inspectorElement.id, inspectorElement.x, Number($event.target.value))"
                   type="number" 
                   class="w-16 px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-interactive-accent/45 bg-bg-base border-border-default text-text-primary shadow-xs"
                 />
@@ -112,7 +115,8 @@
               <div class="flex items-center gap-1.5">
                 <span class="font-bold text-[10px] text-text-muted uppercase font-mono tracking-wider">W:</span>
                 <input 
-                  v-model.number="inspectorElement.width" 
+                  :value="inspectorElement.width" 
+                  @input="diagramStore.updateElementSize(inspectorElement.id, Number($event.target.value), inspectorElement.height)"
                   type="number" 
                   class="w-16 px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-interactive-accent/45 bg-bg-base border-border-default text-text-primary shadow-xs"
                   placeholder="Auto"
@@ -121,7 +125,8 @@
               <div class="flex items-center gap-1.5">
                 <span class="font-bold text-[10px] text-text-muted uppercase font-mono tracking-wider">H:</span>
                 <input 
-                  v-model.number="inspectorElement.height" 
+                  :value="inspectorElement.height" 
+                  @input="diagramStore.updateElementSize(inspectorElement.id, inspectorElement.width, Number($event.target.value))"
                   type="number" 
                   class="w-16 px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-interactive-accent/45 bg-bg-base border-border-default text-text-primary shadow-xs"
                   placeholder="Auto"
@@ -136,7 +141,8 @@
               <div class="flex items-center gap-1.5">
                 <span class="font-bold text-[10px] text-text-muted uppercase font-mono tracking-wider">Layer:</span>
                 <input 
-                  v-model.number="inspectorElement.zIndex" 
+                  :value="inspectorElement.zIndex" 
+                  @input="diagramStore.updateElementZIndex(inspectorElement.id, Number($event.target.value))"
                   type="number" 
                   class="w-16 px-3 py-1.5 text-sm transition-all duration-200 border rounded-xl outline-none focus:ring-2 focus:ring-interactive-accent/45 bg-bg-base border-border-default text-text-primary shadow-xs"
                   placeholder="Auto"
@@ -319,7 +325,7 @@
                   <div 
                     v-for="diag in diagramStore.savedDiagramsList" 
                     :key="diag.id"
-                    class="relative h-[60px] mx-1 rounded-xl overflow-hidden bg-rose-600 shadow-sm"
+                    class="relative h-[60px] mx-1 rounded-xl overflow-hidden bg-error shadow-sm"
                   >
                     <!-- Background Layer (Delete Button) -->
                     <div class="absolute inset-0 flex justify-end">
@@ -366,7 +372,7 @@
           <!-- Resizable Sidebar Drag Handle inside left column at the right edge -->
           <div 
             @mousedown="startResize"
-            class="absolute top-0 right-0 w-[2px] cursor-col-resize bg-transparent hover:bg-zinc-400/20 active:bg-zinc-450/40 transition-colors h-full z-45 select-none"
+            class="absolute top-0 right-0 w-[2px] cursor-col-resize bg-transparent hover:bg-bg-elevated active:bg-border-elevated transition-colors h-full z-45 select-none"
           ></div>
         </div>
       </div>
@@ -377,6 +383,8 @@
         <div class="flex-grow w-full h-full relative bg-bg-canvas transition-all duration-300 overflow-hidden">
           <Canvas :onLogout="handleSignOutFlow" />
         </div>
+        <!-- MiniMap overlay (bottom-right of the canvas viewport) -->
+        <MiniMap />
       </div>
 
       <!-- Right Column: AI Terminal Outer Wrapper -->
@@ -397,6 +405,9 @@
 
     <!-- Bottom: Unified Status Ribbon -->
     <StatusBar />
+
+    <!-- Global Command Palette (⌘K / Ctrl+K) -->
+    <CommandPalette @toggle-theme="toggleDarkMode" />
 
     <!-- Global Confirmation Modal Wrapper -->
     <transition name="fade">
@@ -438,9 +449,11 @@ import { useAuthStore } from '../stores/authStore';
 import Canvas from '../components/Canvas.vue';
 import Toolbar from '../components/Toolbar.vue';
 import TerminalEditor from '../components/TerminalEditor.vue';
+import MiniMap from '../components/MiniMap.vue';
 import Stack from '../components/ui/layout/Stack.vue';
 import Surface from '../components/ui/layout/Surface.vue';
 import StatusBar from '../components/ui/layout/StatusBar.vue';
+import CommandPalette from '../components/CommandPalette.vue';
 import { 
   Folder, 
   Terminal, 
@@ -507,12 +520,10 @@ const toggleDarkMode = () => {
 const triggerQuickSave = async () => {
   try {
     await diagramStore.saveCurrentDiagram(diagramStore.currentDiagramTitle || 'Untitled Diagram');
-    diagramStore.compilerStatus = 'success';
-    diagramStore.compilerMessage = 'Telemetry backup save transmission succeeded.';
+    diagramStore.setCompilerState({ status: 'success', message: 'Telemetry backup save transmission succeeded.' });
     setTimeout(() => {
       if (diagramStore.compilerStatus === 'success' && diagramStore.compilerMessage.includes('backup')) {
-        diagramStore.compilerStatus = 'idle';
-        diagramStore.compilerMessage = 'Ready for telemetry transmission...';
+        diagramStore.setCompilerState({ status: 'idle', message: 'Ready for telemetry transmission...' });
       }
     }, 3000);
   } catch (err) {
@@ -542,23 +553,23 @@ function adjustLayer(delta) {
     }
     currentZ = baseZIndex;
   }
-  inspectorElement.value.zIndex = currentZ + delta;
+  diagramStore.updateElementZIndex(inspectorElement.value.id, currentZ + delta);
 }
 
 function zoomIn() {
   if (diagramStore.zoomLevel < 2) {
-    diagramStore.zoomLevel = Math.min(2, diagramStore.zoomLevel + 0.1);
+    diagramStore.setZoomLevel(Math.min(2, diagramStore.zoomLevel + 0.1));
   }
 }
 
 function zoomOut() {
   if (diagramStore.zoomLevel > 0.5) {
-    diagramStore.zoomLevel = Math.max(0.5, diagramStore.zoomLevel - 0.1);
+    diagramStore.setZoomLevel(Math.max(0.5, diagramStore.zoomLevel - 0.1));
   }
 }
 
 function resetZoom() {
-  diagramStore.zoomLevel = 1;
+  diagramStore.setZoomLevel(1);
 }
 
 const handleBeforeUnload = (event) => {
