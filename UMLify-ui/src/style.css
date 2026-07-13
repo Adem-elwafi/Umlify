@@ -19,8 +19,8 @@
   --color-border-default: rgba(0, 0, 0, 0.08);
   --color-border-elevated: rgba(0, 0, 0, 0.12);
 
-  --color-navbar-bg: #6d28d9;
-  --color-statusbar-bg: #4c1d95;
+  --color-navbar-bg: #0b071a;
+  --color-statusbar-bg: #06030d;
   --color-bar-border: rgba(255, 255, 255, 0.15);
   --color-grid-line: rgba(0, 0, 0, 0.04);
   --color-accent-aura: #63e;
@@ -43,8 +43,8 @@
   --color-border-default: rgba(255, 255, 255, 0.08);
   --color-border-elevated: rgba(255, 255, 255, 0.12);
 
-  --color-navbar-bg: #5b21b6;
-  --color-statusbar-bg: #2e0854;
+  --color-navbar-bg: #0b071a;
+  --color-statusbar-bg: #06030d;
   --color-bar-border: rgba(255, 255, 255, 0.15);
   --color-grid-line: rgba(255, 255, 255, 0.04);
   --color-accent-aura: #63e;

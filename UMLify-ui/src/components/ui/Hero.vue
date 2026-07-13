@@ -104,7 +104,7 @@
             <div class="h-10 border-b border-bar-border bg-navbar-bg text-zinc-100 flex items-center justify-between px-sm select-none shrink-0">
               <!-- Left Branding -->
               <div class="flex items-center gap-1.5">
-                <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-4 h-4 text-interactive-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="2" y="3" width="7" height="6" rx="1" />
                   <rect x="15" y="3" width="7" height="6" rx="1" />
                   <rect x="8.5" y="15" width="7" height="6" rx="1" />
@@ -179,7 +179,7 @@
               <!-- Main Canvas area with dot grid and UML diagrams -->
               <div class="flex-grow sheet-grid relative overflow-hidden flex items-center justify-center p-sm">
                 <!-- Wrapper scaled down for responsiveness to fit all viewports without clipping -->
-                <div class="relative w-[640px] h-[480px] scale-[0.55] xs:scale-[0.6] sm:scale-[0.7] md:scale-[0.8] lg:scale-[0.85] xl:scale-[0.95] 2xl:scale-[1.05] origin-center shrink-0">
+                <div class="relative w-[800px] h-[480px] scale-[0.38] xs:scale-[0.42] sm:scale-[0.5] md:scale-[0.56] lg:scale-[0.62] xl:scale-[0.72] 2xl:scale-[0.82] origin-center shrink-0">
                   
                   <!-- Real Connector lines -->
                   <Connector
@@ -304,16 +304,16 @@ import { getConnectionPoint } from '../../utils/connectorRouting'
 
 const elements = [
   // System Boundary
-  { id: 'app-boundary', type: 'system', label: 'local legends App', x: 180, y: 40, width: 280, height: 380 },
+  { id: 'app-boundary', type: 'system', label: 'local legends App', x: 220, y: 40, width: 360, height: 380 },
 
   // Actors (External/Internal)
-  { id: 'consumer', type: 'actor', label: 'Content Consumer', x: 40, y: 170, width: 80, height: 120 },
-  { id: 'mongodb', type: 'actor', label: 'MongoDB Atlas', x: 520, y: 170, width: 80, height: 120 },
+  { id: 'consumer', type: 'actor', label: 'Content Consumer', x: 60, y: 170, width: 80, height: 120 },
+  { id: 'mongodb', type: 'actor', label: 'MongoDB Atlas', x: 660, y: 170, width: 80, height: 120 },
 
   // Use Cases (Functional)
-  { id: 'geolocate', type: 'usecase', label: 'GeoLocate User', x: 230, y: 80, width: 180, height: 60 },
-  { id: 'read-story', type: 'usecase', label: 'Read A Story', x: 230, y: 200, width: 180, height: 60 },
-  { id: 'query-data', type: 'usecase', label: 'Query Story Data', x: 230, y: 320, width: 180, height: 60 }
+  { id: 'geolocate', type: 'usecase', label: 'GeoLocate User', x: 310, y: 80, width: 180, height: 60 },
+  { id: 'read-story', type: 'usecase', label: 'Read A Story', x: 310, y: 200, width: 180, height: 60 },
+  { id: 'query-data', type: 'usecase', label: 'Query Story Data', x: 310, y: 320, width: 180, height: 60 }
 ]
 
 const connectionsList = [

@@ -6,7 +6,7 @@
       <Surface as="header" depth="1" :border="false" customClass="h-14 w-full flex justify-between items-center px-6 border-b border-bar-border bg-navbar-bg shadow-xs">
         <!-- Left Branding -->
         <div class="flex items-center gap-2.5 select-none text-white">
-          <svg class="w-6 h-6 text-white transition-colors duration-200" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg class="w-6 h-6 text-interactive-accent transition-colors duration-200" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="2" y="3" width="7" height="6" rx="1.5" class="stroke-current" stroke-width="2" stroke-linejoin="round"/>
             <rect x="15" y="3" width="7" height="6" rx="1.5" class="stroke-current" stroke-width="2" stroke-linejoin="round"/>
             <rect x="8.5" y="15" width="7" height="6" rx="1.5" class="stroke-current" stroke-width="2" stroke-linejoin="round"/>

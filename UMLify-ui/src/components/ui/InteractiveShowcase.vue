@@ -107,7 +107,7 @@
               <div class="h-10 border-b border-bar-border bg-navbar-bg text-zinc-100 flex items-center justify-between px-sm select-none shrink-0">
                 <!-- Left Branding -->
                 <div class="flex items-center gap-1.5">
-                  <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg class="w-4 h-4 text-interactive-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="2" y="3" width="7" height="6" rx="1" />
                     <rect x="15" y="3" width="7" height="6" rx="1" />
                     <rect x="8.5" y="15" width="7" height="6" rx="1" />
@@ -187,7 +187,7 @@
                     <!-- Wrapper scaled down for responsiveness -->
                     <div 
                       :key="activeStep"
-                      class="relative w-[640px] h-[480px] scale-[0.5] xs:scale-[0.55] sm:scale-[0.65] md:scale-[0.75] lg:scale-[0.8] xl:scale-[0.9] 2xl:scale-[1.0] origin-center shrink-0 transition-transform duration-350"
+                      class="relative w-[800px] h-[480px] scale-[0.36] xs:scale-[0.4] sm:scale-[0.46] md:scale-[0.52] lg:scale-[0.58] xl:scale-[0.68] 2xl:scale-[0.78] origin-center shrink-0 transition-transform duration-350"
                     >
                       <div :class="{ 'blur-[2px] opacity-40': activeStep === 4 }" class="absolute inset-0">
                         
@@ -379,16 +379,16 @@ import { getConnectionPoint } from '../../utils/connectorRouting'
 
 const elements = [
   // System Boundary
-  { id: 'app-boundary', type: 'system', label: 'local legends App', x: 180, y: 40, width: 280, height: 380 },
+  { id: 'app-boundary', type: 'system', label: 'local legends App', x: 220, y: 40, width: 360, height: 380 },
 
   // Actors (External/Internal)
-  { id: 'consumer', type: 'actor', label: 'Content Consumer', x: 40, y: 170, width: 80, height: 120 },
-  { id: 'mongodb', type: 'actor', label: 'MongoDB Atlas', x: 520, y: 170, width: 80, height: 120 },
+  { id: 'consumer', type: 'actor', label: 'Content Consumer', x: 60, y: 170, width: 80, height: 120 },
+  { id: 'mongodb', type: 'actor', label: 'MongoDB Atlas', x: 660, y: 170, width: 80, height: 120 },
 
   // Use Cases (Functional)
-  { id: 'geolocate', type: 'usecase', label: 'GeoLocate User', x: 230, y: 80, width: 180, height: 60 },
-  { id: 'read-story', type: 'usecase', label: 'Read A Story', x: 230, y: 200, width: 180, height: 60 },
-  { id: 'query-data', type: 'usecase', label: 'Query Story Data', x: 230, y: 320, width: 180, height: 60 }
+  { id: 'geolocate', type: 'usecase', label: 'GeoLocate User', x: 310, y: 80, width: 180, height: 60 },
+  { id: 'read-story', type: 'usecase', label: 'Read A Story', x: 310, y: 200, width: 180, height: 60 },
+  { id: 'query-data', type: 'usecase', label: 'Query Story Data', x: 310, y: 320, width: 180, height: 60 }
 ]
 
 const connectionsList = [
