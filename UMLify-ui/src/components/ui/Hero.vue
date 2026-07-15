@@ -1,5 +1,22 @@
 <template>
-  <Section ref="sectionRef" spacing="xl" custom-class="flex flex-col justify-center min-h-[calc(100vh-56px)] pb-lg lg:pb-xl">
+  <Section ref="sectionRef" spacing="xl" custom-class="flex flex-col justify-center min-h-[calc(100vh-56px)] pb-lg lg:pb-xl isolate">
+    <!-- Grainient animated background layer (hero only) -->
+    <div class="absolute inset-0 -z-10 pointer-events-none">
+      <Grainient
+        color1="#8b5cf6"
+        color2="#6633ee"
+        color3="#0b071a"
+        :time-speed="0.2"
+        :warp-strength="0.8"
+        :warp-speed="1.5"
+        :warp-amplitude="45"
+        :grain-amount="0.08"
+        :contrast="1.25"
+        :saturation="1.1"
+        :zoom="1.0"
+      />
+    </div>
+    <div class="relative z-10 w-full">
     <Container size="2xl">
       <Grid cols="12" colsTablet="12" colsMobile="1" gap="xl" align="center" custom-class="items-stretch">
         
@@ -78,28 +95,15 @@
 
         <!-- Right Column: Workspace Editor Preview -->
         <div
-          class="col-span-12 lg:col-span-7 flex items-stretch min-h-[300px] md:min-h-[360px] lg:min-h-[400px] xl:min-h-[440px] 2xl:min-h-[460px] transition-all duration-350 ease-tactile transform"
+          class="col-span-12 lg:col-span-7 flex items-stretch min-h-[220px] md:min-h-[260px] lg:min-h-[300px] xl:min-h-[340px] 2xl:min-h-[360px] transition-all duration-350 ease-tactile transform"
           :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
           style="transition-delay: 600ms;"
         >
           <Surface
             depth="2"
             radius="lg"
-            class="w-full h-full flex flex-col overflow-hidden border border-border-default bg-bg-surface/40 shadow-2xl relative"
+            class="w-full h-full flex flex-col overflow-hidden border border-border-default bg-bg-surface/20 shadow-2xl relative"
           >
-            <!-- 1px Animated Border Sweep (GPU accelerated) -->
-            <svg class="absolute inset-0 w-full h-full pointer-events-none fill-none z-30" xmlns="http://www.w3.org/2000/svg">
-              <rect
-                x="0.5"
-                y="0.5"
-                width="calc(100% - 1px)"
-                height="calc(100% - 1px)"
-                rx="16"
-                pathLength="100"
-                class="stroke-transparent"
-                :class="{ 'animate-border-sweep': isVisible }"
-              />
-            </svg>
             <!-- Mock Workspace Header (replicates Home.vue) -->
             <div class="h-10 border-b border-bar-border bg-navbar-bg text-zinc-100 flex items-center justify-between px-sm select-none shrink-0">
               <!-- Left Branding -->
@@ -283,6 +287,7 @@
 
       </Grid>
     </Container>
+    </div>
   </Section>
 </template>
 
@@ -296,6 +301,7 @@ import Stack from './layout/Stack.vue'
 import Surface from './layout/Surface.vue'
 import Button from './Button.vue'
 import Badge from './Badge.vue'
+import Grainient from '../Grainient.vue'
 
 import Actor from '../Actor.vue'
 import UseCase from '../UseCase.vue'
