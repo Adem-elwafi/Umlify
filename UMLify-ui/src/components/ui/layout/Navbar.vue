@@ -1,15 +1,26 @@
 <template>
+  <!--
+    INTENTIONAL behavior (do not "fix" back to the original spec):
+    On the landing route (/) the navbar is SOLID at the top of the page and becomes
+    TRANSPARENT once the user scrolls (overHero + isScrolled). This was reviewed and
+    explicitly kept on purpose. Editor/auth views never go transparent (solid always).
+  -->
   <header
     class="sticky top-0 w-full border-b transition-all duration-350 ease-tactile z-navigation transform"
     :class="[
-      isScrolled 
-        ? 'bg-bg-base/95 backdrop-blur-lg border-border-elevated shadow-sm' 
-        : 'bg-bg-base/70 backdrop-blur-md border-border-default',
+      isSolid
+        ? 'bg-bg-base/95 backdrop-blur-lg border-border-elevated shadow-sm'
+        : 'bg-transparent backdrop-blur-sm border-transparent',
       isMounted 
         ? 'opacity-100 translate-y-0' 
         : 'opacity-0 -translate-y-4'
     ]"
   >
+    <!-- Contrast scrim: only shown while the nav sits transparent over the animated hero background -->
+    <div
+      v-if="!isSolid && overHero"
+      class="absolute inset-x-0 top-full h-16 bg-gradient-to-b from-black/25 to-transparent pointer-events-none"
+    ></div>
     <Container size="2xl">
       <div class="h-14 flex items-center justify-between">
         
@@ -107,30 +118,64 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import Container from './Container.vue'
 import Button from '../Button.vue'
 
 import { onMounted, onUnmounted } from 'vue'
 
 const router = useRouter()
+const route = useRoute()
 const isMobileMenuOpen = ref(false)
 const isScrolled = ref(false)
 const isMounted = ref(false)
 
-const handleScroll = () => {
-  isScrolled.value = window.scrollY > 12
+// Only apply the transparent-over-hero behavior on the landing route (/).
+// Editor/auth views keep the solid navbar always.
+const overHero = ref(false)
+
+const computeOverHero = () => {
+  const hero = document.getElementById('hero')
+  if (!hero) {
+    overHero.value = false
+    return
+  }
+  const rect = hero.getBoundingClientRect()
+  overHero.value = rect.top <= 12 && rect.bottom > 12
 }
 
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 12
+  computeOverHero()
+}
+
+// Solid at the top of the page; transparent after scrolling (intentional, see header comment).
+// Route-gated: off the landing route the navbar is always solid.
+const isSolid = computed(() => {
+  if (route.path !== '/') return true
+  if (!overHero.value) return true
+  return isScrolled.value
+})
+
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  computeOverHero()
   requestAnimationFrame(() => {
     setTimeout(() => {
       isMounted.value = true
     }, 50)
   })
 })
+
+// Recompute hero overlap when navigating between routes (e.g. back to /).
+watch(
+  () => route.path,
+  () => {
+    isScrolled.value = window.scrollY > 12
+    computeOverHero()
+  }
+)
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)

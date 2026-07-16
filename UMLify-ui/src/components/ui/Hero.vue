@@ -1,5 +1,5 @@
 <template>
-  <Section ref="sectionRef" spacing="xl" custom-class="flex flex-col justify-center min-h-[calc(100vh-56px)] pb-lg lg:pb-xl isolate">
+  <Section id="hero" ref="sectionRef" spacing="xl" custom-class="flex flex-col justify-center min-h-[calc(100vh-56px)] pb-lg lg:pb-xl isolate">
     <!-- Grainient animated background layer (hero only) -->
     <div class="absolute inset-0 -z-10 pointer-events-none">
       <Grainient
@@ -18,92 +18,71 @@
     </div>
     <div class="relative z-10 w-full">
     <Container size="2xl">
-      <Grid cols="12" colsTablet="12" colsMobile="1" gap="xl" align="center" custom-class="items-stretch">
+      <!-- Centered text block: Badge -> Headline -> Paragraph -> CTA -->
+      <Stack gap="lg" align="center" class="text-center max-w-2xl mx-auto">
         
-        <!-- Left Column: Content Content -->
-        <div class="col-span-12 lg:col-span-5 flex flex-col justify-center">
-          <Stack gap="lg" align="start">
-            
-            <!-- Product Badge -->
-            <Badge
-              variant="accent"
-              class="transition-all duration-350 ease-tactile transform"
-              :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
-              style="transition-delay: 100ms;"
-            >
-              Professional UML Editor
-            </Badge>
-
-            <!-- Headline -->
-            <h1
-              class="text-4xl lg:text-5xl font-bold tracking-tight text-text-primary leading-[1.1] w-full text-left transition-all duration-350 ease-tactile transform"
-              :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
-              style="transition-delay: 200ms;"
-            >
-              The fastest way to design professional UML diagrams.
-            </h1>
-
-            <!-- Supporting Paragraph -->
-            <p
-              class="text-base text-text-secondary leading-relaxed max-w-xl w-full text-left transition-all duration-350 ease-tactile transform"
-              :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
-              style="transition-delay: 300ms;"
-            >
-              Create, edit, and export professional UML diagrams directly in your browser. Umlify combines an intuitive, keyboard-driven workspace with auto-routing layouts to speed up system design.
-            </p>
-
-            <!-- CTA Row -->
-            <Stack
-              direction="row"
-              gap="md"
-              align="center"
-              wrap
-              class="w-full justify-start transition-all duration-350 ease-tactile transform"
-              :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
-              style="transition-delay: 400ms;"
-            >
-              <Button variant="primary" @click="handlePrimaryCTA">
-                Launch Editor
-              </Button>
-              <Button variant="secondary" @click="handleSecondaryCTA">
-                Explore Features
-              </Button>
-            </Stack>
-
-            <!-- Trust Row -->
-            <div
-              class="pt-md w-full border-t border-border-default/50 text-left transition-all duration-350 ease-tactile transform"
-              :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
-              style="transition-delay: 500ms;"
-            >
-              <span class="text-xxs font-mono uppercase tracking-widest text-zinc-800 dark:text-zinc-300 font-medium block mb-xs">
-                Engineered for speed, compliance, and workflow integration
-              </span>
-              <div class="flex flex-wrap items-center gap-sm text-zinc-800 dark:text-zinc-300 text-xs font-medium">
-                <span>✓ UML 2.5 Compliance</span>
-                <span class="text-border-default/85">•</span>
-                <span>✓ Auto-Layout Snapping</span>
-                <span class="text-border-default/85">•</span>
-                <span>✓ Instant SVG Export</span>
-                <span class="text-border-default/85">•</span>
-                <span>✓ Keyboard Shortcuts</span>
-              </div>
-            </div>
-            
-          </Stack>
-        </div>
-
-        <!-- Right Column: Workspace Editor Preview -->
-        <div
-          class="col-span-12 lg:col-span-7 flex items-stretch min-h-[220px] md:min-h-[260px] lg:min-h-[300px] xl:min-h-[340px] 2xl:min-h-[360px] transition-all duration-350 ease-tactile transform"
+        <!-- Product Badge -->
+        <Badge
+          variant="accent"
+          class="backdrop-blur-sm bg-white/15 text-white border border-white/25 dark:bg-white/10 dark:text-white dark:border-white/20 transition-all duration-350 ease-tactile transform"
           :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
-          style="transition-delay: 600ms;"
+          style="transition-delay: 100ms;"
         >
-          <Surface
-            depth="2"
-            radius="lg"
-            class="w-full h-full flex flex-col overflow-hidden border border-border-default bg-bg-surface/20 shadow-2xl relative"
-          >
+          Professional UML Editor
+        </Badge>
+
+        <!-- Headline -->
+        <h1
+          class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] w-full text-center text-[#f5f3ff] dark:text-[#f5f3ff] [text-shadow:0_1px_18px_rgba(0,0,0,0.28)] transition-all duration-350 ease-tactile transform"
+          :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+          style="transition-delay: 200ms;"
+        >
+          The fastest way to design professional UML diagrams.
+        </h1>
+
+        <!-- Supporting Paragraph -->
+        <p
+          class="text-base md:text-lg leading-relaxed max-w-xl w-full text-center text-[#e9e6fb] dark:text-[#e9e6fb] [text-shadow:0_1px_14px_rgba(0,0,0,0.22)] transition-all duration-350 ease-tactile transform"
+          :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+          style="transition-delay: 300ms;"
+        >
+          Create, edit, and export professional UML diagrams directly in your browser. Umlify combines an intuitive, keyboard-driven workspace with auto-routing layouts to speed up system design.
+        </p>
+
+        <!-- CTA Row -->
+        <Stack
+          direction="row"
+          gap="md"
+          align="center"
+          justify="center"
+          wrap
+          class="w-full justify-center transition-all duration-350 ease-tactile transform"
+          :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+          style="transition-delay: 400ms;"
+        >
+          <Button variant="primary" @click="handlePrimaryCTA">
+            Launch Editor
+          </Button>
+          <Button variant="secondary" @click="handleSecondaryCTA">
+            Explore Features
+          </Button>
+        </Stack>
+      </Stack>
+
+      <!-- Spacer between text block and preview -->
+      <div class="h-12 md:h-16 lg:h-20"></div>
+
+      <!-- Centered Workspace Editor Preview -->
+      <div
+        class="w-full max-w-4xl mx-auto min-h-[220px] md:min-h-[260px] lg:min-h-[300px] xl:min-h-[340px] 2xl:min-h-[360px] transition-all duration-350 ease-tactile transform"
+        :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+        style="transition-delay: 600ms;"
+      >
+        <Surface
+          depth="2"
+          radius="lg"
+          class="w-full h-full flex flex-col overflow-hidden border border-border-default bg-bg-surface/20 shadow-2xl relative"
+        >
             <!-- Mock Workspace Header (replicates Home.vue) -->
             <div class="h-10 border-b border-bar-border bg-navbar-bg text-zinc-100 flex items-center justify-between px-sm select-none shrink-0">
               <!-- Left Branding -->
@@ -283,9 +262,7 @@
             </div>
 
           </Surface>
-        </div>
-
-      </Grid>
+      </div>
     </Container>
     </div>
   </Section>
@@ -296,7 +273,6 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Section from './layout/Section.vue'
 import Container from './layout/Container.vue'
-import Grid from './layout/Grid.vue'
 import Stack from './layout/Stack.vue'
 import Surface from './layout/Surface.vue'
 import Button from './Button.vue'
