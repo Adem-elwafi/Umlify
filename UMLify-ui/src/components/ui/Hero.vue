@@ -5,14 +5,14 @@
       <Grainient
         color1="#8b5cf6"
         color2="#6633ee"
-        color3="#0b071a"
+        color3="#1c1533"
         :time-speed="0.2"
-        :warp-strength="0.8"
+        :warp-strength="0.5"
         :warp-speed="1.5"
-        :warp-amplitude="45"
-        :grain-amount="0.08"
-        :contrast="1.25"
-        :saturation="1.1"
+        :warp-amplitude="25"
+        :grain-amount="0.06"
+        :contrast="1.05"
+        :saturation="0.85"
         :zoom="1.0"
       />
     </div>
