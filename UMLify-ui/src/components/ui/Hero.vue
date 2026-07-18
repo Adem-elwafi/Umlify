@@ -37,7 +37,7 @@
           :class="isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
           style="transition-delay: 200ms;"
         >
-          The fastest way to design professional UML diagrams.
+          Keyboard-driven UML, laid out automatically.
         </h1>
 
         <!-- Supporting Paragraph -->
@@ -269,7 +269,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import Section from './layout/Section.vue'
 import Container from './layout/Container.vue'
@@ -286,27 +286,27 @@ import { getConnectionPoint } from '../../utils/connectorRouting'
 
 const elements = [
   // System Boundary
-  { id: 'app-boundary', type: 'system', label: 'local legends App', x: 220, y: 40, width: 360, height: 380 },
+  { id: 'order-system', type: 'system', label: 'Order Management System', x: 220, y: 40, width: 360, height: 380 },
 
   // Actors (External/Internal)
-  { id: 'consumer', type: 'actor', label: 'Content Consumer', x: 60, y: 170, width: 80, height: 120 },
-  { id: 'mongodb', type: 'actor', label: 'MongoDB Atlas', x: 660, y: 170, width: 80, height: 120 },
+  { id: 'customer', type: 'actor', label: 'Customer', x: 60, y: 170, width: 80, height: 120 },
+  { id: 'payment-gateway', type: 'actor', label: 'Payment Gateway', x: 660, y: 170, width: 80, height: 120 },
 
   // Use Cases (Functional)
-  { id: 'geolocate', type: 'usecase', label: 'GeoLocate User', x: 310, y: 80, width: 180, height: 60 },
-  { id: 'read-story', type: 'usecase', label: 'Read A Story', x: 310, y: 200, width: 180, height: 60 },
-  { id: 'query-data', type: 'usecase', label: 'Query Story Data', x: 310, y: 320, width: 180, height: 60 }
+  { id: 'place-order', type: 'usecase', label: 'Place Order', x: 310, y: 80, width: 180, height: 60 },
+  { id: 'track-shipment', type: 'usecase', label: 'Track Shipment', x: 310, y: 200, width: 180, height: 60 },
+  { id: 'process-payment', type: 'usecase', label: 'Process Payment', x: 310, y: 320, width: 180, height: 60 }
 ]
 
 const connectionsList = [
   // 3 Associations (Actors to Use Cases)
-  { id: 'conn-1', from: 'consumer', to: 'geolocate', fromSide: 'right', toSide: 'left', type: 'association' },
-  { id: 'conn-2', from: 'consumer', to: 'read-story', fromSide: 'right', toSide: 'left', type: 'association' },
-  { id: 'conn-3', from: 'mongodb', to: 'query-data', fromSide: 'left', toSide: 'right', type: 'association' },
+  { id: 'conn-1', from: 'customer', to: 'place-order', fromSide: 'right', toSide: 'left', type: 'association' },
+  { id: 'conn-2', from: 'customer', to: 'track-shipment', fromSide: 'right', toSide: 'left', type: 'association' },
+  { id: 'conn-3', from: 'payment-gateway', to: 'process-payment', fromSide: 'left', toSide: 'right', type: 'association' },
 
   // 2 Includes
-  { id: 'conn-4', from: 'read-story', to: 'geolocate', fromSide: 'top', toSide: 'bottom', type: 'include' },
-  { id: 'conn-5', from: 'read-story', to: 'query-data', fromSide: 'bottom', toSide: 'top', type: 'include' }
+  { id: 'conn-4', from: 'track-shipment', to: 'place-order', fromSide: 'top', toSide: 'bottom', type: 'include' },
+  { id: 'conn-5', from: 'track-shipment', to: 'process-payment', fromSide: 'bottom', toSide: 'top', type: 'include' }
 ]
 
 const getElement = (id) => elements.find(e => e.id === id)
@@ -335,10 +335,6 @@ onMounted(() => {
     }, 50)
   })
 
-  setTimeout(() => {
-    isCompiled.value = true
-  }, 1400)
-
   if (!('IntersectionObserver' in window)) {
     isVisible.value = true
     return
@@ -363,6 +359,15 @@ onMounted(() => {
     observer.observe(el)
   }
 })
+
+// Gate the compile animation on visibility: only start the 1400ms timer once the
+// section has scrolled into view (isVisible), not on mount. Fires once.
+watch(isVisible, (visible) => {
+  if (!visible) return
+  setTimeout(() => {
+    isCompiled.value = true
+  }, 1400)
+}, { immediate: true })
 </script>
 
 <style scoped>
