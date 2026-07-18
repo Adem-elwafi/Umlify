@@ -1,5 +1,5 @@
 <template>
-  <Section ref="sectionRef" id="features" spacing="xxl" custom-class="border-t border-border-default bg-bg-base/30 relative overflow-hidden">
+  <Section id="features" spacing="xxl" custom-class="border-t border-border-default bg-bg-base/30 relative overflow-hidden">
     <Container size="xl">
       <Stack gap="xl">
         
@@ -46,19 +46,6 @@
                 @mouseenter="pauseRotation"
                 @mouseleave="resumeRotation"
               >
-                <!-- 1px Animated Border Sweep (GPU accelerated) -->
-                <svg class="absolute inset-0 w-full h-full pointer-events-none fill-none z-30" xmlns="http://www.w3.org/2000/svg">
-                  <rect
-                    x="0.5"
-                    y="0.5"
-                    width="calc(100% - 1px)"
-                    height="calc(100% - 1px)"
-                    rx="12"
-                    pathLength="100"
-                    class="stroke-transparent"
-                    :class="{ 'animate-border-sweep': isVisible }"
-                  />
-                </svg>
                 <div class="flex gap-md relative z-10">
                   <!-- Active Indicator / Step Number -->
                   <div class="flex flex-col items-center">
@@ -241,9 +228,9 @@
                               height: el.height + 'px'
                             }"
                           >
-                            <UseCase :label="el.label" :selected="activeStep === 1 && el.id === 'read-story'" />
+                            <UseCase :label="el.label" :selected="activeStep === 1 && el.id === 'track-shipment'" />
                             
-                            <template v-if="activeStep === 1 && el.id === 'read-story'">
+                            <template v-if="activeStep === 1 && el.id === 'track-shipment'">
                               <div class="absolute -top-1 -left-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border border-bg-surface z-30"></div>
                               <div class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border border-bg-surface z-30"></div>
                               <div class="absolute -bottom-1 -left-1 w-2.5 h-2.5 rounded-full bg-interactive-accent border border-bg-surface z-30"></div>
@@ -268,8 +255,8 @@
                           <div 
                             class="absolute select-none pointer-events-none z-30"
                             :style="{
-                              left: (readStoryEl.x - 6) + 'px',
-                              top: (readStoryEl.y + readStoryEl.height / 2 - 5) + 'px',
+                              left: (trackShipmentEl.x - 6) + 'px',
+                              top: (trackShipmentEl.y + trackShipmentEl.height / 2 - 5) + 'px',
                               width: '10px',
                               height: '10px'
                             }"
@@ -379,39 +366,39 @@ import { getConnectionPoint } from '../../utils/connectorRouting'
 
 const elements = [
   // System Boundary
-  { id: 'app-boundary', type: 'system', label: 'local legends App', x: 220, y: 40, width: 360, height: 380 },
+  { id: 'order-system', type: 'system', label: 'Order Management System', x: 220, y: 40, width: 360, height: 380 },
 
   // Actors (External/Internal)
-  { id: 'consumer', type: 'actor', label: 'Content Consumer', x: 60, y: 170, width: 80, height: 120 },
-  { id: 'mongodb', type: 'actor', label: 'MongoDB Atlas', x: 660, y: 170, width: 80, height: 120 },
+  { id: 'customer', type: 'actor', label: 'Customer', x: 60, y: 170, width: 80, height: 120 },
+  { id: 'payment-gateway', type: 'actor', label: 'Payment Gateway', x: 660, y: 170, width: 80, height: 120 },
 
   // Use Cases (Functional)
-  { id: 'geolocate', type: 'usecase', label: 'GeoLocate User', x: 310, y: 80, width: 180, height: 60 },
-  { id: 'read-story', type: 'usecase', label: 'Read A Story', x: 310, y: 200, width: 180, height: 60 },
-  { id: 'query-data', type: 'usecase', label: 'Query Story Data', x: 310, y: 320, width: 180, height: 60 }
+  { id: 'place-order', type: 'usecase', label: 'Place Order', x: 310, y: 80, width: 180, height: 60 },
+  { id: 'track-shipment', type: 'usecase', label: 'Track Shipment', x: 310, y: 200, width: 180, height: 60 },
+  { id: 'process-payment', type: 'usecase', label: 'Process Payment', x: 310, y: 320, width: 180, height: 60 }
 ]
 
 const connectionsList = [
   // 3 Associations (Actors to Use Cases)
-  { id: 'conn-1', from: 'consumer', to: 'geolocate', fromSide: 'right', toSide: 'left', type: 'association' },
-  { id: 'conn-2', from: 'consumer', to: 'read-story', fromSide: 'right', toSide: 'left', type: 'association' },
-  { id: 'conn-3', from: 'mongodb', to: 'query-data', fromSide: 'left', toSide: 'right', type: 'association' },
+  { id: 'conn-1', from: 'customer', to: 'place-order', fromSide: 'right', toSide: 'left', type: 'association' },
+  { id: 'conn-2', from: 'customer', to: 'track-shipment', fromSide: 'right', toSide: 'left', type: 'association' },
+  { id: 'conn-3', from: 'payment-gateway', to: 'process-payment', fromSide: 'left', toSide: 'right', type: 'association' },
 
   // 2 Includes
-  { id: 'conn-4', from: 'read-story', to: 'geolocate', fromSide: 'top', toSide: 'bottom', type: 'include' },
-  { id: 'conn-5', from: 'read-story', to: 'query-data', fromSide: 'bottom', toSide: 'top', type: 'include' }
+  { id: 'conn-4', from: 'track-shipment', to: 'place-order', fromSide: 'top', toSide: 'bottom', type: 'include' },
+  { id: 'conn-5', from: 'track-shipment', to: 'process-payment', fromSide: 'bottom', toSide: 'top', type: 'include' }
 ]
 
 const getElement = (id) => elements.find(e => e.id === id)
-const customerEl = getElement('consumer')
-const readStoryEl = getElement('read-story')
+const customerEl = getElement('customer')
+const trackShipmentEl = getElement('track-shipment')
 
 const activeElements = computed(() => {
   if (activeStep.value === 1) {
     return elements.filter(e => e.type === 'usecase' || e.type === 'system')
   }
   if (activeStep.value === 2) {
-    return elements.filter(e => e.type === 'usecase' || e.type === 'system' || e.id === 'consumer')
+    return elements.filter(e => e.type === 'usecase' || e.type === 'system' || e.id === 'customer')
   }
   return elements
 })
@@ -422,7 +409,7 @@ const activeConnections = computed(() => {
   }
   if (activeStep.value === 2) {
     return [
-      { id: 'conn-2', from: 'consumer', to: 'read-story', fromSide: 'right', toSide: 'left', type: 'dependency' }
+      { id: 'conn-2', from: 'customer', to: 'track-shipment', fromSide: 'right', toSide: 'left', type: 'dependency' }
     ]
   }
   return connectionsList
@@ -432,8 +419,6 @@ const activeStep = ref(1)
 const rotationInterval = ref(null)
 const isPaused = ref(false)
 const stepRefs = ref([])
-const isVisible = ref(false)
-const sectionRef = ref(null)
 
 const steps = [
   {
@@ -521,30 +506,6 @@ const resumeRotation = () => {
 
 onMounted(() => {
   startRotation()
-
-  if (!('IntersectionObserver' in window)) {
-    isVisible.value = true
-    return
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          isVisible.value = true
-          observer.unobserve(entry.target)
-        }
-      })
-    },
-    {
-      threshold: 0.1
-    }
-  )
-
-  const el = sectionRef.value?.$el || sectionRef.value
-  if (el) {
-    observer.observe(el)
-  }
 })
 
 onUnmounted(() => {
