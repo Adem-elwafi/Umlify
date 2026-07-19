@@ -114,3 +114,71 @@ Spacing tokens remain semantic and independent.
 - Semantic spacing tokens remain reusable.
 - Future contributors can safely use standard utility classes.
 - Prevents hidden namespace collisions.
+
+---
+
+## ADR-010 — Decouple LLM Output from Diagram Layout
+
+### Status
+Accepted
+
+### Context
+
+The AI diagram generation pipeline (Use Case diagrams) originally asked the
+LLM to emit fully-positioned coordinates (`x/y/width/height`) and connection
+sides (`fromSide/toSide`) directly, and `applyPayload` trusted those numbers
+with no validation. This produced several problems:
+
+- AI-generated positions did not snap to the canvas's 20px manual-drag grid,
+  so generated diagrams looked inconsistent with hand-edited ones.
+- Malformed or overlapping coordinates from the model were accepted blindly.
+- The layout "intelligence" (column placement, system box sizing, adjacency
+  ordering) was delegated to a non-deterministic model instead of code, making
+  output unpredictable across vendors and runs.
+
+### Decision
+
+Split the LLM's job from the layout's job.
+
+The LLM now outputs **semantics only**, no coordinates, no connection sides:
+
+```json
+{
+  "actors":    [{ "id": "string", "label": "string" }],
+  "system":    { "id": "string", "label": "string" },
+  "useCases":  [{ "id": "string", "label": "string" }],
+  "connections": [{ "from": "id", "to": "id", "type": "association|include|extend|generalization|dependency" }]
+}
+```
+
+A new **pure, deterministic layout engine** (`src/utils/useCaseLayout.js`,
+`layoutUseCaseDiagram`) consumes that semantic payload and returns fully
+positioned elements + connections (the same `{id,type,label,x,y,width,height}`
+element shape and `{from,to,fromSide,toSide,type}` connection shape the store
+already consumed). `applyPayload` runs the payload through this engine before
+calling `diagramStore.addElement` / `connectElements`.
+
+The layout engine:
+
+- Places actors in a single vertical column, centered against total diagram height.
+- Positions the System box to the right of the actor column, sized by use-case
+  count + padding, growing only if a use-case label genuinely doesn't fit.
+- Stacks use cases vertically inside the System box, horizontally centered.
+- Orders use cases via a simple adjacency heuristic (include/extend/generalization
+  links land adjacent where possible) — NOT full crossing-minimization.
+- Rounds every coordinate to the nearest 20px (matching the canvas drag grid).
+- Pulls default dimensions from `connectorRouting.js`'s `getElementDimensions`
+  (single canonical source — no duplicated constants).
+- Computes `fromSide`/`toSide` from the final relative element positions.
+
+### Consequences
+
+- Generated diagrams are deterministic, grid-aligned, and consistent with
+  hand-edited ones. No coordinate validation is needed because code computes
+  positions, not the model.
+- The demo vendor now emits the new semantic shape and exercises the real
+  layout engine (previously it hardcoded full x/y elements, bypassing layout).
+- `connectorRouting.js` is unchanged — path routing only needs final element
+  positions, which the engine provides.
+- No external layout library (dagre/elkjs) is introduced; layout is plain
+  deterministic logic, per this locked decision.

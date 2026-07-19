@@ -256,6 +256,7 @@ import Input from './ui/Input.vue'
 import Textarea from './ui/Textarea.vue'
 import Badge from './ui/Badge.vue'
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { layoutUseCaseDiagram } from '../utils/useCaseLayout'
 
 defineProps({
   isExpanded: {
@@ -373,22 +374,28 @@ const generateDiagramWithAI = async () => {
 
   isGenerating.value = true
 
-  const systemPrompt = `You are an academic software architect tool. Analyze the user's software description and output ONLY a raw, pure minified JSON object matching this structural shape exactly:
+  const systemPrompt = `You are an academic software architect tool. Analyze the user's software description and output ONLY a raw, pure minified JSON object describing the SEMANTICS of a Use Case diagram. You must NOT output any coordinates (x/y/width/height) or connection sides (fromSide/toSide) — those are computed deterministically by a layout engine after you respond.
+
+Output ONLY this exact structural shape:
 {
-  "elements": [
-    { "id": "unique_string_id", "type": "actor"|"usecase"|"System", "label": "String", "x": number, "y": number, "width": number, "height": number }
+  "actors": [
+    { "id": "unique_string_id", "label": "String" }
+  ],
+  "system": { "id": "unique_string_id", "label": "String" },
+  "useCases": [
+    { "id": "unique_string_id", "label": "String" }
   ],
   "connections": [
-    { "id": "unique_string_id", "from": "element_id", "to": "element_id", "fromSide": "right"|"left"|"top"|"bottom", "toSide": "right"|"left"|"top"|"bottom", "type": "association"|"include"|"extend"|"generalization"|"dependency" }
+    { "from": "element_id", "to": "element_id", "type": "association"|"include"|"extend"|"generalization"|"dependency" }
   ]
 }
 
-UML USE CASE DIAGRAM DESIGN RULES:
-1. Every specific action or capability mentioned in the user requirements (e.g., "borrow books", "register members", "manage books", "search catalog") must be created as a separate "usecase" element. Do not omit any!
-2. All "usecase" elements must be positioned inside the bounds of the "System" container element. For example, if the System has x: 300, y: 100, width: 300, height: 400, then all use cases must have x between 320 and 550, and y between 120 and 450.
-3. "actor" elements represent users/external systems and must be placed outside the System container (e.g., to the left of the System, at x: 80).
-4. "connections" must link the "actor" elements to the specific "usecase" elements they interact with. Do not link actors to the System boundary container itself.
-5. Provide reasonable coordinate layouts (x, y) so elements do not overlap and the diagram is visually spaced out and readable.
+UML USE CASE DIAGRAM SEMANTIC RULES:
+1. Every specific action or capability mentioned in the user requirements (e.g., "borrow books", "register members", "manage books", "search catalog") must be created as a separate entry in "useCases". Do not omit any!
+2. "actors" represent users/external systems that interact with the system.
+3. "system" is the single container boundary that groups the use cases.
+4. "connections" must link the "actor" ids to the specific "usecase" ids they interact with (type "association" or "dependency"), or link "usecase" ids to each other using "include"/"extend"/"generalization" when one use case relates to another. Do NOT connect actors to the system boundary.
+5. Reference elements only by the exact "id" values you defined in actors/useCases/system.
 
 CRITICAL RESTRAINT: Do not wrap your response output inside markdown code blocks (do not include \`\`\`json tags). Do not provide conversational sentences, conversational prefixes, suffixes, or pleasantries. Return only valid parseable JSON text strings.`
 
@@ -400,18 +407,20 @@ CRITICAL RESTRAINT: Do not wrap your response output inside markdown code blocks
       await new Promise(resolve => setTimeout(resolve, 1500))
       
       responseText = JSON.stringify({
-        elements: [
-          { id: "customer", type: "actor", label: "Customer", x: 80, y: 160, width: 80, height: 120 },
-          { id: "teller", type: "actor", label: "Bank Teller", x: 80, y: 340, width: 80, height: 120 },
-          { id: "deposit", type: "usecase", label: "Deposit Funds", x: 280, y: 120, width: 140, height: 80 },
-          { id: "check_bal", type: "usecase", label: "Check Balance", x: 280, y: 240, width: 140, height: 80 },
-          { id: "process", type: "usecase", label: "Process Transaction", x: 280, y: 360, width: 140, height: 80 },
-          { id: "core_bank", type: "System", label: "Core Banking System", x: 240, y: 60, width: 220, height: 420 }
+        actors: [
+          { id: "customer", label: "Customer" },
+          { id: "teller", label: "Bank Teller" }
+        ],
+        system: { id: "core_bank", label: "Core Banking System" },
+        useCases: [
+          { id: "deposit", label: "Deposit Funds" },
+          { id: "check_bal", label: "Check Balance" },
+          { id: "process", label: "Process Transaction" }
         ],
         connections: [
-          { id: "conn_1", from: "customer", to: "deposit", fromSide: "right", toSide: "left", type: "association" },
-          { id: "conn_2", from: "customer", to: "check_bal", fromSide: "right", toSide: "left", type: "association" },
-          { id: "conn_3", from: "teller", to: "process", fromSide: "right", toSide: "left", type: "association" }
+          { from: "customer", to: "deposit", type: "association" },
+          { from: "customer", to: "check_bal", type: "association" },
+          { from: "teller", to: "process", type: "association" }
         ]
       }, null, 2)
     } else if (activeVendor.value === 'gemini') {
@@ -644,25 +653,21 @@ CRITICAL RESTRAINT: Do not wrap your response output inside markdown code blocks
 // METHOD: Apply Compiled Payload to Diagram Store
 // -------------------------------------------------------------------------
 const applyPayload = (payload) => {
-  if (!payload.elements || !Array.isArray(payload.elements)) {
-    throw new Error("Missing root 'elements' node tracking array layer.")
-  }
+  // The LLM emits a SEMANTIC payload (actors/system/useCases/connections,
+  // no coordinates, no sides). Run it through the deterministic layout
+  // engine to produce fully-positioned elements + connections.
+  const isLegacy = !!(payload && Array.isArray(payload.elements))
+
+  const { elements, connections } = isLegacy
+    ? { elements: payload.elements, connections: payload.connections || [] }
+    : layoutUseCaseDiagram(payload)
 
   // 1. SAFE STATE INITIALIZATION
   diagramStore.resetDiagram()
   diagramStore.saveToHistory()
 
-  const elementIdMapping = {}
-
-  // 2. COMPONENT CASING ALIGNMENT & NODE GENERATION
-  payload.elements.forEach((el, index) => {
-    const generatedId = `${el.type?.toLowerCase() || 'node'}-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`
-    
-    elementIdMapping[index] = generatedId
-    if (el.id !== undefined && el.id !== null) {
-      elementIdMapping[String(el.id)] = generatedId
-    }
-
+  // 2. NODE GENERATION (positions already computed by the layout engine)
+  elements.forEach((el) => {
     let normalizedType = el.type || 'usecase'
     const lowerType = String(normalizedType).toLowerCase()
 
@@ -675,35 +680,30 @@ const applyPayload = (payload) => {
     }
 
     const nodePayload = {
-      id: generatedId,
+      id: el.id,
       type: normalizedType,
       label: el.label || 'Default Node',
       x: Number(el.x) || 100,
       y: Number(el.y) || 100,
-      width: Number(el.width) || (normalizedType === 'actor' ? 80 : normalizedType === 'System' ? 300 : 140),
-      height: Number(el.height) || (normalizedType === 'actor' ? 120 : normalizedType === 'System' ? 400 : 80)
+      width: Number(el.width) || 140,
+      height: Number(el.height) || 80
     }
-    
+
     diagramStore.addElement(nodePayload)
   })
 
   // 3. CONNECTIONS RESOLUTION VIA STORE ACTIONS
-  if (payload.connections && Array.isArray(payload.connections)) {
-    payload.connections.forEach(conn => {
-      const fromId = elementIdMapping[conn.from]
-      const toId = elementIdMapping[conn.to]
-
-      if (fromId && toId) {
-        diagramStore.connectElements(
-          fromId,
-          toId,
-          conn.fromSide || 'right',
-          conn.toSide || 'left',
-          conn.type || 'association'
-        )
-      }
-    })
-  }
+  connections.forEach((conn) => {
+    if (conn.from && conn.to) {
+      diagramStore.connectElements(
+        conn.from,
+        conn.to,
+        conn.fromSide || 'right',
+        conn.toSide || 'left',
+        conn.type || 'association'
+      )
+    }
+  })
 }
 
 // -------------------------------------------------------------------------

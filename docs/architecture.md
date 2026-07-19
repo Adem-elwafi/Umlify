@@ -123,7 +123,35 @@ Umlify maps browser paths to views inside `src/router/index.js`:
 
 ---
 
-## 7. Developer Workflow
+## 7. AI Diagram Generation Pipeline (Use Case)
+
+The AI compiler (`TerminalEditor.vue`) splits generation into two decoupled
+stages, per ADR-010.
+
+1. **Semantic extraction (LLM responsibility).** The configured vendor
+   (demo, gemini, openai, groq, openrouter) receives a system prompt that
+   instructs the model to output **semantics only** — `actors`, `system`,
+   `useCases`, and `connections` (with `from`/`to`/`type`), but **no**
+   coordinates and **no** connection sides. The model returns a JSON object
+   parsed into a semantic payload.
+2. **Layout (code responsibility).** The semantic payload is passed to the
+   pure, deterministic `layoutUseCaseDiagram` engine
+   (`src/utils/useCaseLayout.js`). It returns fully-positioned elements
+   (`{id,type,label,x,y,width,height}`) and connections
+   (`{from,to,fromSide,toSide,type}`). Coordinates snap to the 20px canvas
+   grid and default dimensions come from `connectorRouting.js`'s
+   `getElementDimensions`. `fromSide`/`toSide` are computed from the final
+   relative element positions.
+3. **Store hydration.** `applyPayload` feeds the engine output into
+   `diagramStore.addElement` / `connectElements`. The store shape is unchanged
+   from the pre-decoupling design — only how the values are computed differs.
+
+`connectorRouting.js` is purely a path-routing consumer of final element
+positions and is unaffected by this split.
+
+---
+
+## 8. Developer Workflow
 
 1.  **Verify Components:** Always implement UI features by combining existing primitives (`Surface`, `Stack`, `Grid`, `Button`). Never write custom borders, backgrounds, or radii.
 2.  **Visual Check:** Trigger local dev server, edit styles inside `style.css`, and review changes on `/playground` to ensure changes compile correctly and don't break existing panels.
