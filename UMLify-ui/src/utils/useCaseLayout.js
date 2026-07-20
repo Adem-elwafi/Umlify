@@ -17,45 +17,120 @@ const estimateLabelWidth = (label = '', base = 140) => {
   return snap(estimated)
 }
 
-// Deterministic adjacency-sort heuristic.
-// Returns use-case ids ordered so that use cases sharing an
-// include/extend/generalization link land adjacent where possible.
-// This is a simple greedy neighbor-grouping pass, NOT full crossing-minimization.
-const orderUseCasesByAdjacency = (useCases, connections) => {
-  if (useCases.length <= 2) return useCases.map((u) => u.id)
+// Barycenter + adjacency ordering heuristic.
+// Actor-to-usecase associations are the dominant connection type in most
+// diagrams, so we compute each use case's "target y" as the average y of
+// every actor connected to it (actors are placed first and have fixed y).
+// Use cases with no actor connections receive a neutral/median target.
+// After sorting primarily by that target, we do a secondary greedy pass:
+// for each include/extend/generalization pair that isn't adjacent, nudge
+// them together by swapping one endpoint with a neighbor, but only if the
+// swap keeps both use cases within 1 position of their barycenter-ideal
+// slot. Actor alignment always wins over UC-to-UC adjacency.
+const orderUseCasesByBarycenterAndAdjacency = (useCases, connections, actorYById) => {
+  if (useCases.length <= 1) return useCases.map((u) => u.id)
 
-  const adjacency = new Map()
-  useCases.forEach((u) => adjacency.set(u.id, new Set()))
+  const actorConns = new Map()
+  const adjacencyConns = []
+
   connections.forEach((c) => {
-    if (!ADJACENCY_TYPES.includes(c.type)) return
-    const a = useCases.find((u) => u.id === c.from)
-    const b = useCases.find((u) => u.id === c.to)
-    if (a && b) {
-      adjacency.get(a.id).add(b.id)
-      adjacency.get(b.id).add(a.id)
+    const fromActor = actorYById.has(c.from)
+    const toActor = actorYById.has(c.to)
+    const fromUC = useCases.some((u) => u.id === c.from)
+    const toUC = useCases.some((u) => u.id === c.to)
+
+    if (fromActor && toUC) {
+      if (!actorConns.has(c.to)) actorConns.set(c.to, new Set())
+      actorConns.get(c.to).add(c.from)
+    } else if (fromUC && toActor) {
+      if (!actorConns.has(c.from)) actorConns.set(c.from, new Set())
+      actorConns.get(c.from).add(c.to)
+    }
+
+    if (fromUC && toUC && ADJACENCY_TYPES.includes(c.type)) {
+      adjacencyConns.push({ from: c.from, to: c.to })
     }
   })
 
-  const ordered = []
-  const visited = new Set()
-
-  const start = useCases[0].id
-  const queue = [start]
-  while (queue.length) {
-    const current = queue.shift()
-    if (visited.has(current)) continue
-    visited.add(current)
-    ordered.push(current)
-    const neighbors = [...adjacency.get(current)].filter((n) => !visited.has(n))
-    queue.unshift(...neighbors)
+  const getTargetY = (ucId) => {
+    const connectedActors = actorConns.get(ucId)
+    if (!connectedActors || connectedActors.size === 0) {
+      const targets = useCases
+        .map((u) => {
+          const actors = actorConns.get(u.id)
+          if (!actors || actors.size === 0) return null
+          const ys = [...actors].map((a) => actorYById.get(a)).filter((y) => y !== undefined)
+          return ys.length > 0 ? ys.reduce((s, y) => s + y, 0) / ys.length : null
+        })
+        .filter((t) => t !== null)
+      if (targets.length === 0) return 0
+      targets.sort((a, b) => a - b)
+      return targets[Math.floor(targets.length / 2)]
+    }
+    const ys = [...connectedActors].map((a) => actorYById.get(a)).filter((y) => y !== undefined)
+    return ys.length > 0 ? ys.reduce((s, y) => s + y, 0) / ys.length : 0
   }
 
-  // Append any use cases that were never reached (disconnected from the graph).
-  useCases.forEach((u) => {
-    if (!visited.has(u.id)) ordered.push(u.id)
-  })
+  const withTargets = useCases.map((u, i) => ({ id: u.id, target: getTargetY(u.id), index: i }))
+  withTargets.sort((a, b) => a.target - b.target || a.index - b.index)
 
-  return ordered
+  const idealOrder = withTargets.map((w) => w.id)
+  const idealSlot = new Map()
+  idealOrder.forEach((id, i) => idealSlot.set(id, i))
+
+  const order = [...idealOrder]
+  const pos = new Map()
+  order.forEach((id, i) => pos.set(id, i))
+
+  let changed = true
+  let iterations = 0
+  const maxIterations = useCases.length * 2
+
+  while (changed && iterations < maxIterations) {
+    changed = false
+    iterations++
+
+    for (const { from, to } of adjacencyConns) {
+      const fromPos = pos.get(from)
+      const toPos = pos.get(to)
+      if (fromPos === undefined || toPos === undefined) continue
+      if (Math.abs(fromPos - toPos) <= 1) continue
+
+      if (toPos > fromPos) {
+        const neighbor = order[toPos - 1]
+        const toNew = toPos - 1
+        const neighborNew = toPos
+        const toDelta = Math.abs(toNew - idealSlot.get(to))
+        const neighborDelta = Math.abs(neighborNew - idealSlot.get(neighbor))
+        if (toDelta <= 1 && neighborDelta <= 1) {
+          order[toNew] = to
+          order[neighborNew] = neighbor
+          pos.set(to, toNew)
+          pos.set(neighbor, neighborNew)
+          changed = true
+          break
+        }
+      }
+
+      if (fromPos < toPos) {
+        const neighbor = order[fromPos + 1]
+        const fromNew = fromPos + 1
+        const neighborNew = fromPos
+        const fromDelta = Math.abs(fromNew - idealSlot.get(from))
+        const neighborDelta = Math.abs(neighborNew - idealSlot.get(neighbor))
+        if (fromDelta <= 1 && neighborDelta <= 1) {
+          order[fromNew] = from
+          order[neighborNew] = neighbor
+          pos.set(from, fromNew)
+          pos.set(neighbor, neighborNew)
+          changed = true
+          break
+        }
+      }
+    }
+  }
+
+  return order
 }
 
 // Estimate the width a use-case label needs; the System box must be wide enough.
@@ -147,6 +222,8 @@ export function layoutUseCaseDiagram(payload = {}) {
     ? totalDiagramHeight / actors.length
     : 0
 
+  const actorYById = new Map()
+
   actors.forEach((actor, i) => {
     const el = {
       id: actor.id,
@@ -159,6 +236,7 @@ export function layoutUseCaseDiagram(payload = {}) {
     }
     elements.push(el)
     elementMap[el.id] = el
+    actorYById.set(el.id, el.y)
   })
 
   // --- System: right of actor column, sized by use-case count + padding ---
@@ -188,7 +266,7 @@ export function layoutUseCaseDiagram(payload = {}) {
   elementMap[systemEl.id] = systemEl
 
   // --- Use cases: stacked vertically inside the System box, centered ---
-  const orderedIds = orderUseCasesByAdjacency(useCases, connections)
+  const orderedIds = orderUseCasesByBarycenterAndAdjacency(useCases, connections, actorYById)
   const orderedUseCases = orderedIds
     .map((id) => useCases.find((u) => u.id === id))
     .filter(Boolean)

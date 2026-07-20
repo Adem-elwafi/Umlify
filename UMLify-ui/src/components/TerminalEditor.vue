@@ -664,9 +664,29 @@ CRITICAL RESTRAINT: Do not wrap your response output inside markdown code blocks
 //     elements[] + connections[] shape with explicit x/y/side coordinates.
 const applyPayload = (payload, mode = 'semantic') => {
   if (mode === 'legacy') {
-    const elements = (payload && Array.isArray(payload.elements)) ? payload.elements : []
-    const connections = (payload && Array.isArray(payload.connections)) ? payload.connections : []
-    hydrateStore(elements, connections)
+    // Manual compile path: shape-detection is acceptable here because
+    // the input is user-typed, not an untrusted AI response. If the
+    // payload has the semantic shape (actors/system/useCases/connections),
+    // run it through the layout engine; otherwise fall back to the legacy
+    // raw elements[] path.
+    const isSemantic =
+      payload &&
+      typeof payload === 'object' &&
+      !Array.isArray(payload) &&
+      Array.isArray(payload.actors) &&
+      payload.system &&
+      typeof payload.system === 'object' &&
+      Array.isArray(payload.useCases) &&
+      Array.isArray(payload.connections)
+
+    if (isSemantic) {
+      const { elements, connections } = layoutUseCaseDiagram(payload)
+      hydrateStore(elements, connections)
+    } else {
+      const elements = (payload && Array.isArray(payload.elements)) ? payload.elements : []
+      const connections = (payload && Array.isArray(payload.connections)) ? payload.connections : []
+      hydrateStore(elements, connections)
+    }
     return
   }
 

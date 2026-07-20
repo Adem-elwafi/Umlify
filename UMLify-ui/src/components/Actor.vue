@@ -36,7 +36,7 @@
         rows="2"
         autocomplete="off"
         :class="[
-          'text-zinc-700 dark:text-zinc-300 text-xs mt-2 font-medium px-2 py-1 rounded-lg text-center w-full outline-none resize-none overflow-hidden whitespace-normal text-wrap break-words h-9 transition-all duration-200',
+          'text-zinc-700 dark:text-zinc-300 text-xs mt-2 font-medium px-2 py-1 rounded-lg text-center w-full outline-none resize-none whitespace-normal text-wrap break-words min-h-9 transition-all duration-200',
           isEditing 
             ? 'bg-bg-surface border border-border-default ring-2 ring-interactive-accent/35' 
             : 'bg-transparent border border-transparent cursor-pointer'
