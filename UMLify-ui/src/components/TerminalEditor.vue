@@ -630,9 +630,11 @@ CRITICAL RESTRAINT: Do not wrap your response output inside markdown code blocks
     // Cache the result in raw JSON sandbox textarea for manual checks
     jsonInput.value = cleanText
 
-    // Parse cleansed string directly into data models
+    // Parse cleansed string directly into data models. AI-generated
+    // payloads MUST be the semantic shape; any schema deviation throws
+    // and is reported below as a generation error (not silently accepted).
     const payload = JSON.parse(cleanText)
-    applyPayload(payload)
+    applyPayload(payload, 'semantic')
 
     successMessage.value = `AI compiled successfully! Loaded ${diagramStore.elements.length} components and ${diagramStore.connections.length} relational vectors.`
   } catch (err) {
@@ -652,16 +654,59 @@ CRITICAL RESTRAINT: Do not wrap your response output inside markdown code blocks
 // -------------------------------------------------------------------------
 // METHOD: Apply Compiled Payload to Diagram Store
 // -------------------------------------------------------------------------
-const applyPayload = (payload) => {
-  // The LLM emits a SEMANTIC payload (actors/system/useCases/connections,
-  // no coordinates, no sides). Run it through the deterministic layout
-  // engine to produce fully-positioned elements + connections.
-  const isLegacy = !!(payload && Array.isArray(payload.elements))
+// The routing decision is made by CALL ORIGIN, never by inspecting which
+// keys happen to be present in the payload:
+//   - mode 'semantic' (AI generation path): payload MUST be the new
+//     coordinate-free schema. If it isn't, we throw a generation error so
+//     the failure is reported/retried instead of silently producing a bad,
+//     possibly-overlapping diagram.
+//   - mode 'legacy' (manual JSON-compile path): allows the old raw
+//     elements[] + connections[] shape with explicit x/y/side coordinates.
+const applyPayload = (payload, mode = 'semantic') => {
+  if (mode === 'legacy') {
+    const elements = (payload && Array.isArray(payload.elements)) ? payload.elements : []
+    const connections = (payload && Array.isArray(payload.connections)) ? payload.connections : []
+    hydrateStore(elements, connections)
+    return
+  }
 
-  const { elements, connections } = isLegacy
-    ? { elements: payload.elements, connections: payload.connections || [] }
-    : layoutUseCaseDiagram(payload)
+  // Semantic path: validate the schema strictly before trusting it.
+  const validated = validateSemanticPayload(payload)
+  const { elements, connections } = layoutUseCaseDiagram(validated)
+  hydrateStore(elements, connections)
+}
 
+// Strict validation of the AI semantic payload. Throws on any deviation
+// from the agreed contract (the LLM must NOT emit x/y/width/height or
+// fromSide/toSide, and must provide the expected arrays/strings).
+const validateSemanticPayload = (payload) => {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    throw new Error("AI response is not the expected semantic Use Case payload object.")
+  }
+  if (!Array.isArray(payload.actors) || !Array.isArray(payload.useCases) || !Array.isArray(payload.connections)) {
+    throw new Error("AI response is missing required semantic arrays (actors/useCases/connections). The model may have reverted to emitting raw coordinates.")
+  }
+  if (!payload.system || typeof payload.system !== 'object' || typeof payload.system.id !== 'string') {
+    throw new Error("AI response is missing a valid 'system' object.")
+  }
+  const looksLikeRawElements = Array.isArray(payload.elements)
+  const hasRawCoordinates = [...payload.actors, ...payload.useCases].some(
+    (item) => item && ('x' in item || 'y' in item || 'width' in item || 'height' in item || 'type' in item)
+  )
+  if (looksLikeRawElements || hasRawCoordinates) {
+    throw new Error("AI response contains coordinates/raw element shapes. The model ignored the semantic-only system prompt.")
+  }
+  payload.connections.forEach((conn) => {
+    if (!conn || typeof conn.from !== 'string' || typeof conn.to !== 'string' || typeof conn.type !== 'string') {
+      throw new Error("AI response has a malformed connection (requires from/to/type strings).")
+    }
+  })
+  return payload
+}
+
+// Hydrate the diagram store from positioned elements + connections.
+// Connections are matched to elements by stable semantic id.
+const hydrateStore = (elements, connections) => {
   // 1. SAFE STATE INITIALIZATION
   diagramStore.resetDiagram()
   diagramStore.saveToHistory()
@@ -722,7 +767,7 @@ const compileDiagram = () => {
 
   try {
     const payload = JSON.parse(jsonInput.value)
-    applyPayload(payload)
+    applyPayload(payload, 'legacy')
     successMessage.value = `Rendered ${diagramStore.elements.length} components and ${diagramStore.connections.length} relational vectors.`
   } catch (err) {
     errorLog.value = err.message || "Invalid JSON syntactic topology formatting rule detected."
