@@ -696,9 +696,21 @@ const validateSemanticPayload = (payload) => {
   if (looksLikeRawElements || hasRawCoordinates) {
     throw new Error("AI response contains coordinates/raw element shapes. The model ignored the semantic-only system prompt.")
   }
+  const validTypes = ['association', 'include', 'extend', 'generalization', 'dependency']
+  const knownIds = new Set([
+    ...payload.actors.map((a) => a?.id),
+    payload.system.id,
+    ...payload.useCases.map((u) => u?.id)
+  ].filter((id) => typeof id === 'string'))
   payload.connections.forEach((conn) => {
     if (!conn || typeof conn.from !== 'string' || typeof conn.to !== 'string' || typeof conn.type !== 'string') {
       throw new Error("AI response has a malformed connection (requires from/to/type strings).")
+    }
+    if (!validTypes.includes(conn.type)) {
+      throw new Error(`AI response has a connection with an invalid type '${conn.type}'. Allowed: ${validTypes.join('|')}.`)
+    }
+    if (!knownIds.has(conn.from) || !knownIds.has(conn.to)) {
+      throw new Error(`AI response references an unknown element id in a connection ('${conn.from}' -> '${conn.to}'). All connection endpoints must reference a defined actor/system/useCase id.`)
     }
   })
   return payload
