@@ -6,13 +6,23 @@
     ]"
     :style="{}"
   >
-    <input 
-      type="text" 
+    <textarea 
+      ref="labelInput"
       v-model="localLabel" 
       @input="updateLabel"
+      @mousedown.stop
+      @dblclick="enableEditing"
+      @blur="disableEditing"
+      :readonly="!isEditing"
+      rows="2"
       autocomplete="off"
-      class="text-xs font-medium tracking-tight text-inherit text-center w-full bg-transparent border-none outline-none focus:ring-0"
-    >
+      :class="[
+        'text-xs font-medium tracking-tight text-inherit text-center w-full outline-none resize-none whitespace-normal text-wrap break-words min-h-9 transition-all duration-200',
+        isEditing 
+          ? 'bg-bg-surface border border-border-default ring-2 ring-interactive-accent/35' 
+          : 'bg-transparent border border-transparent cursor-pointer'
+      ]"
+    ></textarea>
 
     <!-- Resize handles (only show when selected) -->
     <div 

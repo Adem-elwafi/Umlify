@@ -63,6 +63,16 @@
       ]"
     />
     
+    <rect
+      v-if="type !== 'association' && type !== ''"
+      :x="labelX - labelBgWidth / 2"
+      :y="labelY - 9"
+      :width="labelBgWidth"
+      height="18"
+      fill="var(--color-bg-canvas)"
+      rx="3"
+    />
+
     <text
       v-if="type !== 'association' && type !== ''"
       :x="labelX"
@@ -123,8 +133,24 @@ const pathString = computed(() => getPathStringFromPoints(pathPoints.value));
 
 const midPt = computed(() => getOrthogonalPathMidpoint(pathPoints.value));
 
-const labelX = computed(() => midPt.value.x);
-const labelY = computed(() => midPt.value.y);
+const labelOffset = computed(() => {
+  const pts = pathPoints.value
+  if (!pts || pts.length < 2) return { x: 0, y: 0 }
+  const dx = pts[pts.length - 1].x - pts[0].x
+  const dy = pts[pts.length - 1].y - pts[0].y
+  if (Math.abs(dx) >= Math.abs(dy)) {
+    return { x: 0, y: dy >= 0 ? 8 : -8 }
+  }
+  return { x: dx >= 0 ? 8 : -8, y: 0 }
+});
+
+const labelBgWidth = computed(() => {
+  const len = (props.type || '').length
+  return Math.max(44, len * 7 + 12)
+});
+
+const labelX = computed(() => midPt.value.x + labelOffset.value.x)
+const labelY = computed(() => midPt.value.y + labelOffset.value.y)
 </script>
 
 <style scoped>
