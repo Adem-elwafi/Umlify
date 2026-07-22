@@ -71,66 +71,72 @@ const orderUseCasesByBarycenterAndAdjacency = (useCases, connections, actorYById
     return ys.length > 0 ? ys.reduce((s, y) => s + y, 0) / ys.length : 0
   }
 
-  const withTargets = useCases.map((u, i) => ({ id: u.id, target: getTargetY(u.id), index: i }))
-  withTargets.sort((a, b) => a.target - b.target || a.index - b.index)
+  const useCaseMeta = useCases.map((u, index) => ({
+    id: u.id,
+    index,
+    target: getTargetY(u.id)
+  }))
 
-  const idealOrder = withTargets.map((w) => w.id)
-  const idealSlot = new Map()
-  idealOrder.forEach((id, i) => idealSlot.set(id, i))
+  const parent = new Map()
+  const rank = new Map()
+  useCases.forEach((u) => {
+    parent.set(u.id, u.id)
+    rank.set(u.id, 0)
+  })
 
-  const order = [...idealOrder]
-  const pos = new Map()
-  order.forEach((id, i) => pos.set(id, i))
+  const find = (id) => {
+    let root = parent.get(id)
+    if (root === undefined) return id
+    while (root !== parent.get(root)) {
+      root = parent.get(root)
+    }
+    let current = id
+    while (current !== root) {
+      const next = parent.get(current)
+      parent.set(current, root)
+      current = next
+    }
+    return root
+  }
 
-  let changed = true
-  let iterations = 0
-  const maxIterations = useCases.length * 2
+  const union = (a, b) => {
+    const rootA = find(a)
+    const rootB = find(b)
+    if (rootA === rootB) return
 
-  while (changed && iterations < maxIterations) {
-    changed = false
-    iterations++
-
-    for (const { from, to } of adjacencyConns) {
-      const fromPos = pos.get(from)
-      const toPos = pos.get(to)
-      if (fromPos === undefined || toPos === undefined) continue
-      if (Math.abs(fromPos - toPos) <= 1) continue
-
-      if (toPos > fromPos) {
-        const neighbor = order[toPos - 1]
-        const toNew = toPos - 1
-        const neighborNew = toPos
-        const toDelta = Math.abs(toNew - idealSlot.get(to))
-        const neighborDelta = Math.abs(neighborNew - idealSlot.get(neighbor))
-        if (toDelta <= 1 && neighborDelta <= 1) {
-          order[toNew] = to
-          order[neighborNew] = neighbor
-          pos.set(to, toNew)
-          pos.set(neighbor, neighborNew)
-          changed = true
-          break
-        }
-      }
-
-      if (fromPos < toPos) {
-        const neighbor = order[fromPos + 1]
-        const fromNew = fromPos + 1
-        const neighborNew = fromPos
-        const fromDelta = Math.abs(fromNew - idealSlot.get(from))
-        const neighborDelta = Math.abs(neighborNew - idealSlot.get(neighbor))
-        if (fromDelta <= 1 && neighborDelta <= 1) {
-          order[fromNew] = from
-          order[neighborNew] = neighbor
-          pos.set(from, fromNew)
-          pos.set(neighbor, neighborNew)
-          changed = true
-          break
-        }
-      }
+    const rankA = rank.get(rootA) || 0
+    const rankB = rank.get(rootB) || 0
+    if (rankA < rankB) {
+      parent.set(rootA, rootB)
+    } else if (rankA > rankB) {
+      parent.set(rootB, rootA)
+    } else {
+      parent.set(rootB, rootA)
+      rank.set(rootA, rankA + 1)
     }
   }
 
-  return order
+  adjacencyConns.forEach(({ from, to }) => union(from, to))
+
+  const clusters = new Map()
+  useCaseMeta.forEach((item) => {
+    const root = find(item.id)
+    if (!clusters.has(root)) {
+      clusters.set(root, [])
+    }
+    clusters.get(root).push(item)
+  })
+
+  const clusterList = [...clusters.values()].map((members) => {
+    const orderedMembers = [...members].sort((a, b) => a.target - b.target || a.index - b.index)
+    const clusterTarget = orderedMembers.reduce((sum, member) => sum + member.target, 0) / orderedMembers.length
+    const clusterIndex = Math.min(...orderedMembers.map((member) => member.index))
+    return { target: clusterTarget, index: clusterIndex, members: orderedMembers }
+  })
+
+  clusterList.sort((a, b) => a.target - b.target || a.index - b.index)
+
+  return clusterList.flatMap((cluster) => cluster.members.map((member) => member.id))
 }
 
 // Estimate the width a use-case label needs; the System box must be wide enough.
