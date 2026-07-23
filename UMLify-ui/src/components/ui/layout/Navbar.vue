@@ -196,8 +196,12 @@ const closeMobileMenu = () => {
   isMobileMenuOpen.value = false
 }
 
-const launchWorkspace = () => {
-  router.push('/workspace')
+const launchWorkspace = async () => {
+  try {
+    await router.push('/workspace')
+  } catch {
+    window.location.href = '/workspace'
+  }
 }
 
 const launchWorkspaceMobile = () => {
