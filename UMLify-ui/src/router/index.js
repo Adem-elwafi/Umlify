@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '../stores/authStore'
 import Home from '../Views/Home.vue'
 import Login from '../Views/Login.vue'
 import Signup from '../Views/Signup.vue'
@@ -20,15 +19,18 @@ const router = createRouter({
 
 // Dynamic Global Interceptor Guard
 router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore()
+  try {
+    const token = localStorage.getItem('auth_token')
 
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    // Intercept unauthorized workspace channel accesses
-    next('/login')
-  } else if ((to.path === '/login' || to.path === '/signup') && authStore.isAuthenticated) {
-    // Fast-forward authenticated workers past visual login sequences
-    next('/workspace')
-  } else {
+    if (to.meta.requiresAuth && !token) {
+      next('/login')
+    } else if ((to.path === '/login' || to.path === '/signup') && token) {
+      next('/workspace')
+    } else {
+      next()
+    }
+  } catch (e) {
+    console.error('Router guard error:', e)
     next()
   }
 })

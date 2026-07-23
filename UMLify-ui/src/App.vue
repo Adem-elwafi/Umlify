@@ -1,8 +1,8 @@
 <template>
   <div class="h-screen w-screen bg-bg-base text-text-primary font-sans antialiased overflow-hidden select-none">
-    <router-view v-slot="{ Component }">
+    <router-view v-slot="{ Component, route }">
       <transition name="fade" mode="out-in">
-        <component :is="Component" class="h-full w-full" />
+        <component :is="Component" :key="route.fullPath" class="h-full w-full" />
       </transition>
     </router-view>
   </div>
