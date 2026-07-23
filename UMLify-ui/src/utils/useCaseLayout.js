@@ -17,16 +17,16 @@ const estimateLabelWidth = (label = '', base = 140) => {
   return snap(estimated)
 }
 
-// Barycenter + adjacency ordering heuristic.
+// Barycenter + union-find clustering ordering heuristic.
 // Actor-to-usecase associations are the dominant connection type in most
 // diagrams, so we compute each use case's "target y" as the average y of
 // every actor connected to it (actors are placed first and have fixed y).
 // Use cases with no actor connections receive a neutral/median target.
-// After sorting primarily by that target, we do a secondary greedy pass:
-// for each include/extend/generalization pair that isn't adjacent, nudge
-// them together by swapping one endpoint with a neighbor, but only if the
-// swap keeps both use cases within 1 position of their barycenter-ideal
-// slot. Actor alignment always wins over UC-to-UC adjacency.
+// Then we form clusters via union-find over include/extend/generalization
+// pairs so that related use cases stay together. Each cluster's sort key is
+// the mean barycenter target of its members (tie-break by earliest index).
+// Finally, we sort clusters by that key and flatten — this keeps
+// semantically related use cases adjacent without a pairwise nudge pass.
 const orderUseCasesByBarycenterAndAdjacency = (useCases, connections, actorYById) => {
   if (useCases.length <= 1) return useCases.map((u) => u.id)
 

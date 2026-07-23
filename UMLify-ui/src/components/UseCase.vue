@@ -16,11 +16,13 @@
       :readonly="!isEditing"
       rows="2"
       autocomplete="off"
+      draggable="false"
+      @dragstart.prevent
       :class="[
         'text-xs font-medium tracking-tight text-inherit text-center w-full outline-none resize-none whitespace-normal text-wrap break-words min-h-9 transition-all duration-200',
         isEditing 
           ? 'bg-bg-surface border border-border-default ring-2 ring-interactive-accent/35' 
-          : 'bg-transparent border border-transparent cursor-pointer'
+          : 'bg-transparent border border-transparent cursor-pointer select-none'
       ]"
     ></textarea>
 
@@ -63,6 +65,19 @@ const props = defineProps({
 const emit = defineEmits(['click', 'update:label', 'delete', 'resize-start'])
 
 const localLabel = ref(props.label || 'Use Case')
+const isEditing = ref(false)
+const labelInput = ref(null)
+
+function enableEditing() {
+  isEditing.value = true
+  setTimeout(() => {
+    labelInput.value?.focus()
+  }, 0)
+}
+
+function disableEditing() {
+  isEditing.value = false
+}
 
 watch(() => props.label, (newLabel) => {
   localLabel.value = newLabel

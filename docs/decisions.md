@@ -164,8 +164,11 @@ The layout engine:
 - Positions the System box to the right of the actor column, sized by use-case
   count + padding, growing only if a use-case label genuinely doesn't fit.
 - Stacks use cases vertically inside the System box, horizontally centered.
-- Orders use cases via a simple adjacency heuristic (include/extend/generalization
-  links land adjacent where possible) — NOT full crossing-minimization.
+- Orders use cases via barycenter + union-find clustering: each use case
+  gets a "target y" from connected actor positions, then include/extend/
+  generalization pairs are unioned into clusters; clusters are sorted by
+  mean barycenter target and flattened to keep related use cases adjacent
+  without a pairwise nudge pass — NOT full crossing-minimization.
 - Rounds every coordinate to the nearest 20px (matching the canvas drag grid).
 - Pulls default dimensions from `connectorRouting.js`'s `getElementDimensions`
   (single canonical source — no duplicated constants).

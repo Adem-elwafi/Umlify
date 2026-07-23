@@ -252,7 +252,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 import { useDiagramStore } from '../stores/diagramStore';
 import { useAuthStore } from '../stores/authStore';
 import Surface from './ui/layout/Surface.vue';
@@ -318,12 +318,15 @@ const emitLocalExport = () => {
   URL.revokeObjectURL(url);
 };
 
-const emitLocalSnapshot = () => {
+const emitLocalSnapshot = async () => {
   const el = document.getElementById('uml-canvas');
   if (!el) return;
-  html2canvas(el).then(canvas => {
-    Object.assign(document.createElement('a'), { download: 'uml-diagram.png', href: canvas.toDataURL('image/png') }).click();
-  });
+  try {
+    const dataUrl = await toPng(el, { quality: 1, pixelRatio: 2, cacheBust: true });
+    Object.assign(document.createElement('a'), { download: 'uml-diagram.png', href: dataUrl }).click();
+  } catch (err) {
+    console.error('Snapshot failed:', err);
+  }
 };
 
 const handleLogOutFlow = () => { diagramStore.resetDiagram(); authStore.logout(); };

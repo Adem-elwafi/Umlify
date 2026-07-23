@@ -28,18 +28,20 @@
       <textarea 
         ref="labelInput"
         v-model="localLabel" 
-        @input="updateLabel"
+        @input="onInput"
         @mousedown.stop
         @dblclick="enableEditing"
         @blur="disableEditing"
         :readonly="!isEditing"
-        rows="2"
+        rows="1"
         autocomplete="off"
+        draggable="false"
+        @dragstart.prevent
         :class="[
-          'text-zinc-700 dark:text-zinc-300 text-xs mt-2 font-medium px-2 py-1 rounded-lg text-center w-full outline-none resize-none whitespace-normal text-wrap break-words min-h-9 transition-all duration-200',
+          'text-zinc-700 dark:text-zinc-300 text-xs mt-2 font-medium px-2 py-1 rounded-lg text-center w-full outline-none resize-none overflow-hidden whitespace-normal text-wrap break-words min-h-9 transition-all duration-200',
           isEditing 
             ? 'bg-bg-surface border border-border-default ring-2 ring-interactive-accent/35' 
-            : 'bg-transparent border border-transparent cursor-pointer'
+            : 'bg-transparent border border-transparent cursor-pointer select-none'
         ]"
       ></textarea>
     </div>
@@ -68,7 +70,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, nextTick } from 'vue'
 
 const props = defineProps({
   label: String,
@@ -80,7 +82,7 @@ const props = defineProps({
   onResize: Function,
   selected: { type: Boolean, default: false }
 })
-const emit = defineEmits(['click', 'update:label', 'delete', 'resize-start'])
+const emit = defineEmits(['click', 'update:label', 'update:height', 'delete', 'resize-start'])
 
 const localLabel = ref(props.label || 'Actor')
 const isEditing = ref(false)
@@ -97,8 +99,33 @@ function disableEditing() {
   isEditing.value = false
 }
 
+function autoResize() {
+  const ta = labelInput.value
+  if (!ta) return
+  ta.style.height = 'auto'
+  const newHeight = ta.scrollHeight
+  ta.style.height = newHeight + 'px'
+  const taHeight = newHeight + 16
+  if (taHeight > props.height) {
+    emit('update:height', Math.max(props.height, taHeight))
+  }
+}
+
+function onInput() {
+  updateLabel()
+  autoResize()
+}
+
 watch(() => props.label, (newLabel) => {
   localLabel.value = newLabel
+})
+
+watch(localLabel, () => {
+  autoResize()
+})
+
+onMounted(() => {
+  nextTick(autoResize)
 })
 
 function updateLabel() {

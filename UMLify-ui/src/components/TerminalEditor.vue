@@ -680,7 +680,11 @@ const applyPayload = (payload, mode = 'semantic') => {
       Array.isArray(payload.connections)
 
     if (isSemantic) {
-      const { elements, connections } = layoutUseCaseDiagram(payload)
+      // CRITICAL FIX: Legacy mode also needs referential integrity validation.
+      // Even user-entered JSON can have dangling connections that produce visual bugs.
+      // Validate before layout to ensure all connection endpoints exist.
+      const validated = validateSemanticPayload(payload)
+      const { elements, connections } = layoutUseCaseDiagram(validated)
       hydrateStore(elements, connections)
     } else {
       const elements = (payload && Array.isArray(payload.elements)) ? payload.elements : []
@@ -699,6 +703,8 @@ const applyPayload = (payload, mode = 'semantic') => {
 // Strict validation of the AI semantic payload. Throws on any deviation
 // from the agreed contract (the LLM must NOT emit x/y/width/height or
 // fromSide/toSide, and must provide the expected arrays/strings).
+// CRITICAL: Also validates referential integrity — all connection endpoints
+// must reference real ids in actors/system/useCases.
 const validateSemanticPayload = (payload) => {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
     throw new Error("AI response is not the expected semantic Use Case payload object.")
@@ -717,20 +723,39 @@ const validateSemanticPayload = (payload) => {
     throw new Error("AI response contains coordinates/raw element shapes. The model ignored the semantic-only system prompt.")
   }
   const validTypes = ['association', 'include', 'extend', 'generalization', 'dependency']
-  const knownIds = new Set([
-    ...payload.actors.map((a) => a?.id),
-    payload.system.id,
-    ...payload.useCases.map((u) => u?.id)
-  ].filter((id) => typeof id === 'string'))
-  payload.connections.forEach((conn) => {
-    if (!conn || typeof conn.from !== 'string' || typeof conn.to !== 'string' || typeof conn.type !== 'string') {
-      throw new Error("AI response has a malformed connection (requires from/to/type strings).")
+  
+  // Build set of known ids. Filter out any non-string ids to ensure exact matching.
+  const actorIds = payload.actors
+    .filter((a) => a && typeof a === 'object')
+    .map((a) => a.id)
+    .filter((id) => typeof id === 'string')
+  
+  const useCaseIds = payload.useCases
+    .filter((u) => u && typeof u === 'object')
+    .map((u) => u.id)
+    .filter((id) => typeof id === 'string')
+  
+  const systemId = (typeof payload.system.id === 'string') ? payload.system.id : null
+  
+  const knownIds = new Set([...actorIds, systemId, ...useCaseIds].filter((id) => id !== null))
+  
+  // Validate each connection
+  payload.connections.forEach((conn, connIndex) => {
+    if (!conn || typeof conn !== 'object') {
+      throw new Error(`Connection at index ${connIndex} is not a valid object.`)
+    }
+    if (typeof conn.from !== 'string' || typeof conn.to !== 'string' || typeof conn.type !== 'string') {
+      throw new Error(`Connection at index ${connIndex} has missing or invalid from/to/type strings (got from=${typeof conn.from}, to=${typeof conn.to}, type=${typeof conn.type}).`)
     }
     if (!validTypes.includes(conn.type)) {
-      throw new Error(`AI response has a connection with an invalid type '${conn.type}'. Allowed: ${validTypes.join('|')}.`)
+      throw new Error(`Connection at index ${connIndex} has invalid type '${conn.type}'. Allowed: ${validTypes.join('|')}.`)
     }
-    if (!knownIds.has(conn.from) || !knownIds.has(conn.to)) {
-      throw new Error(`AI response references an unknown element id in a connection ('${conn.from}' -> '${conn.to}'). All connection endpoints must reference a defined actor/system/useCase id.`)
+    // CRITICAL: Referential integrity check. Every connection endpoint must reference a real element.
+    if (!knownIds.has(conn.from)) {
+      throw new Error(`Connection at index ${connIndex} references unknown 'from' id: '${conn.from}'. Defined ids are: ${Array.from(knownIds).join(', ')}.`)
+    }
+    if (!knownIds.has(conn.to)) {
+      throw new Error(`Connection at index ${connIndex} references unknown 'to' id: '${conn.to}'. Defined ids are: ${Array.from(knownIds).join(', ')}.`)
     }
   })
   return payload

@@ -74,6 +74,7 @@
             :selected="selectedElements.includes(String(element.id))"
             @click="selectElement(element.id, $event)"
             @update:label="(newLabel) => updateLabel(element.id, newLabel)"
+            @update:height="(newHeight) => updateSize(element.id, element.width || 80, newHeight)"
             @delete="deleteElement(element.id)"
             @resize-start="initiateResize($event, element)"
           />

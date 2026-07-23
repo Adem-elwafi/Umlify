@@ -108,7 +108,7 @@ const handleSignup = async () => {
   isLoading.value = false
   
   if (success) {
-    router.push('/')
+    router.push('/workspace')
   }
 }
 </script>

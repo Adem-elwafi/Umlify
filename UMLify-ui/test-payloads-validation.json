@@ -1,0 +1,106 @@
+{
+  "description": "Test payloads for referential integrity validation fix",
+  "test_cases": [
+    {
+      "name": "VALID: Library System - All refs match",
+      "payload": {
+        "actors": [
+          {"id": "librarian", "label": "Librarian"},
+          {"id": "member", "label": "Member"},
+          {"id": "admin", "label": "Admin"}
+        ],
+        "system": {"id": "lib_system", "label": "Library System"},
+        "useCases": [
+          {"id": "manage_books", "label": "Manage Books"},
+          {"id": "register_member", "label": "Register Member"},
+          {"id": "view_account", "label": "View Account"},
+          {"id": "borrow_books", "label": "Borrow Books"},
+          {"id": "return_books", "label": "Return Books"},
+          {"id": "search_catalog", "label": "Search Catalog"}
+        ],
+        "connections": [
+          {"from": "librarian", "to": "manage_books", "type": "association"},
+          {"from": "member", "to": "register_member", "type": "association"},
+          {"from": "member", "to": "view_account", "type": "association"},
+          {"from": "member", "to": "borrow_books", "type": "association"},
+          {"from": "member", "to": "return_books", "type": "association"},
+          {"from": "member", "to": "search_catalog", "type": "association"},
+          {"from": "admin", "to": "manage_books", "type": "dependency"},
+          {"from": "borrow_books", "to": "search_catalog", "type": "include"}
+        ]
+      },
+      "expected_result": "SUCCESS - All connections reference existing actors/useCases"
+    },
+    {
+      "name": "INVALID: Dangling from reference (WOULD CAUSE BUG)",
+      "payload": {
+        "actors": [
+          {"id": "librarian", "label": "Librarian"}
+        ],
+        "system": {"id": "lib_system", "label": "Library System"},
+        "useCases": [
+          {"id": "manage_books", "label": "Manage Books"}
+        ],
+        "connections": [
+          {"from": "librarian", "to": "manage_books", "type": "association"},
+          {"from": "unknown_actor", "to": "manage_books", "type": "dependency"}
+        ]
+      },
+      "expected_result": "ERROR: Connection references unknown 'from' id: 'unknown_actor' (This connection would have created orphaned circles or escaped paths)"
+    },
+    {
+      "name": "INVALID: Dangling to reference (WOULD CAUSE BUG)",
+      "payload": {
+        "actors": [
+          {"id": "patient", "label": "Patient"}
+        ],
+        "system": {"id": "hospital", "label": "Hospital System"},
+        "useCases": [
+          {"id": "schedule_appt", "label": "Schedule Appointment"}
+        ],
+        "connections": [
+          {"from": "patient", "to": "schedule_appt", "type": "association"},
+          {"from": "patient", "to": "perform_surgery", "type": "association"}
+        ]
+      },
+      "expected_result": "ERROR: Connection references unknown 'to' id: 'perform_surgery' (This connection would have created a floating circle if the id was typo'd)"
+    },
+    {
+      "name": "VALID: Hospital System - Corrected",
+      "payload": {
+        "actors": [
+          {"id": "patient", "label": "Patient"},
+          {"id": "doctor", "label": "Doctor"},
+          {"id": "nurse", "label": "Nurse"},
+          {"id": "admin", "label": "Administrator"}
+        ],
+        "system": {"id": "hospital", "label": "Hospital System"},
+        "useCases": [
+          {"id": "schedule_appt", "label": "Schedule Appointment"},
+          {"id": "register_patient", "label": "Register Patient"},
+          {"id": "admit_patient", "label": "Admit Patient"},
+          {"id": "manage_records", "label": "Manage Patient Records"},
+          {"id": "perform_surgery", "label": "Perform Surgery"},
+          {"id": "view_history", "label": "View Patient History"},
+          {"id": "prescribe_med", "label": "Prescribe Medication"},
+          {"id": "dispense_med", "label": "Dispense Medication"},
+          {"id": "generate_bill", "label": "Generate Bill"}
+        ],
+        "connections": [
+          {"from": "patient", "to": "schedule_appt", "type": "association"},
+          {"from": "patient", "to": "register_patient", "type": "association"},
+          {"from": "doctor", "to": "admit_patient", "type": "association"},
+          {"from": "doctor", "to": "manage_records", "type": "association"},
+          {"from": "doctor", "to": "perform_surgery", "type": "association"},
+          {"from": "doctor", "to": "view_history", "type": "association"},
+          {"from": "doctor", "to": "prescribe_med", "type": "association"},
+          {"from": "nurse", "to": "dispense_med", "type": "association"},
+          {"from": "admin", "to": "generate_bill", "type": "association"},
+          {"from": "admit_patient", "to": "manage_records", "type": "include"}
+        ]
+      },
+      "expected_result": "SUCCESS - All 10 connections reference existing actors/useCases"
+    }
+  ],
+  "notes": "These test cases verify that the referential integrity validation catches dangling connections that would have previously produced: (1) orphaned floating circles when endpoint id doesn't resolve, (2) escaped connector paths going outside system boundaries with incorrect 0,0 fallback coordinates"
+}
