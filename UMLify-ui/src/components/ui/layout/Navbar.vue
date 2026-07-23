@@ -122,7 +122,6 @@ import { useRoute } from 'vue-router'
 import Container from './Container.vue'
 import Button from '../Button.vue'
 
-const router = useRouter()
 const route = useRoute()
 const isMobileMenuOpen = ref(false)
 const isScrolled = ref(false)
