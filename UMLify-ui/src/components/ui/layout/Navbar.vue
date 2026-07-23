@@ -51,9 +51,9 @@
 
         <!-- Right: Desktop Actions -->
         <div class="hidden md:flex items-center gap-sm">
-          <router-link to="/login" class="font-sans text-sm font-medium text-text-secondary hover:text-text-primary transition-colors px-xs py-xxs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-accent rounded">
+          <button @click="goToLogin" class="font-sans text-sm font-medium text-text-secondary hover:text-text-primary transition-colors px-xs py-xxs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-accent rounded cursor-pointer">
             Login
-          </router-link>
+          </button>
           <Button variant="primary" size="sm" @click="launchWorkspace">
             Launch Editor
           </Button>
@@ -99,13 +99,12 @@
             
             <!-- Actions -->
             <div class="flex flex-col gap-xs pt-xs pb-sm">
-              <router-link
-                to="/login"
-                @click="closeMobileMenu"
-                class="font-sans text-center text-sm font-medium text-text-secondary hover:text-text-primary py-sm border border-border-default rounded-interactive transition-colors hover:bg-bg-surface"
+              <button
+                @click="goToLogin"
+                class="w-full font-sans text-center text-sm font-medium text-text-secondary hover:text-text-primary py-sm border border-border-default rounded-interactive transition-colors hover:bg-bg-surface cursor-pointer"
               >
                 Login
-              </router-link>
+              </button>
               <Button variant="primary" full @click="launchWorkspaceMobile">
                 Launch Editor
               </Button>
@@ -118,12 +117,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 import Container from './Container.vue'
 import Button from '../Button.vue'
-
-import { onMounted, onUnmounted } from 'vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -196,12 +193,12 @@ const closeMobileMenu = () => {
   isMobileMenuOpen.value = false
 }
 
-const launchWorkspace = async () => {
-  try {
-    await router.push('/workspace')
-  } catch {
-    window.location.href = '/workspace'
-  }
+const goToLogin = () => {
+  window.location.href = '/login'
+}
+
+const launchWorkspace = () => {
+  window.location.href = '/workspace'
 }
 
 const launchWorkspaceMobile = () => {
