@@ -62,4 +62,16 @@ import TrustSection from '../components/ui/TrustSection.vue'
 import PricingSection from '../components/ui/PricingSection.vue'
 import FinalCTASection from '../components/ui/FinalCTASection.vue'
 import FooterSection from '../components/ui/FooterSection.vue'
+import { onUnmounted } from 'vue'
+
+const savedTheme = localStorage.getItem('theme')
+const hadDark = document.documentElement.classList.contains('dark')
+
+document.documentElement.classList.add('dark')
+
+onUnmounted(() => {
+  if (!hadDark) {
+    document.documentElement.classList.remove('dark')
+  }
+})
 </script>

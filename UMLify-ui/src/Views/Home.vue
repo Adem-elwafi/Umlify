@@ -474,7 +474,7 @@ import {
 const diagramStore = useDiagramStore();
 const authStore = useAuthStore();
 
-const isTerminalOpen = ref(true);
+const isTerminalOpen = ref(false);
 const isSidebarDrawerOpen = ref(true);
 const activeSidebarTab = ref('tools');
 const swipedRowId = ref(null);

@@ -4,13 +4,16 @@ import App from './App.vue';
 import router from './router';
 import './style.css'; 
 
-// Programmatically lock dark mode as the default framework profile
-// document.documentElement.classList.add('dark');
-
 const app = createApp(App);
 const pinia = createPinia();
 
 app.use(pinia);   
+
+// Initialize auth store before router so the guard has the correct auth state
+// on the very first navigation (avoids stale isAuthenticated check).
+import { useAuthStore } from './stores/authStore';
+useAuthStore();
+
 app.use(router);  
 
 app.mount('#app');
